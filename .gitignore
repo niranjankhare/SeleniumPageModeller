@@ -27,7 +27,7 @@ hs_err_pid*
 .classpath
 .project
 .settings
-/bin/
+bin/
 ### Gradle ###
 .gradle
 /build/
@@ -39,3 +39,6 @@ gradle-app.setting
 
 # Cache of project
 .gradletasknamecache
+
+# ignore local application.conf for check-in (See typesafe)
+application.conf
