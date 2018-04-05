@@ -57,6 +57,11 @@ public class Propsview extends TableImpl<PropsviewRecord> {
     public final TableField<PropsviewRecord, Integer> GUIMAPID = createField("GUIMAPID", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.inline("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
+     * The column <code>automation.PROPSVIEW.MAPPEDCLASS</code>.
+     */
+    public final TableField<PropsviewRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
+
+    /**
      * The column <code>automation.PROPSVIEW.CONTROLNAME</code>.
      */
     public final TableField<PropsviewRecord, String> CONTROLNAME = createField("CONTROLNAME", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");

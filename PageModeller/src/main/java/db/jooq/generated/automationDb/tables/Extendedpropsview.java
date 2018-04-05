@@ -47,6 +47,11 @@ public class Extendedpropsview extends TableImpl<ExtendedpropsviewRecord> {
     }
 
     /**
+     * The column <code>automation.EXTENDEDPROPSVIEW.GUIMAPID</code>.
+     */
+    public final TableField<ExtendedpropsviewRecord, Integer> GUIMAPID = createField("GUIMAPID", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
      * The column <code>automation.EXTENDEDPROPSVIEW.EXPROP1</code>.
      */
     public final TableField<ExtendedpropsviewRecord, String> EXPROP1 = createField("EXPROP1", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");

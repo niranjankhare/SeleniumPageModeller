@@ -24,6 +24,7 @@ ext {
 	codeModelVersion = '2.3.0'
 	h2databaseVersion = '1.4.196'
 	mysqlDriverVersion = '5.1.6'
+	tomcatJdbcVersion = '8.5.23'
 }
 buildscript {
     repositories {
@@ -63,6 +64,9 @@ dependencies {
    // https://mvnrepository.com/artifact/com.h2database/h2
    testCompile group: 'com.h2database', name: 'h2', version: "$h2databaseVersion"
    compile group: 'mysql', name: 'mysql-connector-java', version: "$mysqlDriverVersion"
+   // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-jdbc
+   compile group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: "$tomcatJdbcVersion"
+   
    compile group: 'com.google.code.gson', name: 'gson', version: '2.6.2' 
 }
 
