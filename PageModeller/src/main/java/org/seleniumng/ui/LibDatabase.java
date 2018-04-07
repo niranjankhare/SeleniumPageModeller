@@ -28,6 +28,7 @@ import org.jooq.DataType;
 import org.jooq.Field;
 import org.jooq.InsertValuesStepN;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Record3;
 import org.jooq.Result;
@@ -208,15 +209,15 @@ public class LibDatabase {
 				propertiesValues.add(locatorType);
 
 				if (propertiesFields.size() > 0) {
-				UpdateSetMoreStep<PropertiesRecord> updateProperties = (UpdateSetMoreStep<PropertiesRecord>) getTableUpdateStatement(
-						PROPERTIES, propertiesFields, propertiesValues);
-				updateProperties.where(PROPERTIES.GUIMAPID.eq(currentGuiMapId)).execute();
+					UpdateSetMoreStep<PropertiesRecord> updateProperties = (UpdateSetMoreStep<PropertiesRecord>) getTableUpdateStatement(
+							PROPERTIES, propertiesFields, propertiesValues);
+					updateProperties.where(PROPERTIES.GUIMAPID.eq(currentGuiMapId)).execute();
 				}
 				if (expropertiesFields.size() > 0) {
 
-				UpdateSetMoreStep<ExtendedpropsRecord> updateExtendedProperties = (UpdateSetMoreStep<ExtendedpropsRecord>) getTableUpdateStatement(
-						EXTENDEDPROPS, expropertiesFields, expropertiesValues);
-				updateExtendedProperties.where(EXTENDEDPROPS.GUIMAPID.eq(currentGuiMapId)).execute();
+					UpdateSetMoreStep<ExtendedpropsRecord> updateExtendedProperties = (UpdateSetMoreStep<ExtendedpropsRecord>) getTableUpdateStatement(
+							EXTENDEDPROPS, expropertiesFields, expropertiesValues);
+					updateExtendedProperties.where(EXTENDEDPROPS.GUIMAPID.eq(currentGuiMapId)).execute();
 				}
 			}
 
@@ -292,7 +293,7 @@ public class LibDatabase {
 		returnList.add(fields);
 
 		for (Record r : result) {
-			List<Object>	values1 = new ArrayList<Object>();
+			List<Object> values1 = new ArrayList<Object>();
 			for (Field<?> f : r.fields()) {
 				values1.add(r.get(f));
 			}
@@ -319,7 +320,7 @@ public class LibDatabase {
 			for (Field<?> f : r.fields()) {
 				values.add(r.get(f));
 			}
-		returnList.add(values);
+			returnList.add(values);
 
 		}
 
@@ -342,8 +343,8 @@ public class LibDatabase {
 	public static UpdateSetMoreStep<?> getTableUpdateStatement(TableImpl<?> table, List<TableField<?, ?>> tableFields,
 			List<Object> values) {
 
-		UpdateSetMoreStep<?> updateStatement = (UpdateSetMoreStep<?>) DbManager.getOpenContext().update(table);//.set(f,
-//				DSL.cast(values.get(0), t));
+		UpdateSetMoreStep<?> updateStatement = (UpdateSetMoreStep<?>) DbManager.getOpenContext().update(table);// .set(f,
+		// DSL.cast(values.get(0), t));
 		for (Integer i = 0; i < tableFields.size(); i++) {
 			Field<?> f = table.field(tableFields.get(i));
 			;
@@ -351,6 +352,27 @@ public class LibDatabase {
 			updateStatement = updateStatement.set(f, DSL.cast(values.get(i), t));
 		}
 		return updateStatement;
+	}
+
+	public static LinkedHashMap<String, LinkedHashMap<String, String>> getPageData(String webPage) {
+		LinkedHashMap<String, LinkedHashMap<String, String>> pageData = new LinkedHashMap<String, LinkedHashMap<String, String>>();
+
+		SelectConditionStep<Record3<String, String, String>> selectStatement = DbManager.getOpenContext()
+				.select(PROPSVIEW.CONTROLNAME, PROPSVIEW.MAPPEDCLASS, PROPSVIEW.STANDARDCLASS).from(PROPSVIEW)
+				.where(PROPSVIEW.PAGENAME.equal(webPage));
+
+		for (Record r : selectStatement.fetch()) {
+			LinkedHashMap<String, String> classmap = new LinkedHashMap<String, String>();
+			classmap.put("abrv", r.get(PROPSVIEW.STANDARDCLASS));
+			classmap.put("class", r.get(PROPSVIEW.MAPPEDCLASS));
+			pageData.put(r.get(PROPSVIEW.CONTROLNAME), classmap);
+		}
+		return pageData;
+	}
+
+	public static String getClassAbrv(String string) {
+		Record1<String> r = DbManager.getOpenContext().select(TYPES.ABRV).from(TYPES).where(TYPES.CLASS.equal(string)).fetchOne();
+		return r.get(TYPES.ABRV);
 	}
 
 }

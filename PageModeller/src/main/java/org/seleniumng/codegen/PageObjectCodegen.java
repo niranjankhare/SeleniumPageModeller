@@ -18,6 +18,7 @@ package org.seleniumng.codegen;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.jar.JarException;
 
 import com.sun.codemodel.JClass;
@@ -31,12 +32,17 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 
-import java.util.Arrays;
+import static org.seleniumng.utils.TAFConfig.*;
 
-import org.seleniumng.controls.TextField;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+
+import org.seleniumng.controls.*;
+import org.seleniumng.ui.LibDatabase;
 
 public class PageObjectCodegen {
-
+	private static JCodeModel codeModel = new JCodeModel();
 	public static void main(String... args) {
 
 		try {
@@ -50,22 +56,24 @@ public class PageObjectCodegen {
 
 	public static void generateSource() throws JClassAlreadyExistsException, IOException {
 		// Instantiate an instance of the JCodeModel class
-		String pagePackage = "heimdallSaaS.webPages";
-
-		JCodeModel codeModel = new JCodeModel();
+		String myApplication = tafConfig.getString("application");
+		String pagePackage = myApplication + ".webPages";
+		
 		JDefinedClass repositoryToCreate = codeModel._class(pagePackage + ".PageRepository");
 		List<String> webPages = fetchPageList();
 		for (String webPage : webPages) {
-			JDefinedClass pageClassToCreate = codeModel._class(pagePackage + ".Page" + webPage);
-			JClass jc = codeModel.ref(TextField.class);
+			JDefinedClass pageClassToCreate = func(pagePackage, webPage);
+			// JClass jc = codeModel.ref(TextField.class);
+			//
+			// // Creating fields in the class
+			//
+			// JFieldVar field1 = pageClassToCreate.field(JMod.PRIVATE, jc,
+			// "foo", JExpr._null());
 
-			// Creating fields in the class
-
-			JFieldVar field1 = pageClassToCreate.field(JMod.PRIVATE, jc, "foo", JExpr._null());
-
-			repositoryToCreate.field(JMod.PUBLIC, pageClassToCreate, "pageLogin");
+			repositoryToCreate.field(JMod.PUBLIC, pageClassToCreate, "page" + webPage);
 
 		}
+		// again
 
 		// JDefinedClass will let you create a class in a specified package.
 
@@ -122,7 +130,31 @@ public class PageObjectCodegen {
 	}
 
 	private static List<String> fetchPageList() {
-		// TODO Auto-generated method stub
-		return Arrays.asList("Login");
+		Set<String> set = LibDatabase.getAvailablePages().keySet();
+		List<String> pages = new ArrayList<String>();
+		for (String page : set) {
+			pages.add(page);
+		}
+		return pages;
+	}
+
+	private static JDefinedClass func(String pPackage, String webPage) throws IOException {
+		
+		JDefinedClass retClass = null;
+		try {
+			retClass = codeModel._class(pPackage + ".Page" + webPage);
+		} catch (Exception e) {
+
+		}
+		LinkedHashMap<String, LinkedHashMap<String, String>> data = LibDatabase.getPageData(webPage);
+
+		for (String control : data.keySet()) {
+			String abrv = LibDatabase.getClassAbrv(data.get(control).get("abrv"));
+			String classz = data.get(control).get("class");
+			JClass jc = codeModel.ref("org.seleniumng.controls."+classz);
+			retClass.field(JMod.PRIVATE, jc, abrv+control, JExpr._null());
+		}
+		codeModel.build(new File("src/main/java"));
+		return retClass;
 	}
 }
