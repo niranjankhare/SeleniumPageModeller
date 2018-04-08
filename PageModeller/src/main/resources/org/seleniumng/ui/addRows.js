@@ -363,6 +363,7 @@ function fillPopup_new(p, op){
 	p.appendChild(title);
 	var content = document.createElement('div');
 	content.setAttribute ('id', rowId+'.contentDiv');
+	content.style.visibility='hidden';
 	content.appendChild(document.createTextNode("Extend to class:"));
 	var sel = document.createElement('select');
 	p.appendChild(content);
@@ -491,6 +492,7 @@ function addExtendedPropsTableToPopup(popup, operation){
 	var content = document.getElementById(rowId+'.contentDiv');
 	var tableId = rowId+'.exPropsTable';
 	var exPropsTable = document.createElement('table');
+	var footer = exPropsTable.appendChild(document.createElement('tfoot'));
 	exPropsTable.appendChild(document.createElement('tbody'));
 	exPropsTable.setAttribute("id", tableId);
 	content.appendChild(exPropsTable);
@@ -509,8 +511,6 @@ function addExtendedPropsTableToPopup(popup, operation){
 		labelText = placeholder;
 		labelCell = row.insertCell(-1);
 		cellContent = document.createElement('textarea');
-		
-		
 		valueCell =	row.insertCell(-1); 
 		row.id = rowId+'.POPUP.'+ placeholder;
 		labelCell.innerHTML =labelText;
@@ -520,7 +520,7 @@ function addExtendedPropsTableToPopup(popup, operation){
 		cellContent.placeholder = labelText;
 		valueCell.innerHTML = cellContent.outerHTML;
 	}
-	content.style.visibility='hidden';
+	/*content.style.visibility='hidden';*/
 
 }
 
