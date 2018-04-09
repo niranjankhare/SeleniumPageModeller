@@ -492,7 +492,7 @@ function addExtendedPropsTableToPopup(popup, operation){
 	var content = document.getElementById(rowId+'.contentDiv');
 	var tableId = rowId+'.exPropsTable';
 	var exPropsTable = document.createElement('table');
-	var footer = exPropsTable.appendChild(document.createElement('tfoot'));
+	
 	exPropsTable.appendChild(document.createElement('tbody'));
 	exPropsTable.setAttribute("id", tableId);
 	content.appendChild(exPropsTable);
@@ -521,7 +521,20 @@ function addExtendedPropsTableToPopup(popup, operation){
 		valueCell.innerHTML = cellContent.outerHTML;
 	}
 	/*content.style.visibility='hidden';*/
+	var footer = exPropsTable.appendChild(document.createElement('tfoot'));
+	var footerRow = footer.insertRow(-1);	
+	var btnContainer = footerRow.insertCell(-1);
+	var btnRemoveExtended = document.createElement('button');
+	btnRemoveExtended.type = 'button'; 
+	btnRemoveExtended.setAttribute('rowId',rowId);
+	btnRemoveExtended.text = 'Remove Class Mapping';
+	btnRemoveExtended.setAttribute
+		  ('onclick','removeExtendedProps(this)');
+	btnRemoveExtended.appendChild(document.createTextNode("Remove Mapping"));
+	btnContainer.appendChild(btnRemoveExtended);
 
 }
 
-
+function removeExtendedProps (theRow){
+	console.log ('Remove extended properties for '+ theRow.getAttribute('rowId'));
+}

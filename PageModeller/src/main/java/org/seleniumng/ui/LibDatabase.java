@@ -363,8 +363,8 @@ public class LibDatabase {
 
 		for (Record r : selectStatement.fetch()) {
 			LinkedHashMap<String, String> classmap = new LinkedHashMap<String, String>();
-			classmap.put("abrv", r.get(PROPSVIEW.STANDARDCLASS));
-			classmap.put("class", r.get(PROPSVIEW.MAPPEDCLASS));
+			classmap.put("standardClass", r.get(PROPSVIEW.STANDARDCLASS));
+			classmap.put("customClass", r.get(PROPSVIEW.MAPPEDCLASS));
 			pageData.put(r.get(PROPSVIEW.CONTROLNAME), classmap);
 		}
 		return pageData;

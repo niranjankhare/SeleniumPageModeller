@@ -62,7 +62,7 @@ public class PageObjectCodegen {
 		JDefinedClass repositoryToCreate = codeModel._class(pagePackage + ".PageRepository");
 		List<String> webPages = fetchPageList();
 		for (String webPage : webPages) {
-			JDefinedClass pageClassToCreate = func(pagePackage, webPage);
+			JDefinedClass pageClassToCreate = generatePageObject(pagePackage, webPage);
 			// JClass jc = codeModel.ref(TextField.class);
 			//
 			// // Creating fields in the class
@@ -138,7 +138,7 @@ public class PageObjectCodegen {
 		return pages;
 	}
 
-	private static JDefinedClass func(String pPackage, String webPage) throws IOException {
+	private static JDefinedClass generatePageObject(String pPackage, String webPage) throws IOException {
 		
 		JDefinedClass retClass = null;
 		try {
@@ -149,10 +149,13 @@ public class PageObjectCodegen {
 		LinkedHashMap<String, LinkedHashMap<String, String>> data = LibDatabase.getPageData(webPage);
 
 		for (String control : data.keySet()) {
-			String abrv = LibDatabase.getClassAbrv(data.get(control).get("abrv"));
-			String classz = data.get(control).get("class");
-			JClass jc = codeModel.ref("org.seleniumng.controls."+classz);
-			retClass.field(JMod.PRIVATE, jc, abrv+control, JExpr._null());
+			String stdClass = data.get(control).get("standardClass");
+			String classAbrv = LibDatabase.getClassAbrv(stdClass);
+			String customClass = data.get(control).get("customClass");
+			customClass = (customClass.equals(""))?stdClass:customClass;
+			
+			JClass jc = codeModel.ref("org.seleniumng.controls."+customClass);
+			retClass.field(JMod.PRIVATE, jc, classAbrv+control, JExpr._null());
 		}
 		codeModel.build(new File("src/main/java"));
 		return retClass;
