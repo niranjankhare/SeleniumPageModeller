@@ -5,7 +5,7 @@ use automation;
 create table PAGES (
 `PAGEID` int (10) NOT NULL AUTO_INCREMENT,
 `PAGENAME` VARCHAR (50) UNIQUE, -- SELECT
-`PARENTID` VARCHAR (50), -- SELECT
+`PARENTID` int (10), -- SELECT
 `PAGEDESCRIPTION` VARCHAR (150), -- SELECT
 PRIMARY KEY (`PAGEID`)
 );
@@ -119,6 +119,19 @@ values ('Dashboard', null, 'Dashboard');
 update PAGES set PARENTID=3
 WHERE 
 PAGEID=5;
+
+alter TABLE PAGES
+DROP COLUMN `PARENTID`;
+
+alter TABLE PAGES
+ADD COLUMN `PARENTID` int(10) AFTER `PAGENAME`;
+
+insert into PAGES (`PAGENAME`, `PARENTID`, `PAGEDESCRIPTION`)
+values (
+1,	'Login',	null,	'Login page'),
+(3,	'LeftMenu',	4,	'Left Menu Bar');
+(4,	'TopMenu',	null,	'Top Menu Bar'),
+(5,	'Dashboard',	3,	'Dashboard');
 */
 INSERT INTO PAGES
 SET `pagename` = 'logon',

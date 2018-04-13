@@ -17,6 +17,7 @@ package org.seleniumng.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -32,6 +33,7 @@ import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Record3;
 import org.jooq.Result;
+import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectField;
 import org.jooq.SelectJoinStep;
@@ -370,7 +372,7 @@ public class LibDatabase {
 		return updateStatement;
 	}
 
-	public static LinkedHashMap<String, LinkedHashMap<String, String>> getPageData(String webPage) {
+	public static LinkedHashMap<String, LinkedHashMap<String, String>> getPageGuiMapData(String webPage) {
 		LinkedHashMap<String, LinkedHashMap<String, String>> pageData = new LinkedHashMap<String, LinkedHashMap<String, String>>();
 
 		SelectConditionStep<Record3<String, String, String>> selectStatement = DbManager.getOpenContext()
@@ -389,6 +391,18 @@ public class LibDatabase {
 	public static String getClassAbrv(String string) {
 		Record1<String> r = DbManager.getOpenContext().select(TYPES.ABRV).from(TYPES).where(TYPES.CLASS.equal(string)).fetchOne();
 		return r.get(TYPES.ABRV);
+	}
+
+	public static HashMap <String,String> getPageHeirarchy() {
+		Select<?> selectStatement  = DbManager.getOpenContext().select(PAGES.PAGEID, PAGES.PARENTID).from(PAGES);
+		HashMap<String,String> pageHeirarchy = new HashMap<String,String>();
+		for (Record r : selectStatement.fetch()) {
+			String pageName = DbManager.getOpenContext().select(PAGES.PAGENAME).from(PAGES).where(PAGES.PAGEID.eq(r.get(PAGES.PAGEID))).fetchOne().get(PAGES.PAGENAME);
+			String parentName = DbManager.getOpenContext().select(PAGES.PAGENAME).from(PAGES).where(PAGES.PAGEID.eq(r.get(PAGES.PARENTID))).fetchOne().get(PAGES.PAGENAME);
+			pageHeirarchy.put(pageName, parentName);
+			
+		}
+		return pageHeirarchy;
 	}
 
 }

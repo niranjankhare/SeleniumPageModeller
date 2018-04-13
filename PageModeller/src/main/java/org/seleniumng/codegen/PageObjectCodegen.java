@@ -32,6 +32,7 @@ import com.sun.codemodel.fmt.JTextFile;
 import static org.seleniumng.utils.TAFConfig.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import org.seleniumng.controls.*;
@@ -42,6 +43,7 @@ public class PageObjectCodegen {
 	private static JCodeModel resourceModel = new JCodeModel();
 	private static String sourceDirPath = "src/main/java";
 	private static String resourceDirPath = "src/main/resources";
+	
 	public static void main(String... args) {
 
 		try {
@@ -59,9 +61,9 @@ public class PageObjectCodegen {
 		String pagePackage = myApplication + ".webPages";
 		
 		JDefinedClass repositoryToCreate = codeModel._class(pagePackage + ".PageRepository");
-		List<String> webPages = fetchPageList();
-		for (String webPage : webPages) {
-			JDefinedClass pageClassToCreate = generatePageObject(pagePackage, webPage);
+		HashMap<String, String>  webPages = fetchPageList();
+		for (String webPage : webPages.keySet()) {
+			JDefinedClass pageClassToCreate = generatePageObject(pagePackage, webPage, webPages.get(webPage));
 			repositoryToCreate.field(JMod.PUBLIC, pageClassToCreate, "page" + webPage);
 
 		}
@@ -69,27 +71,26 @@ public class PageObjectCodegen {
 		codeModel.build(new File(sourceDirPath));
 	}
 
-	private static List<String> fetchPageList() {
-		Set<String> set = LibDatabase.getAvailablePages().keySet();
-		List<String> pages = new ArrayList<String>();
-		for (String page : set) {
-			pages.add(page);
-		}
-		return pages;
+	private static HashMap<String, String> fetchPageList() {
+		HashMap<String, String> set = LibDatabase.getPageHeirarchy();
+		return set;
 	}
 
-	private static JDefinedClass generatePageObject(String pPackage, String webPage) throws IOException {
+	private static JDefinedClass generatePageObject(String pPackage, String webPage, String parent) throws IOException {
 		
 		JDefinedClass retClass = null;
+		JDefinedClass parentClass = null;
 		JPackage retResource  = null;
 		try {
 			retClass = codeModel._class(pPackage + ".Page" + webPage);
+			retClass = codeModel._class(pPackage + ".Page" + parent);
+			retClass._extends(parentClass);
 			retResource = resourceModel._package(pPackage+".en");
 
 		} catch (Exception e) {
 
 		}
-		LinkedHashMap<String, LinkedHashMap<String, String>> data = LibDatabase.getPageData(webPage);
+		LinkedHashMap<String, LinkedHashMap<String, String>> data = LibDatabase.getPageGuiMapData(webPage);
 
 		for (String control : data.keySet()) {
 			String stdClass = data.get(control).get("standardClass");

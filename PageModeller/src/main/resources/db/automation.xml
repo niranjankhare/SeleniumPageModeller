@@ -3,9 +3,10 @@
   <!-- Configure the database connection here -->
   <jdbc>
     <driver>org.mariadb.jdbc.Driver</driver>
-    <url>jdbc:mysql://localhost:3306/automation</url>
-    <user>nkh</user>
-    <password>automation</password>
+    <!-- <url>jdbc:mysql://localhost:3306/automation</url> -->
+    <url>__JDBC_URL__</url>
+    <user>__DB_USERNAME__</user>
+    <password>__DB_PASSWORD__</password>
   </jdbc>
 
   <generator>

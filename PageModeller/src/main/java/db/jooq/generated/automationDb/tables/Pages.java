@@ -39,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Pages extends TableImpl<PagesRecord> {
 
-    private static final long serialVersionUID = 1024726007;
+    private static final long serialVersionUID = -327522503;
 
     /**
      * The reference instance of <code>automation.PAGES</code>
@@ -67,7 +67,7 @@ public class Pages extends TableImpl<PagesRecord> {
     /**
      * The column <code>automation.PAGES.PARENTID</code>.
      */
-    public final TableField<PagesRecord, String> PARENTID = createField("PARENTID", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
+    public final TableField<PagesRecord, Integer> PARENTID = createField("PARENTID", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>automation.PAGES.PAGEDESCRIPTION</code>.
