@@ -246,7 +246,18 @@ public class LibDatabase {
 	}
 
 	public static LinkedHashMap getStandardTypes() {
-		return getTypes("STANDARD");
+//		LinkedHashMap oldMap = getTypes("STANDARD");
+		LinkedHashMap<String, String[]> list = new LinkedHashMap<String, String[]>();
+		SelectConditionStep<Record3<String, String, String>> x = DbManager.getOpenContext()
+				.select(TYPES.ABRV, TYPES.CLASS, TYPES.PROPERTYMAP).from(TYPES).where(TYPES.TYPE.eq("STANDARD"));
+		for (Record rec : x.fetch()) {
+			String[] nestedMap = new String[2];
+			nestedMap[0] = rec.get(TYPES.CLASS);
+			nestedMap[1] = rec.get(TYPES.PROPERTYMAP);
+			list.put(rec.get(TYPES.CLASS), nestedMap);
+		}
+		return list;
+		
 	}
 
 	public static LinkedHashMap getCustomTypes() {
@@ -277,7 +288,7 @@ public class LibDatabase {
 
 	}
 
-	public static Object getTableData(String tableName, String pageName) {
+	public static Object getUIPropsView(String tableName, String pageName) {
 		// Connection is the only JDBC resource that we need
 		// PreparedStatement and ResultSet are handled by jOOQ, internally
 		Table<?> table = AUTOMATION.getTable(tableName.toUpperCase());
@@ -288,14 +299,19 @@ public class LibDatabase {
 		Result<?> result = x.fetch();
 		List<Object> fields = new ArrayList<Object>();
 		for (Field<?> f : result.fields()) {
-			fields.add(f.getName());
+			String fName = f.getName();
+			if (!fName.equalsIgnoreCase("MAPPEDCLASS"))
+			fields.add(fName);
+			else 
+				continue;
 		}
+		//fields.remove(fields.indexOf("MAPPEDCLASS"));
 		returnList.add(fields);
-
+		
 		for (Record r : result) {
 			List<Object> values1 = new ArrayList<Object>();
-			for (Field<?> f : r.fields()) {
-				values1.add(r.get(f));
+			for (Object f : fields) {
+				values1.add(r.get((String)f));
 			}
 			returnList.add(values1);
 
@@ -303,10 +319,10 @@ public class LibDatabase {
 		return returnList;
 	}
 
-	public static Object getPageExtendedProperties(String tableName, Integer gId) {
-		Table<?> table = AUTOMATION.getTable(tableName.toUpperCase());
+	public static Object getPageExtendedProperties(Integer gId) {
+//		Table<?> table = AUTOMATION.getTable(tableName.toUpperCase());
 		Collection<Condition> conditions = new ArrayList<Condition>();
-		SelectConditionStep<?> x = DbManager.getOpenContext().selectFrom(table)
+		SelectConditionStep<?> x = DbManager.getOpenContext().selectFrom(EXTENDEDPROPSVIEW)
 				.where(EXTENDEDPROPSVIEW.GUIMAPID.equal(gId));
 		List<Object> returnList = new ArrayList<Object>();
 		Result<?> result = x.fetch();
@@ -327,7 +343,7 @@ public class LibDatabase {
 		return returnList;
 	}
 
-	public static Object getExtendedProptypes(String tableName, String pageName) {
+	public static Object getExtendedProptypes(String tableName) {
 		LinkedHashMap<String, String[]> list = new LinkedHashMap<String, String[]>();
 		SelectConditionStep<Record3<String, String, String>> x = DbManager.getOpenContext()
 				.select(TYPES.ABRV, TYPES.CLASS, TYPES.PROPERTYMAP).from(TYPES).where(TYPES.HASEXTENDEDPROPS.isTrue());

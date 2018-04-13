@@ -83,8 +83,13 @@ function add_UpdateRow(){
 	var elTable = document.getElementById(tname);
 	
 	var respFields = Promise.resolve(getTableData(tname, pageName));
+	var stdClasses = Promise.resolve(getData('/fetch/libdatabase/getstandardypes'));
 	var oper = document.getElementById('oper').value;
-	respFields.then(function (tableData){
+	Promise.all([respFields,stdClasses]).then(function (allData){
+	var tableData = allData[0];
+	var stdClassesData = allData[1];
+		console.log (tableData);
+		console.log (tableData[0]);
 		var headerRow = document.getElementById('headerRow');
 		var dbColumns = tableData[0];
 		var indexToHide = dbColumns.indexOf('CONTROLNAME');
@@ -107,14 +112,21 @@ function add_UpdateRow(){
 				for (var r=0; r<rowData.length; r++){
 					var rowId = rowIdmain + '.' + dbColumns[r];
 					var cell = row.insertCell(-1);
-					var hiddenInput = document.createElement('input');
+					var inputElement ;
+					if (r != selectIndex){
+						inputElement = document.createElement('input');
+					} else{
+						inputElement = document.createElement('select');
+						getSelectControlt(stdClassesData, inputElement);
+					} 
+						
 					if (r< indexToHide){
 						cell.setAttribute ('style', 'display:none;');
 					} 
-					hiddenInput.setAttribute ('name', rowId);
-					hiddenInput.id = hiddenInput.name;
-					hiddenInput.value = rowData[r];
-					cell.appendChild(hiddenInput);
+					inputElement.setAttribute ('name', rowId);
+					inputElement.id = inputElement.name;
+					inputElement.value = rowData[r];
+					cell.appendChild(inputElement);
 				}
 				var popupBtn = document.createElement('button'); 
 				popupBtn.type = 'button'; 
@@ -166,8 +178,8 @@ function getTableData(tname,pname){
 	return r;
 }
 
-function getExtendedPageGuiData(tname,guiId){
-	r = Promise.resolve(getData('/fetch/libdatabase/pageguiextendedprops?tableName='+tname+"&guiId="+ guiId)); 
+function getExtendedPageGuiData(guiId){
+	r = Promise.resolve(getData('/fetch/libdatabase/pageguiextendedprops?guiId='+guiId)); 
 	return r;
 }
 
@@ -316,7 +328,8 @@ function addRowToPopup(popup,rowContent){
 	
 }
 
-function refreshPopup (popup, val){
+function refreshPopup (popup, e){
+	var val = e.value;
 	var keys = JSON.parse(propertyMap[val][1]);
 	var rowId= popup.getAttribute('rowId');
 	
@@ -324,7 +337,7 @@ function refreshPopup (popup, val){
 		var placeholder = 'EXPROP'+(i+1);
 		var currentRow = document.getElementById(rowId+'.POPUP.'+ placeholder);
 		
-		if (keys[placeholder] == null){
+		if (keys == null || keys[placeholder] == null){
 			currentRow.disabled=true;
 			currentRow.style.visibility = 'hidden';
 			currentRow.style.display = 'none';
@@ -364,17 +377,18 @@ function fillPopup_new(p, op){
 	var content = document.createElement('div');
 	content.setAttribute ('id', rowId+'.contentDiv');
 	content.style.visibility='hidden';
+	content.style.display='none';
 	content.appendChild(document.createTextNode("Extend to class:"));
 	var sel = document.createElement('select');
 	p.appendChild(content);
 	sel.name = rowId + '.MAPPEDCLASS';
 	sel.setAttribute('rowId',rowId);
-	sel.setAttribute ('onchange','refreshPopup(document.getElementById("'+p.id +'"), this.value)');
+	sel.setAttribute ('onchange','refreshPopup(document.getElementById("'+p.id +'"), this)');
 	content.appendChild(sel);
 	
 	
 	var guimapId = document.getElementById(rowId+ '.GUIMAPID').value;
-	var tableName = 'EXTENDEDPROPSVIEW';
+	
 	var pageName = document.getElementById('pageName').value;
 	
 	Promise.resolve(getData('/fetch/libdatabase/getextendedproptypes'))
@@ -388,21 +402,24 @@ function fillPopup_new(p, op){
 		p.appendChild(content);
 		
 		if (op==='update'){
-			Promise.resolve(getExtendedPageGuiData(tableName, guimapId))
+			Promise.resolve(getExtendedPageGuiData(guimapId))
 			 .then(function(resp){
-				console.log (resp);
-				var mapClass = document.getElementById(rowId+'.MAPPEDCLASS').value;
-				sel.value = mapClass;
-				refreshPopup (p,sel.value);
-				var keys = JSON.parse(propertyMap[mapClass][1]);
 				var flds = resp[0];
 				var vals = resp[1];
+				var mapClass = vals[flds.indexOf('MAPPEDCLASS')];
+				
+				console.log (resp);
+				sel.value = mapClass;
+				refreshPopup (p,sel);
+				var keys = JSON.parse(propertyMap[mapClass][1]);
+				
 				for (var key in keys){
 					console.log(key);
 					var valueCell = document.getElementById(rowId + '.' + key);
 					valueCell.value = vals[flds.indexOf(key)];
 				}
 				content.style.visibility='inherit';
+				content.style.display='inline';
 			})
 			.catch (function(error){
 				
@@ -411,8 +428,9 @@ function fillPopup_new(p, op){
 			}
 		else {
 			
-			refreshPopup (p,sel.value);
+			refreshPopup (p,sel);
 			content.style.visibility='inherit';
+			content.style.display='inline';
 		}
 		
 		
@@ -520,10 +538,11 @@ function addExtendedPropsTableToPopup(popup, operation){
 		cellContent.placeholder = labelText;
 		valueCell.innerHTML = cellContent.outerHTML;
 	}
-	/*content.style.visibility='hidden';*/
+	
 	var footer = exPropsTable.appendChild(document.createElement('tfoot'));
 	var footerRow = footer.insertRow(-1);	
 	var btnContainer = footerRow.insertCell(-1);
+	/*
 	var btnRemoveExtended = document.createElement('button');
 	btnRemoveExtended.type = 'button'; 
 	btnRemoveExtended.setAttribute('rowId',rowId);
@@ -532,7 +551,7 @@ function addExtendedPropsTableToPopup(popup, operation){
 		  ('onclick','removeExtendedProps(this)');
 	btnRemoveExtended.appendChild(document.createTextNode("Remove Mapping"));
 	btnContainer.appendChild(btnRemoveExtended);
-
+    */
 }
 
 function removeExtendedProps (theRow){

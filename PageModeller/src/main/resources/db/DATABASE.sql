@@ -29,7 +29,7 @@ create table PROPERTIES (
 `PROPERTYID` int (10) NOT NULL AUTO_INCREMENT,
 `GUIMAPID` int (10) NOT NULL, 
 `STANDARDCLASS`  VARCHAR (50), -- same as element type from guimap
-`MAPPEDCLASS`  VARCHAR (50), 
+`MAPPEDCLASS`  VARCHAR (50) DEFAULT '(No Maping)', 
 `LOCATORVALUE` VARCHAR  (100) NOT NULL, -- Select
 `LOCATORTYPE` VARCHAR (10) NOT NULL, -- Calculate based on value (xpath or id?)
 PRIMARY KEY (`PROPERTYID`),
@@ -50,10 +50,11 @@ PRIMARY KEY (`CLASSID`)
 );
 
 insert into TYPES (`CLASS`, `TYPE`, `ABRV`,`HASEXTENDEDPROPS`,`PROPERTYMAP`)
-values  ('Button','STANDARD','btn',null, null),
+values  ('(No Maping)','CUSTOM','del',true, null),
+('Button','STANDARD','btn',null, null),
 ('InputText','STANDARD','iTxt',null, null),
 ('Select','STANDARD','sel',true,'{"EXPROP1":"options"}'),
-('EmberSelect','CUSTOM','emSel',true, '{"EXPROP1":"options","EXPROP2":"showControlId"}');
+('ComplexSelect','CUSTOM','emSel',true, '{"EXPROP1":"options","EXPROP2":"showControlId"}');
 
 create table EXTENDEDPROPS (
 `EXPROPID` int (10) NOT NULL AUTO_INCREMENT,
@@ -88,16 +89,13 @@ g.PAGEID = p.PAGEID;
 
 CREATE VIEW automation.EXTENDEDPROPSVIEW AS
 SELECT  
-c.GUIMAPID, c.EXPROP1, c.EXPROP2, c.EXPROP3, c.EXPROP4, c.EXPROP5,
+c.GUIMAPID, p.MAPPEDCLASS, c.EXPROP1, c.EXPROP2, c.EXPROP3, c.EXPROP4, c.EXPROP5,
 c.EXPROP6, c.EXPROP7, c.EXPROP8, c.EXPROP9
 FROM
-automation.EXTENDEDPROPS c;
+automation.EXTENDEDPROPS c 
+INNER JOIN automation.PROPERTIES p 
+ON c.GUIMAPID=p.GUIMAPID;
 
-CREATE VIEW automation.`show` AS
-SELECT g.PAGENAME, g.CONTROLTYPE, g.CONTROLNAME, g.CONTROLDESCRIPTION, a.FIELDNAME,
-b.PROPERTYID, b.GUIMAPID, b.STANDARDCLASS, b.MAPPEDCLASS, b.LOCATORVALUE, b.LOCATORTYPE
-FROM
-automation.GUIMAP g, automation.PROPERTIES b;
 /*
 ALTER TABLE PROPERTIES
 DROP FOREIGN KEY fk_guimap;
