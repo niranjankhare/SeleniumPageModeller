@@ -132,11 +132,16 @@ values (
 (3,	'LeftMenu',	4,	'Left Menu Bar');
 (4,	'TopMenu',	null,	'Top Menu Bar'),
 (5,	'Dashboard',	3,	'Dashboard');
+
+q1 = SELECT PAGEID FROM PAGES 
+WHERE PARENTID is null;
+
+while q1.fetchCount>0;
+q1. process;
+q1 = SELECT PAGEID FROM PAGES 
+WHERE PAGEID in (q1);
+
 */
-INSERT INTO PAGES
-SET `pagename` = 'logon',
-`parentid` = null,
-`pagedescription` = "Login page";
 
 
 
