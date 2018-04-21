@@ -1,115 +1,125 @@
 /*******************************************************************************
  * Copyright 2018 Niranjan Khare
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *******************************************************************************/
-function add_NewRow(){
-add_Row(false);
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+function add_HeaderRow(){
+	var tname = 'propsview';
+	var pageName = document.getElementById('pageName').value;
+	var elTable = document.getElementById(tname);
+	var respFields = Promise.resolve(getTableData(tname, pageName));
+	Promise.resolve(respFields).then(function (tableData ){
+	var headerRow = document.getElementById('headerRow');
+	var dbColumns = tableData[0];
+	var indexToHide = dbColumns.indexOf('CONTROLNAME');
+	var selectIndex = dbColumns.indexOf('STANDARDCLASS');
+	for (var i = 0; i < dbColumns.length; i++) {
+		var th = document.createElement('th');
+		if (i< indexToHide){
+			th.setAttribute ('style', 'display:none;');
+		}
+        headerRow.appendChild(th).innerHTML=dbColumns[i];
+    }
+	headerRow.appendChild(document.createElement('th')).innerHTML='More properties';
+	add_UpdateRow (tableData);
+	
+	});
 }
 
 var propertyMap = null;
 
-function add_Row(f){
-	var table = document.getElementById('propsview');
-	var rowCount = table.getElementsByTagName('tbody')[0].rows.length;
-	var row =  (table.getElementsByTagName('tbody')[0]).insertRow(-1);
-	var rowId = 'Row' + rowCount;
-	row.id = rowId;
-	row.setAttribute ('style', 'visibility:inherit;');
-	var oper = document.getElementById('oper');
-	
-	var resp = Promise.resolve(getTableFields('propsview'));
-	resp.then(function (dbColumns){
-		var index = dbColumns.indexOf('CONTROLNAME');
-		
-		for (var i = 0; i < dbColumns.length; i++) {
-			var cellContent = null;
-			if (i === dbColumns.indexOf('STANDARDCLASS')) {
-				cellContent = document.createElement('select');
-				getStandardtypes(cellContent);
-			}
-			else {
-				
-				if (i< index){
-					cellContent = document.createElement('input');
-					if (!f){
-						cellContent.setAttribute ('type', 'hidden');
-						cellContent.disabled=true;
-					}
-				} else
-					cellContent = document.createElement('textarea');
-			} 
-			cellContent.placeholder = dbColumns[i];
-			cellContent.name = rowId + '.' + dbColumns[i];
-			cellContent.id = cellContent.name;
-			cellContent.style.resize = 'none';
-			var cell = row.insertCell(-1);
-			cell.appendChild(cellContent);
-		}
-		var popupBtn = document.createElement('button');
-		popupBtn.type = 'button';
-		popupBtn.setAttribute ('onclick','showMoreProps(this, "'+ oper.value +'")');
-		popupBtn.id = rowId + '.popupBtn';
-		popupBtn.appendChild(document.createTextNode("Define More\nProperties"));
-		popupBtn.style.resize = 'none';
-		popupBtn.setAttribute ('rowid', rowId);
-		var cellButton = row.insertCell(-1);
-		cellButton.appendChild(popupBtn);
-		var cellPopupDiv = row.insertCell(-1);
-		cellPopupDiv.setAttribute ('style', 'visibility:hidden;');
-		var popupDiv = document.createElement('div');
-		popupDiv.id = rowId +'.popupDiv';
-		popupDiv.setAttribute ('style', 'visibility:hidden;display:block');
-		popupDiv.setAttribute ('rowid', rowId);
-		cellPopupDiv.appendChild(popupDiv);
-	});
-
-}
-
-
-function add_UpdateRow(){
+function add_Row(stdClasses, resp){
 	var tname = 'propsview';
 	var pageName = document.getElementById('pageName').value;
 	var elTable = document.getElementById(tname);
-	
-	var respFields = Promise.resolve(getTableData(tname, pageName));
-	var stdClasses = Promise.resolve(getData('/fetch/libdatabase/getstandardypes'));
 	var oper = document.getElementById('oper').value;
-	Promise.all([respFields,stdClasses]).then(function (allData){
-	var tableData = allData[0];
-	var stdClassesData = allData[1];
-		console.log (tableData);
-		console.log (tableData[0]);
-		var headerRow = document.getElementById('headerRow');
-		var dbColumns = tableData[0];
+	
+	Promise.all([stdClasses, resp]).then(function(allData){
+		var stdClassesData = allData[0];
+		var dbColumns = allData[1];
+		
+		console.log (dbColumns);
 		var indexToHide = dbColumns.indexOf('CONTROLNAME');
 		var selectIndex = dbColumns.indexOf('STANDARDCLASS');
-		for (var i = 0; i < dbColumns.length; i++) {
-			var th = document.createElement('th');
-			if (i< indexToHide){
-				th.setAttribute ('style', 'display:none;');
-			}
-            headerRow.appendChild(th).innerHTML=dbColumns[i];
-        }
-		headerRow.appendChild(document.createElement('th')).innerHTML='More properties';
 		
-		for (var k = 1; k < tableData.length; k++) {
+		var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
+		var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
+		var rowIdmain = 'Row'+ (rowCount-1);
+		row.id = rowIdmain;
+		for (var r=0; r<dbColumns.length; r++){
+			var rowId = rowIdmain + '.' + dbColumns[r];
+			var cell = row.insertCell(-1);
+			var inputElement ;
+			if (r != selectIndex){
+				inputElement = document.createElement('input');
+			} else{
+				inputElement = document.createElement('select');
+				getSelectControlt(stdClassesData, inputElement);
+			} 
 				
-				var rowData = tableData[k];
-				var rowIdmain = 'Row' + (k-1);
-				var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
+			if (r< indexToHide){
+				cell.setAttribute ('style', 'display:none;');
+			} 
+			inputElement.setAttribute ('name', rowId);
+			inputElement.id = inputElement.name;
+			if (dbColumns.indexOf('PAGENAME')== r){
+				inputElement.value= pageName;
+			}
+			cell.appendChild(inputElement);
+		}
+		 var popupBtn = document.createElement('button');
+         popupBtn.type = 'button';
+         popupBtn.setAttribute('onclick', 'showMoreProps(this, "' + 'new' + '")');
+         popupBtn.id = rowIdmain + '.popupBtn';
+         popupBtn.appendChild(document.createTextNode("Define More\nProperties"));
+         popupBtn.style.resize = 'none';
+         popupBtn.setAttribute('rowid', rowIdmain);
+         var cellButton = row.insertCell(-1);
+         cellButton.appendChild(popupBtn);
+         var cellPopupDiv = row.insertCell(-1);
+         cellPopupDiv.setAttribute('style', 'visibility:hidden;');
+         var popupDiv = document.createElement('div');
+         popupDiv.id = rowIdmain + '.popupDiv';
+         popupDiv.setAttribute('style', 'visibility:hidden;display:block');
+         popupDiv.setAttribute('rowid', rowIdmain);
+         cellPopupDiv.appendChild(popupDiv);
+	});
+	
+	}
+
+function add_UpdateRow(someData){
+	var tname = 'propsview';
+	var pageName = document.getElementById('pageName').value;
+	var elTable = document.getElementById(tname);
+	var stdClasses = Promise.resolve(getData('/fetch/libdatabase/getstandardypes'));
+	var oper = document.getElementById('oper').value;
+
+Promise.all([someData, stdClasses]).then(function (allData){
+	var tableData = allData[0];
+	var stdClassesData = allData[1];
+	var dbColumns = tableData[0];
+	console.log (dbColumns);
+	var indexToHide = dbColumns.indexOf('CONTROLNAME');
+	var selectIndex = dbColumns.indexOf('STANDARDCLASS');
+	var rowIterator;
+
+		rowIterator = tableData.length;
+		for (var k = 1; k < rowIterator; k++) {
+			var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
+				var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
+				var rowIdmain = 'Row'+ (rowCount-1);
 				row.id = rowIdmain;
-				for (var r=0; r<rowData.length; r++){
+				for (var r=0; r<dbColumns.length; r++){
 					var rowId = rowIdmain + '.' + dbColumns[r];
 					var cell = row.insertCell(-1);
 					var inputElement ;
@@ -125,9 +135,10 @@ function add_UpdateRow(){
 					} 
 					inputElement.setAttribute ('name', rowId);
 					inputElement.id = inputElement.name;
-					inputElement.value = rowData[r];
+					inputElement.value = tableData[k][r];
 					cell.appendChild(inputElement);
 				}
+				
 				var popupBtn = document.createElement('button'); 
 				popupBtn.type = 'button'; 
 				popupBtn.setAttribute
@@ -148,7 +159,7 @@ function add_UpdateRow(){
 			  cellPopupDiv.appendChild(popupDiv); 
 				
 			}
-			
+		add_Row(stdClassesData,dbColumns );
 			  
 			 
 		});
@@ -543,15 +554,14 @@ function addExtendedPropsTableToPopup(popup, operation){
 	var footerRow = footer.insertRow(-1);	
 	var btnContainer = footerRow.insertCell(-1);
 	/*
-	var btnRemoveExtended = document.createElement('button');
-	btnRemoveExtended.type = 'button'; 
-	btnRemoveExtended.setAttribute('rowId',rowId);
-	btnRemoveExtended.text = 'Remove Class Mapping';
-	btnRemoveExtended.setAttribute
-		  ('onclick','removeExtendedProps(this)');
-	btnRemoveExtended.appendChild(document.createTextNode("Remove Mapping"));
-	btnContainer.appendChild(btnRemoveExtended);
-    */
+	 * var btnRemoveExtended = document.createElement('button');
+	 * btnRemoveExtended.type = 'button';
+	 * btnRemoveExtended.setAttribute('rowId',rowId); btnRemoveExtended.text =
+	 * 'Remove Class Mapping'; btnRemoveExtended.setAttribute
+	 * ('onclick','removeExtendedProps(this)');
+	 * btnRemoveExtended.appendChild(document.createTextNode("Remove Mapping"));
+	 * btnContainer.appendChild(btnRemoveExtended);
+	 */
 }
 
 function removeExtendedProps (theRow){

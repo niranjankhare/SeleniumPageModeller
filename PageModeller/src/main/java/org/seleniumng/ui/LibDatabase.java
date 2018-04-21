@@ -168,6 +168,7 @@ public class LibDatabase {
 			LinkedHashMap<String, LinkedHashMap<String, String>> cleanParamMap) {
 		try {
 			for (Entry<String, LinkedHashMap<String, String>> row : cleanParamMap.entrySet()) {
+				Boolean isInsert = false;
 				LinkedHashMap<String, String> fieldMap = row.getValue();
 				Set<String> keys = fieldMap.keySet();
 
@@ -175,7 +176,7 @@ public class LibDatabase {
 				List<Object> guimapValues = new ArrayList<Object>();
 
 				Integer pageId = DbManager.getOpenContext().select(PAGES.PAGEID).from(PAGES)
-						.where(PAGES.PAGENAME.eq(pageName)).execute();
+						.where(PAGES.PAGENAME.eq(pageName)).fetchOne(PAGES.PAGEID);
 
 				List<TableField<?, ?>> propertiesFields = new ArrayList<TableField<?, ?>>();
 				List<Object> propertiesValues = new ArrayList<Object>();
@@ -185,8 +186,13 @@ public class LibDatabase {
 
 				Integer currentGuiMapId = null;
 				for (String key : keys) {
+
 					if (key.equalsIgnoreCase("GUIMAPID")) {
-						currentGuiMapId = Integer.parseInt(fieldMap.get(key));
+						isInsert = fieldMap.get(key).equalsIgnoreCase("");
+						if (!isInsert)
+							currentGuiMapId = Integer.parseInt(fieldMap.get(key));
+						else
+							;
 					} else {
 						if (GUIMAP.field(key) != null) {
 							guimapFields.add((TableField<GuimapRecord, ?>) GUIMAP.field(key));
@@ -200,26 +206,53 @@ public class LibDatabase {
 						}
 					}
 				}
-				if (guimapFields.size() > 0) {
-					UpdateSetMoreStep<GuimapRecord> updateGuiMap = (UpdateSetMoreStep<GuimapRecord>) getTableUpdateStatement(
-							GUIMAP, guimapFields, guimapValues);
-					updateGuiMap.where(GUIMAP.GUIMAPID.eq(currentGuiMapId)).execute();
-				}
-				String locatorValue = row.getValue().get("LOCATORVALUE");
-				propertiesFields.add(PROPERTIES.LOCATORTYPE);
-				String locatorType = (locatorValue.startsWith("/")) ? "XPATH" : "ID";
-				propertiesValues.add(locatorType);
+				if (!isInsert) {
+					if (guimapFields.size() > 0) {
+						UpdateSetMoreStep<GuimapRecord> updateGuiMap = (UpdateSetMoreStep<GuimapRecord>) getTableUpdateStatement(
+								GUIMAP, guimapFields, guimapValues);
+						updateGuiMap.where(GUIMAP.GUIMAPID.eq(currentGuiMapId)).execute();
+					}
+					String locatorValue = row.getValue().get("LOCATORVALUE");
+					propertiesFields.add(PROPERTIES.LOCATORTYPE);
+					String locatorType = (locatorValue.startsWith("/")) ? "XPATH" : "ID";
+					propertiesValues.add(locatorType);
 
-				if (propertiesFields.size() > 0) {
-					UpdateSetMoreStep<PropertiesRecord> updateProperties = (UpdateSetMoreStep<PropertiesRecord>) getTableUpdateStatement(
-							PROPERTIES, propertiesFields, propertiesValues);
-					updateProperties.where(PROPERTIES.GUIMAPID.eq(currentGuiMapId)).execute();
-				}
-				if (expropertiesFields.size() > 0) {
+					if (propertiesFields.size() > 0) {
+						UpdateSetMoreStep<PropertiesRecord> updateProperties = (UpdateSetMoreStep<PropertiesRecord>) getTableUpdateStatement(
+								PROPERTIES, propertiesFields, propertiesValues);
+						updateProperties.where(PROPERTIES.GUIMAPID.eq(currentGuiMapId)).execute();
+					}
+					if (expropertiesFields.size() > 0) {
 
-					UpdateSetMoreStep<ExtendedpropsRecord> updateExtendedProperties = (UpdateSetMoreStep<ExtendedpropsRecord>) getTableUpdateStatement(
-							EXTENDEDPROPS, expropertiesFields, expropertiesValues);
-					updateExtendedProperties.where(EXTENDEDPROPS.GUIMAPID.eq(currentGuiMapId)).execute();
+						UpdateSetMoreStep<ExtendedpropsRecord> updateExtendedProperties = (UpdateSetMoreStep<ExtendedpropsRecord>) getTableUpdateStatement(
+								EXTENDEDPROPS, expropertiesFields, expropertiesValues);
+						updateExtendedProperties.where(EXTENDEDPROPS.GUIMAPID.eq(currentGuiMapId)).execute();
+					}
+				} else {
+					guimapFields.add(GUIMAP.PAGEID);
+					guimapValues.add(pageId);
+					InsertValuesStepN<?> insertSetStepGuiMap = DbManager.getOpenContext().insertInto(GUIMAP,
+							guimapFields);
+					insertSetStepGuiMap.values(guimapValues);
+					Result<?> x = insertSetStepGuiMap.returning(GUIMAP.GUIMAPID).fetch();
+					currentGuiMapId = x.getValue(0, GUIMAP.GUIMAPID);
+
+					propertiesFields.add(PROPERTIES.GUIMAPID);
+					propertiesValues.add(currentGuiMapId);
+					String locatorValue = row.getValue().get("LOCATORVALUE");
+					propertiesFields.add(PROPERTIES.LOCATORTYPE);
+					String locatorType = (locatorValue.startsWith("/")) ? "XPATH" : "ID";
+					propertiesValues.add(locatorType);
+
+					InsertValuesStepN<?> insertSetStepProperties = DbManager.getOpenContext().insertInto(PROPERTIES,
+							propertiesFields);
+					insertSetStepProperties.values(propertiesValues).execute();
+
+					expropertiesFields.add(EXTENDEDPROPS.GUIMAPID);
+					expropertiesValues.add(currentGuiMapId);
+					InsertValuesStepN<?> insertSetStepExtendedProps = DbManager.getOpenContext()
+							.insertInto(EXTENDEDPROPS, expropertiesFields);
+					insertSetStepExtendedProps.values(expropertiesValues).execute();
 				}
 			}
 
@@ -248,7 +281,7 @@ public class LibDatabase {
 	}
 
 	public static LinkedHashMap getStandardTypes() {
-//		LinkedHashMap oldMap = getTypes("STANDARD");
+		// LinkedHashMap oldMap = getTypes("STANDARD");
 		LinkedHashMap<String, String[]> list = new LinkedHashMap<String, String[]>();
 		SelectConditionStep<Record3<String, String, String>> x = DbManager.getOpenContext()
 				.select(TYPES.ABRV, TYPES.CLASS, TYPES.PROPERTYMAP).from(TYPES).where(TYPES.TYPE.eq("STANDARD"));
@@ -259,7 +292,7 @@ public class LibDatabase {
 			list.put(rec.get(TYPES.CLASS), nestedMap);
 		}
 		return list;
-		
+
 	}
 
 	public static LinkedHashMap getCustomTypes() {
@@ -303,17 +336,17 @@ public class LibDatabase {
 		for (Field<?> f : result.fields()) {
 			String fName = f.getName();
 			if (!fName.equalsIgnoreCase("MAPPEDCLASS"))
-			fields.add(fName);
-			else 
+				fields.add(fName);
+			else
 				continue;
 		}
-		//fields.remove(fields.indexOf("MAPPEDCLASS"));
+		// fields.remove(fields.indexOf("MAPPEDCLASS"));
 		returnList.add(fields);
-		
+
 		for (Record r : result) {
 			List<Object> values1 = new ArrayList<Object>();
 			for (Object f : fields) {
-				values1.add(r.get((String)f));
+				values1.add(r.get((String) f));
 			}
 			returnList.add(values1);
 
@@ -322,7 +355,7 @@ public class LibDatabase {
 	}
 
 	public static Object getPageExtendedProperties(Integer gId) {
-//		Table<?> table = AUTOMATION.getTable(tableName.toUpperCase());
+		// Table<?> table = AUTOMATION.getTable(tableName.toUpperCase());
 		Collection<Condition> conditions = new ArrayList<Condition>();
 		SelectConditionStep<?> x = DbManager.getOpenContext().selectFrom(EXTENDEDPROPSVIEW)
 				.where(EXTENDEDPROPSVIEW.GUIMAPID.equal(gId));
@@ -389,7 +422,8 @@ public class LibDatabase {
 	}
 
 	public static String getClassAbrv(String string) {
-		Record1<String> r = DbManager.getOpenContext().select(TYPES.ABRV).from(TYPES).where(TYPES.CLASS.equal(string)).fetchOne();
+		Record1<String> r = DbManager.getOpenContext().select(TYPES.ABRV).from(TYPES).where(TYPES.CLASS.equal(string))
+				.fetchOne();
 		return r.get(TYPES.ABRV);
 	}
 

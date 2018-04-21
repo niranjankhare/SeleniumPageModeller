@@ -142,14 +142,14 @@ public class LibHtml {
 
         Element table = new Element("table").attr("id", mainPropertiesView);
         Element headerRow = new Element("tr").attr("id", "headerRow").attr("style", "visibility:visible;");
-
+        /*
         // Add columns to the displayed table as header row
         for (String field : mainFieldsList) {
             headerRow.appendElement("th").text(field);
         }
 
         headerRow.appendElement("th").text("More properties");
-
+*/
         String scriptBlock = addRowScriptTemplateN;
 
         Document html = Jsoup.parse("<html></html>");
@@ -184,7 +184,7 @@ public class LibHtml {
         Element addMore = new Element("input");
         addMore.attr("type", "button");
         addMore.attr("id", "addRow");
-        addMore.attr("onclick", "add_NewRow();");
+        addMore.attr("onclick", "add_UpdateRow(getTableData('propsview',document.getElementById('pageName').value));");
         addMore.attr("value", "Add row");
 
         Element submit = new Element("input");
@@ -202,7 +202,7 @@ public class LibHtml {
         form.appendChild(submit);
         html.body().before(scriptElement);
         html.body().appendChild(form);
-        html.body().attr("onload", "add_NewRow()");
+        html.body().attr("onload", "add_HeaderRow()");
 
         return Parser.unescapeEntities(html.toString(), false);
 
@@ -333,12 +333,12 @@ public class LibHtml {
         elOperation.attr("id", "oper");
         elOperation.attr("name", "oper");
         elOperation.attr("value", operation);
-
-//        Element addMore = new Element("input");
-//        addMore.attr("type", "button");
-//        addMore.attr("id", "addRow");
-//        addMore.attr("onclick", "add_NewRow();");
-//        addMore.attr("value", "Add row");
+        
+        Element addMore = new Element("input");
+        addMore.attr("type", "button");
+        addMore.attr("id", "addRow");
+        addMore.attr("onclick", "add_Row(getData('/fetch/libdatabase/getstandardypes'),getTableFields('propsview'));");
+        addMore.attr("value", "Add row");
 
         Element submit = new Element("input");
         submit.attr("type", "submit");
@@ -348,14 +348,14 @@ public class LibHtml {
         parentPageDiv.appendChild(table);
         Element form = new Element("form").attr("id", "guimap").attr("method", "post").attr("action", "/updatePageGui");
         form.appendChild(parentPageDiv);
-//        form.appendChild(addMore);
         form.appendChild(elTableName);
         form.appendChild(elPageName);
         form.appendChild( elOperation);
+        form.appendChild(addMore);
         form.appendChild(submit);
         html.body().before(scriptElement);
         html.body().appendChild(form);
-        html.body().attr("onload", "add_UpdateRow()");
+        html.body().attr("onload", "add_HeaderRow()");
 
         return Parser.unescapeEntities(html.toString(), false);
 
