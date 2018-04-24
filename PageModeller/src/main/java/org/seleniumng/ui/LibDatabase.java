@@ -427,16 +427,31 @@ public class LibDatabase {
 		return r.get(TYPES.ABRV);
 	}
 
-	public static HashMap <String,String> getPageHeirarchy() {
-		Select<?> selectStatement  = DbManager.getOpenContext().select(PAGES.PAGEID, PAGES.PARENTID).from(PAGES);
+	public static List<HashMap <String,String>> getPageHeirarchy(Integer... pageId) {
+		List<HashMap<String,String>> returnList = new ArrayList<HashMap<String,String>>();
+		Select<?> selectStatement  = null;
+		if (pageId.length==0)
+			selectStatement  = DbManager.getOpenContext().select(PAGES.PAGEID, PAGES.PARENTID).from(PAGES).where(PAGES.PARENTID.isNull());
+		else 
+			selectStatement  = DbManager.getOpenContext().select(PAGES.PAGEID, PAGES.PARENTID).from(PAGES).where(PAGES.PARENTID.in(pageId));
 		HashMap<String,String> pageHeirarchy = new HashMap<String,String>();
 		for (Record r : selectStatement.fetch()) {
-			String pageName = DbManager.getOpenContext().select(PAGES.PAGENAME).from(PAGES).where(PAGES.PAGEID.eq(r.get(PAGES.PAGEID))).fetchOne().get(PAGES.PAGENAME);
-			String parentName = DbManager.getOpenContext().select(PAGES.PAGENAME).from(PAGES).where(PAGES.PAGEID.eq(r.get(PAGES.PARENTID))).fetchOne().get(PAGES.PAGENAME);
+			Integer pId = r.get(PAGES.PAGEID);
+			Integer prId = r.get(PAGES.PARENTID);
+			String pageName = DbManager.getOpenContext().select(PAGES.PAGENAME).from(PAGES).where(PAGES.PAGEID.eq(pId)).fetchOne().get(PAGES.PAGENAME);
+			Record1<String> s = DbManager.getOpenContext().select(PAGES.PAGENAME).from(PAGES).where(PAGES.PAGEID.eq(prId)).fetchOne();
+			String parentName = (s==null)?null:s.get(PAGES.PAGENAME);
 			pageHeirarchy.put(pageName, parentName);
 			
 		}
-		return pageHeirarchy;
+		returnList.add(pageHeirarchy);
+		List<Integer> a = selectStatement.fetch().getValues(PAGES.PAGEID,Integer.class);
+		if (a.size()>0){
+			Integer list2[] = new Integer[a.size()];
+			returnList.addAll(getPageHeirarchy((Integer[])a.toArray(list2)));
+			}
+		return returnList;
+		
 	}
 
 }

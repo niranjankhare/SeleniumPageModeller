@@ -29,6 +29,8 @@ import com.sun.codemodel.JMod;
 import com.sun.codemodel.JPackage;
 import com.sun.codemodel.fmt.JTextFile;
 
+import java.util.Arrays;
+
 import static org.seleniumng.utils.TAFConfig.*;
 
 import java.util.ArrayList;
@@ -45,14 +47,17 @@ public class PageObjectCodegen {
 	private static String resourceDirPath = "src/main/resources";
 	
 	public static void main(String... args) {
-
-		try {
-			PageObjectCodegen.generateSource();
-		} catch (JClassAlreadyExistsException ex) {
-			ex.printStackTrace();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
+		List<HashMap<String, String>> h = LibDatabase.getPageHeirarchy();
+//		try {
+//			PageObjectCodegen.generateSource();
+//		
+//		} catch (JClassAlreadyExistsException ex) {
+//			ex.printStackTrace();
+//		} catch (IOException ex) {
+//			ex.printStackTrace();
+//		}
+//		System.out.println(b.toString());
+		System.out.println("Done");
 	}
 
 	public static void generateSource() throws JClassAlreadyExistsException, IOException {
@@ -72,8 +77,8 @@ public class PageObjectCodegen {
 	}
 
 	private static HashMap<String, String> fetchPageList() {
-		HashMap<String, String> set = LibDatabase.getPageHeirarchy();
-		return set;
+		List<HashMap<String, String>> set = LibDatabase.getPageHeirarchy();
+		return (HashMap<String, String>) set;
 	}
 
 	private static JDefinedClass generatePageObject(String pPackage, String webPage, String parent) throws IOException {
