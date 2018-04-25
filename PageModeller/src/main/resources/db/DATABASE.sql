@@ -51,6 +51,7 @@ PRIMARY KEY (`CLASSID`)
 
 insert into TYPES (`CLASS`, `TYPE`, `ABRV`,`HASEXTENDEDPROPS`,`PROPERTYMAP`)
 values  ('(No Maping)','CUSTOM','del',true, null),
+('Link','STANDARD','lnk',null, null),
 ('Button','STANDARD','btn',null, null),
 ('InputText','STANDARD','iTxt',null, null),
 ('Select','STANDARD','sel',true,'{"EXPROP1":"options"}'),

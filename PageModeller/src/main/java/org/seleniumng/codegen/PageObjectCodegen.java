@@ -129,7 +129,7 @@ public class PageObjectCodegen {
 	 * //The codeModel instance will have a list of Java primitives which can be
 	 * //used to create a primitive field in the new class JFieldVar field2 =
 	 * classToBeCreated.field(JMod.PRIVATE, codeModel.DOUBLE,
-	 * "bar",JExpr.direct("new TextField()")); // field2.assign( ); //Create
+	 * "bar",JExpr.direct("new InputText()")); // field2.assign( ); //Create
 	 * getter and setter methods for the fields JMethod field1GetterMethod =
 	 * classToBeCreated.method(JMod.PUBLIC, field1.type(), "getFoo"); //code to
 	 * create a return statement with the field1

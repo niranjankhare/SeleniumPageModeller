@@ -19,9 +19,9 @@ import org.seleniumng.driver.GuiControl;
 
 import com.typesafe.config.Config;
 
-public class TextField extends GuiControl{
+public class Link extends GuiControl{
 
-	public TextField(Config config) {
+	public Link(Config config) {
 		super(config);
 	}
 	
