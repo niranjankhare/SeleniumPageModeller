@@ -46,7 +46,7 @@ public class PageObjectCodegen {
 	private static String sourceDirPath = "src/main/java";
 	private static String resourceDirPath = "src/main/resources";
 
-	static Boolean overriteLib = true;
+	static Boolean overriteLib = false;
 
 	public static void main(String... args) {
 		// List<HashMap<String, String>> h = LibDatabase.getPageHeirarchy();
@@ -94,18 +94,20 @@ public class PageObjectCodegen {
 
 		JDefinedClass mainClass = null;
 		JDefinedClass parentClass = null;
-		JDefinedClass childLibClass = null;
+		JDefinedClass userImplClass = null;
 		JPackage retResource = null;
 		try {
 			String classFQN = pPackage + "._Page" + webPage;
-			String parentFQN = uPackage + ".Page" + parent;
-			String childLibFQN = uPackage + ".Page" + webPage;
+			String parentSN = ".Page"+parent;
+			String parentFQN = uPackage + parentSN;
+			String userImplClassSN = ".Page" + webPage;
+			String userImplClassFQN = uPackage + ".Page" + webPage;
 
 			if (codeModel._getClass(classFQN) == null) {
 				mainClass = codeModel._class(classFQN);
 				if (overriteLib) {
-					childLibClass = codeModel._class(childLibFQN);
-					childLibClass._extends(mainClass);
+					userImplClass = codeModel._class(userImplClassFQN);
+					userImplClass._extends(mainClass);
 				}
 			}
 			if (parent != null) {
@@ -141,7 +143,7 @@ public class PageObjectCodegen {
 		rsrc.setContents("resourceContent");
 		retResource.addResourceFile(rsrc);
 
-		return childLibClass;
+		return userImplClass;
 	}
 
 	// again
