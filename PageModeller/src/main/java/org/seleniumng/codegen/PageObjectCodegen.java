@@ -46,8 +46,11 @@ public class PageObjectCodegen {
 	private static String sourceDirPath = "src/main/java";
 	private static String resourceDirPath = "src/main/resources";
 
+	static Boolean overriteLib = true;
+
 	public static void main(String... args) {
 		// List<HashMap<String, String>> h = LibDatabase.getPageHeirarchy();
+
 		try {
 			PageObjectCodegen.generateSource();
 
@@ -71,9 +74,10 @@ public class PageObjectCodegen {
 		List<HashMap<String, String>> orderedList = LibDatabase.getPageHeirarchy();
 		for (HashMap<String, String> webPages : orderedList) {
 			for (String webPage : webPages.keySet()) {
-				JDefinedClass pageClassToCreate = generatePageObject(pagePackage, userLibrariesPackage,  webPage, webPages.get(webPage));
+				JDefinedClass pageClassToCreate = generatePageObject(pagePackage, userLibrariesPackage, webPage,
+						webPages.get(webPage));
 				repositoryToCreate.field(JMod.PUBLIC, pageClassToCreate, "page" + webPage);
-				
+
 			}
 		}
 		codeModel.build(new File(sourceDirPath));
@@ -85,7 +89,8 @@ public class PageObjectCodegen {
 	// return (HashMap<String, String>) set;
 	// }
 
-	private static JDefinedClass generatePageObject(String pPackage, String uPackage, String webPage, String parent) throws IOException {
+	private static JDefinedClass generatePageObject(String pPackage, String uPackage, String webPage, String parent)
+			throws IOException {
 
 		JDefinedClass mainClass = null;
 		JDefinedClass parentClass = null;
@@ -95,17 +100,23 @@ public class PageObjectCodegen {
 			String classFQN = pPackage + "._Page" + webPage;
 			String parentFQN = uPackage + ".Page" + parent;
 			String childLibFQN = uPackage + ".Page" + webPage;
-			
-			if (codeModel._getClass(classFQN)== null){
+
+			if (codeModel._getClass(classFQN) == null) {
 				mainClass = codeModel._class(classFQN);
-				childLibClass = codeModel._class(childLibFQN);
-				childLibClass._extends(mainClass);
+				if (overriteLib) {
+					childLibClass = codeModel._class(childLibFQN);
+					childLibClass._extends(mainClass);
+				}
 			}
-			if (parent !=null ){
+			if (parent != null) {
 				parentClass = codeModel._getClass(parentFQN);
-				if(parentClass==null)
-					parentClass:codeModel._class(parentFQN);
-			mainClass._extends(parentClass);
+				if (parentClass == null && overriteLib) {
+					parentClass: codeModel._class(parentFQN);
+					mainClass._extends(parentClass);
+				} else {
+					JClass p = codeModel.directClass(parentFQN);
+					mainClass._extends(p);
+				}
 			}
 			retResource = resourceModel._package(uPackage + ".en");
 
@@ -118,17 +129,18 @@ public class PageObjectCodegen {
 			String stdClass = data.get(control).get("standardClass");
 			String classAbrv = LibDatabase.getClassAbrv(stdClass);
 			String customClass = data.get(control).get("customClass");
-			customClass = (customClass==null|| customClass.equals("")||customClass.equals("(No Maping)")) ? stdClass : customClass;
+			customClass = (customClass == null || customClass.equals("") || customClass.equals("(No Maping)"))
+					? stdClass : customClass;
 
 			JClass jc = codeModel.ref("org.seleniumng.controls." + customClass);
-			mainClass.field(JMod.PRIVATE, jc, classAbrv + control, JExpr._null());
+			mainClass.field(JMod.PROTECTED, jc, classAbrv + control, JExpr._null());
 
 		}
 		String rsrcPath = "Page" + webPage + ".conf";
 		JTextFile rsrc = new JTextFile(rsrcPath);
 		rsrc.setContents("resourceContent");
 		retResource.addResourceFile(rsrc);
-		
+
 		return childLibClass;
 	}
 
