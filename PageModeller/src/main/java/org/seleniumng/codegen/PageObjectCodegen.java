@@ -18,6 +18,7 @@ package org.seleniumng.codegen;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -27,11 +28,12 @@ import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JPackage;
 import com.sun.codemodel.fmt.JTextFile;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+
+import java.util.Arrays;
 
 import static org.seleniumng.utils.TAFConfig.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -94,12 +96,13 @@ public class PageObjectCodegen {
 		JDefinedClass parentClass = null;
 		JClass userImplClass = null;
 		JPackage retResource = null;
-		String classFQN = pPackage + "._Page" + webPage;
-		String parentSN = "Page"+parent;
-		String parentFQN = uPackage + "."+ parentSN;
-		String userImplClassSN = "Page" + webPage;
-		String userImplClassFQN = uPackage +"."+ userImplClassSN;
 		try {
+			String classFQN = pPackage + "._Page" + webPage;
+			String parentSN = ".Page"+parent;
+			String parentFQN = uPackage + parentSN;
+			String userImplClassSN = ".Page" + webPage;
+			String userImplClassFQN = uPackage + ".Page" + webPage;
+
 			if (codeModel._getClass(classFQN) == null) {
 				mainClass = codeModel._class(classFQN);
 				if (overriteLib) {
@@ -125,7 +128,7 @@ public class PageObjectCodegen {
 			e.printStackTrace();
 		}
 		LinkedHashMap<String, LinkedHashMap<String, String>> data = LibDatabase.getPageGuiMapData(webPage);
-		Config c = ConfigFactory.parseString("someDummyProperty = SomeDummyValue");
+
 		for (String control : data.keySet()) {
 			String stdClass = data.get(control).get("standardClass");
 			String classAbrv = LibDatabase.getClassAbrv(stdClass);
@@ -135,12 +138,11 @@ public class PageObjectCodegen {
 
 			JClass jc = codeModel.ref("org.seleniumng.controls." + customClass);
 			mainClass.field(JMod.PROTECTED, jc, classAbrv + control, JExpr._null());
-			
+
 		}
-		String rsrcPath = userImplClassSN + ".conf";
+		String rsrcPath = "Page" + webPage + ".conf";
 		JTextFile rsrc = new JTextFile(rsrcPath);
-		String propertyMap = c.root().render();
-		rsrc.setContents(propertyMap );
+		rsrc.setContents("resourceContent");
 		retResource.addResourceFile(rsrc);
 
 		return userImplClass;
