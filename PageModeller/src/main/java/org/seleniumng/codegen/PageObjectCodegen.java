@@ -74,7 +74,7 @@ public class PageObjectCodegen {
 		List<HashMap<String, String>> orderedList = LibDatabase.getPageHeirarchy();
 		for (HashMap<String, String> webPages : orderedList) {
 			for (String webPage : webPages.keySet()) {
-				JDefinedClass pageClassToCreate = generatePageObject(pagePackage, userLibrariesPackage, webPage,
+				JClass pageClassToCreate = generatePageObject(pagePackage, userLibrariesPackage, webPage,
 						webPages.get(webPage));
 				repositoryToCreate.field(JMod.PUBLIC, pageClassToCreate, "page" + webPage);
 
@@ -89,12 +89,12 @@ public class PageObjectCodegen {
 	// return (HashMap<String, String>) set;
 	// }
 
-	private static JDefinedClass generatePageObject(String pPackage, String uPackage, String webPage, String parent)
+	private static JClass generatePageObject(String pPackage, String uPackage, String webPage, String parent)
 			throws IOException {
 
 		JDefinedClass mainClass = null;
 		JDefinedClass parentClass = null;
-		JDefinedClass userImplClass = null;
+		JClass userImplClass = null;
 		JPackage retResource = null;
 		try {
 			String classFQN = pPackage + "._Page" + webPage;
@@ -107,7 +107,9 @@ public class PageObjectCodegen {
 				mainClass = codeModel._class(classFQN);
 				if (overriteLib) {
 					userImplClass = codeModel._class(userImplClassFQN);
-					userImplClass._extends(mainClass);
+					((JDefinedClass)userImplClass)._extends(mainClass);
+				} else {
+					userImplClass =codeModel.directClass (userImplClassFQN);
 				}
 			}
 			if (parent != null) {
