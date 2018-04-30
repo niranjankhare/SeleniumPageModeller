@@ -10,6 +10,7 @@ import db.jooq.generated.automationDb.tables.Guimap;
 import db.jooq.generated.automationDb.tables.Pages;
 import db.jooq.generated.automationDb.tables.Properties;
 import db.jooq.generated.automationDb.tables.Propsview;
+import db.jooq.generated.automationDb.tables.Propwriterview;
 import db.jooq.generated.automationDb.tables.Types;
 
 import java.util.ArrayList;
@@ -74,6 +75,11 @@ public class Automation extends SchemaImpl {
     public final Propsview PROPSVIEW = db.jooq.generated.automationDb.tables.Propsview.PROPSVIEW;
 
     /**
+     * VIEW
+     */
+    public final Propwriterview PROPWRITERVIEW = db.jooq.generated.automationDb.tables.Propwriterview.PROPWRITERVIEW;
+
+    /**
      * The table <code>automation.TYPES</code>.
      */
     public final Types TYPES = db.jooq.generated.automationDb.tables.Types.TYPES;
@@ -109,6 +115,7 @@ public class Automation extends SchemaImpl {
             Pages.PAGES,
             Properties.PROPERTIES,
             Propsview.PROPSVIEW,
+            Propwriterview.PROPWRITERVIEW,
             Types.TYPES);
     }
 }
