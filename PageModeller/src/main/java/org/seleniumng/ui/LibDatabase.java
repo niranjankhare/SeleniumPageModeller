@@ -32,6 +32,7 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Record3;
+import org.jooq.Record6;
 import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
@@ -420,7 +421,31 @@ public class LibDatabase {
 		}
 		return pageData;
 	}
+	
+	public static LinkedHashMap<String, LinkedHashMap<String, String>> getPageGuiPropertyData(String webPage) {
+		LinkedHashMap<String, LinkedHashMap<String, String>> pageData = new LinkedHashMap<String, LinkedHashMap<String, String>>();
 
+		SelectConditionStep<Record6<Integer, String, String, String, String, String>> selectProperties = DbManager.getOpenContext()
+				.select(PROPSVIEW.GUIMAPID, PROPSVIEW.CONTROLNAME ,PROPSVIEW.MAPPEDCLASS, PROPSVIEW.CONTROLDESCRIPTION, PROPSVIEW.LOCATORTYPE, PROPSVIEW.LOCATORVALUE).from(PROPSVIEW)
+				.where(PROPSVIEW.PAGENAME.equal(webPage));
+
+		for (Record r : selectProperties.fetch()) {
+			Record extendedProperties = DbManager.getOpenContext()
+					.select().from(EXTENDEDPROPSVIEW)
+					.where(EXTENDEDPROPSVIEW.GUIMAPID.equal(r.get(PROPSVIEW.GUIMAPID))).fetchOne();
+			LinkedHashMap<String, String> propertyMap = new LinkedHashMap<String, String>();
+			propertyMap.put("CONTROLDESCRIPTION", r.get(PROPSVIEW.CONTROLDESCRIPTION));
+			propertyMap.put("LOCATORTYPE", r.get(PROPSVIEW.LOCATORTYPE));
+			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
+			for (Field<?> ep : extendedProperties.fields()){
+				propertyMap.put(ep.getName(), (String)extendedProperties.get(ep));
+				
+			}
+			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
+					pageData.put(r.get(PROPSVIEW.CONTROLNAME), propertyMap);
+		}
+		return pageData;
+	}
 	public static String getClassAbrv(String string) {
 		Record1<String> r = DbManager.getOpenContext().select(TYPES.ABRV).from(TYPES).where(TYPES.CLASS.equal(string))
 				.fetchOne();

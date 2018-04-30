@@ -29,6 +29,7 @@ import com.sun.codemodel.JPackage;
 import com.sun.codemodel.fmt.JTextFile;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigRenderOptions;
 
 import static org.seleniumng.utils.TAFConfig.*;
 
@@ -124,12 +125,12 @@ public class PageObjectCodegen {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LinkedHashMap<String, LinkedHashMap<String, String>> data = LibDatabase.getPageGuiMapData(webPage);
-		Config c = ConfigFactory.parseString("someDummyProperty = SomeDummyValue");
-		for (String control : data.keySet()) {
-			String stdClass = data.get(control).get("standardClass");
+		LinkedHashMap<String, LinkedHashMap<String, String>> fields = LibDatabase.getPageGuiMapData(webPage);
+		LinkedHashMap<String, LinkedHashMap<String, String>> properties = LibDatabase.getPageGuiPropertyData(webPage);
+		for (String control : fields.keySet()) {
+			String stdClass = fields.get(control).get("standardClass");
 			String classAbrv = LibDatabase.getClassAbrv(stdClass);
-			String customClass = data.get(control).get("customClass");
+			String customClass = fields.get(control).get("customClass");
 			customClass = (customClass == null || customClass.equals("") || customClass.equals("(No Maping)"))
 					? stdClass : customClass;
 
@@ -139,8 +140,8 @@ public class PageObjectCodegen {
 		}
 		String rsrcPath = userImplClassSN + ".conf";
 		JTextFile rsrc = new JTextFile(rsrcPath);
-		String propertyMap = "";
-		rsrc.setContents(propertyMap );
+		
+//		rsrc.setContents(propertyMap );
 		retResource.addResourceFile(rsrc);
 
 		return userImplClass;
