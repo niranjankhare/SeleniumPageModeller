@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -30,6 +30,7 @@ import org.jooq.Field;
 import org.jooq.InsertValuesStepN;
 import org.jooq.Record;
 import org.jooq.Record1;
+import org.jooq.Record14;
 import org.jooq.Record2;
 import org.jooq.Record3;
 import org.jooq.Record6;
@@ -60,8 +61,7 @@ import static db.jooq.generated.automationDb.tables.Propsview.*;
 import static db.jooq.generated.automationDb.tables.Extendedpropsview.*;
 import static db.jooq.generated.automationDb.tables.Properties.*;
 import static db.jooq.generated.automationDb.tables.Extendedprops.*;
-
-import static org.seleniumng.utils.TAFConfig.*;
+import static db.jooq.generated.automationDb.tables.Propwriterview.*;
 
 public class LibDatabase {
 
@@ -422,27 +422,32 @@ public class LibDatabase {
 		return pageData;
 	}
 	
-	public static LinkedHashMap<String, LinkedHashMap<String, String>> getPageGuiPropertyData(String webPage) {
-		LinkedHashMap<String, LinkedHashMap<String, String>> pageData = new LinkedHashMap<String, LinkedHashMap<String, String>>();
+	public static Map<String, Object> getPageGuiPropertyData(String webPage) {
+		Map<String,Object> pageData = new LinkedHashMap<String, Object>();
 
-		SelectConditionStep<Record6<Integer, String, String, String, String, String>> selectProperties = DbManager.getOpenContext()
-				.select(PROPSVIEW.GUIMAPID, PROPSVIEW.CONTROLNAME ,PROPSVIEW.MAPPEDCLASS, PROPSVIEW.CONTROLDESCRIPTION, PROPSVIEW.LOCATORTYPE, PROPSVIEW.LOCATORVALUE).from(PROPSVIEW)
-				.where(PROPSVIEW.PAGENAME.equal(webPage));
+		SelectConditionStep<Record14<Integer, String, String, String, String, String, String, String, String, String, String, String, String, String>> selectProperties = DbManager.getOpenContext()
+				.select(PROPWRITERVIEW.GUIMAPID, PROPWRITERVIEW.CONTROLNAME , PROPWRITERVIEW.CONTROLDESCRIPTION, PROPWRITERVIEW.LOCATORTYPE, PROPWRITERVIEW.LOCATORVALUE,
+						PROPWRITERVIEW.EXPROP1,PROPWRITERVIEW.EXPROP2,PROPWRITERVIEW.EXPROP3,PROPWRITERVIEW.EXPROP4,PROPWRITERVIEW.EXPROP5,PROPWRITERVIEW.EXPROP6,
+						PROPWRITERVIEW.EXPROP7,PROPWRITERVIEW.EXPROP8,PROPWRITERVIEW.EXPROP9 ).from(PROPWRITERVIEW)
+				.where(PROPWRITERVIEW.PAGENAME.equal(webPage));
+		
 
 		for (Record r : selectProperties.fetch()) {
-			Record extendedProperties = DbManager.getOpenContext()
-					.select().from(EXTENDEDPROPSVIEW)
-					.where(EXTENDEDPROPSVIEW.GUIMAPID.equal(r.get(PROPSVIEW.GUIMAPID))).fetchOne();
-			LinkedHashMap<String, String> propertyMap = new LinkedHashMap<String, String>();
-			propertyMap.put("CONTROLDESCRIPTION", r.get(PROPSVIEW.CONTROLDESCRIPTION));
-			propertyMap.put("LOCATORTYPE", r.get(PROPSVIEW.LOCATORTYPE));
-			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
-			for (Field<?> ep : extendedProperties.fields()){
-				propertyMap.put(ep.getName(), (String)extendedProperties.get(ep));
+//			Record extendedProperties = DbManager.getOpenContext()
+//					.select().from(EXTENDEDPROPSVIEW)
+//					.where(EXTENDEDPROPSVIEW.GUIMAPID.equal(r.get(PROPSVIEW.GUIMAPID))).fetchOne();
+			LinkedHashMap<String, Object> propertyMap = new LinkedHashMap<String, Object>();
+//			propertyMap.put("CONTROLDESCRIPTION", r.get(PROPSVIEW.CONTROLDESCRIPTION));
+//			propertyMap.put("LOCATORTYPE", r.get(PROPSVIEW.LOCATORTYPE));
+//			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
+			for (Field<?> ep : r.fields()){
+				propertyMap.put(ep.getName(), r.get(ep));
 				
 			}
 			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
-					pageData.put(r.get(PROPSVIEW.CONTROLNAME), propertyMap);
+			Object o = (Object)propertyMap;
+			pageData.put(r.get(PROPSVIEW.CONTROLNAME).toString(),o);
+			
 		}
 		return pageData;
 	}
