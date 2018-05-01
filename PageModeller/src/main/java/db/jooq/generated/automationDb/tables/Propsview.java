@@ -31,10 +31,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Propsview extends TableImpl<PropsviewRecord> {
 
-    private static final long serialVersionUID = -1985423063;
+    private static final long serialVersionUID = 79529717;
 
     /**
-     * The reference instance of <code>automation.PROPSVIEW</code>
+     * The reference instance of <code>automation.propsview</code>
      */
     public static final Propsview PROPSVIEW = new Propsview();
 
@@ -47,61 +47,61 @@ public class Propsview extends TableImpl<PropsviewRecord> {
     }
 
     /**
-     * The column <code>automation.PROPSVIEW.PAGENAME</code>.
+     * The column <code>automation.propsview.PAGENAME</code>.
      */
     public final TableField<PropsviewRecord, String> PAGENAME = createField("PAGENAME", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
 
     /**
-     * The column <code>automation.PROPSVIEW.GUIMAPID</code>.
+     * The column <code>automation.propsview.GUIMAPID</code>.
      */
     public final TableField<PropsviewRecord, Integer> GUIMAPID = createField("GUIMAPID", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.inline("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
-     * The column <code>automation.PROPSVIEW.MAPPEDCLASS</code>.
+     * The column <code>automation.propsview.MAPPEDCLASS</code>.
      */
     public final TableField<PropsviewRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
 
     /**
-     * The column <code>automation.PROPSVIEW.CONTROLNAME</code>.
+     * The column <code>automation.propsview.CONTROLNAME</code>.
      */
     public final TableField<PropsviewRecord, String> CONTROLNAME = createField("CONTROLNAME", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
 
     /**
-     * The column <code>automation.PROPSVIEW.CONTROLDESCRIPTION</code>.
+     * The column <code>automation.propsview.CONTROLDESCRIPTION</code>.
      */
     public final TableField<PropsviewRecord, String> CONTROLDESCRIPTION = createField("CONTROLDESCRIPTION", org.jooq.impl.SQLDataType.VARCHAR(150), this, "");
 
     /**
-     * The column <code>automation.PROPSVIEW.LOCATORVALUE</code>.
+     * The column <code>automation.propsview.LOCATORVALUE</code>.
      */
     public final TableField<PropsviewRecord, String> LOCATORVALUE = createField("LOCATORVALUE", org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "");
 
     /**
-     * The column <code>automation.PROPSVIEW.LOCATORTYPE</code>.
+     * The column <code>automation.propsview.LOCATORTYPE</code>.
      */
     public final TableField<PropsviewRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(10).nullable(false), this, "");
 
     /**
-     * The column <code>automation.PROPSVIEW.STANDARDCLASS</code>.
+     * The column <code>automation.propsview.STANDARDCLASS</code>.
      */
     public final TableField<PropsviewRecord, String> STANDARDCLASS = createField("STANDARDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
 
     /**
-     * Create a <code>automation.PROPSVIEW</code> table reference
+     * Create a <code>automation.propsview</code> table reference
      */
     public Propsview() {
-        this(DSL.name("PROPSVIEW"), null);
+        this(DSL.name("propsview"), null);
     }
 
     /**
-     * Create an aliased <code>automation.PROPSVIEW</code> table reference
+     * Create an aliased <code>automation.propsview</code> table reference
      */
     public Propsview(String alias) {
         this(DSL.name(alias), PROPSVIEW);
     }
 
     /**
-     * Create an aliased <code>automation.PROPSVIEW</code> table reference
+     * Create an aliased <code>automation.propsview</code> table reference
      */
     public Propsview(Name alias) {
         this(alias, PROPSVIEW);

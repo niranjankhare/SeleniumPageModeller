@@ -30,10 +30,9 @@ import org.jooq.Field;
 import org.jooq.InsertValuesStepN;
 import org.jooq.Record;
 import org.jooq.Record1;
-import org.jooq.Record14;
+import org.jooq.Record15;
 import org.jooq.Record2;
 import org.jooq.Record3;
-import org.jooq.Record6;
 import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
@@ -425,21 +424,19 @@ public class LibDatabase {
 	public static Map<String, Object> getPageGuiPropertyData(String webPage) {
 		Map<String,Object> pageData = new LinkedHashMap<String, Object>();
 
-		SelectConditionStep<Record14<Integer, String, String, String, String, String, String, String, String, String, String, String, String, String>> selectProperties = DbManager.getOpenContext()
+		SelectConditionStep<Record15<Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> selectProperties = DbManager.getOpenContext()
 				.select(PROPWRITERVIEW.GUIMAPID, PROPWRITERVIEW.CONTROLNAME , PROPWRITERVIEW.CONTROLDESCRIPTION, PROPWRITERVIEW.LOCATORTYPE, PROPWRITERVIEW.LOCATORVALUE,
-						PROPWRITERVIEW.EXPROP1,PROPWRITERVIEW.EXPROP2,PROPWRITERVIEW.EXPROP3,PROPWRITERVIEW.EXPROP4,PROPWRITERVIEW.EXPROP5,PROPWRITERVIEW.EXPROP6,
-						PROPWRITERVIEW.EXPROP7,PROPWRITERVIEW.EXPROP8,PROPWRITERVIEW.EXPROP9 ).from(PROPWRITERVIEW)
+						PROPWRITERVIEW.MAPPEDCLASS,	PROPWRITERVIEW.EXPROP1,PROPWRITERVIEW.EXPROP2,PROPWRITERVIEW.EXPROP3,PROPWRITERVIEW.EXPROP4,PROPWRITERVIEW.EXPROP5,
+						PROPWRITERVIEW.EXPROP6, PROPWRITERVIEW.EXPROP7,PROPWRITERVIEW.EXPROP8,PROPWRITERVIEW.EXPROP9 ).from(PROPWRITERVIEW)
 				.where(PROPWRITERVIEW.PAGENAME.equal(webPage));
 		
-
+		Result<Record2<String, String>> result = DbManager.getOpenContext().select(TYPES.CLASS,TYPES.PROPERTYMAP).from(TYPES).where(TYPES.HASEXTENDEDPROPS.isTrue()).fetch();
+		Map<String, List<String>> xPropertyMap = result.intoGroups(TYPES.CLASS,TYPES.PROPERTYMAP);
 		for (Record r : selectProperties.fetch()) {
-//			Record extendedProperties = DbManager.getOpenContext()
-//					.select().from(EXTENDEDPROPSVIEW)
-//					.where(EXTENDEDPROPSVIEW.GUIMAPID.equal(r.get(PROPSVIEW.GUIMAPID))).fetchOne();
+			String jSon = null;
+			if (r.get(PROPWRITERVIEW.MAPPEDCLASS)!=null && !r.get(PROPWRITERVIEW.MAPPEDCLASS).equalsIgnoreCase("(No Maping)"))
+				jSon=	xPropertyMap.get(r.get(PROPWRITERVIEW.MAPPEDCLASS)).get(0);
 			LinkedHashMap<String, Object> propertyMap = new LinkedHashMap<String, Object>();
-//			propertyMap.put("CONTROLDESCRIPTION", r.get(PROPSVIEW.CONTROLDESCRIPTION));
-//			propertyMap.put("LOCATORTYPE", r.get(PROPSVIEW.LOCATORTYPE));
-//			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
 			for (Field<?> ep : r.fields()){
 				propertyMap.put(ep.getName(), r.get(ep));
 				

@@ -50,7 +50,7 @@ PRIMARY KEY (`CLASSID`)
 );
 
 insert into TYPES (`CLASS`, `TYPE`, `ABRV`,`HASEXTENDEDPROPS`,`PROPERTYMAP`)
-values  ('(No Maping)','CUSTOM','del',true, null),
+values  ('(No Maping)','STANDARD','null',true, null),
 ('Link','STANDARD','lnk',null, null),
 ('Button','STANDARD','btn',null, null),
 ('InputText','STANDARD','iTxt',null, null),
@@ -99,7 +99,7 @@ ON c.GUIMAPID=p.GUIMAPID;
 
 CREATE VIEW automation.PROPWRITERVIEW AS
 SELECT p.PAGENAME, g.GUIMAPID,g.CONTROLNAME, g.CONTROLDESCRIPTION,
-r.LOCATORVALUE, r.LOCATORTYPE,c.EXPROP1, c.EXPROP2, c.EXPROP3, c.EXPROP4, c.EXPROP5,
+r.MAPPEDCLASS, r.LOCATORVALUE, r.LOCATORTYPE,c.EXPROP1, c.EXPROP2, c.EXPROP3, c.EXPROP4, c.EXPROP5,
 c.EXPROP6, c.EXPROP7, c.EXPROP8, c.EXPROP9
 FROM
  automation.GUIMAP g INNER JOIN
