@@ -440,9 +440,14 @@ public class LibDatabase {
 				exmap= new Gson().fromJson(jSon, new TypeToken<HashMap<String, String>>(){}.getType());
 			}
 			LinkedHashMap<String, Object> propertyMap = new LinkedHashMap<String, Object>();
-			for (Field<?> ep : r.fields()){
-				propertyMap.put(ep.getName(), r.get(ep));
-				
+			
+			propertyMap.put("CONTROLDESCRIPTION", r.get(PROPSVIEW.CONTROLDESCRIPTION));
+			propertyMap.put("LOCATORTYPE", r.get(PROPSVIEW.LOCATORTYPE));
+			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
+			if (exmap!=null){		
+			for (String xf : exmap.keySet()){
+				propertyMap.put(exmap.get(xf), r.get(xf));
+			}
 			}
 			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
 			Object o = (Object)propertyMap;
