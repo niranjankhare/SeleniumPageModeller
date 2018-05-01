@@ -46,6 +46,7 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import db.jooq.generated.automationDb.*;
 import db.jooq.generated.automationDb.tables.records.ExtendedpropsRecord;
@@ -329,7 +330,7 @@ public class LibDatabase {
 		Table<?> table = AUTOMATION.getTable(tableName.toUpperCase());
 		Collection<Condition> conditions = new ArrayList<Condition>();
 		SelectConditionStep<?> x = DbManager.getOpenContext().selectFrom(table)
-				.where(PROPSVIEW.PAGENAME.equal(pageName));
+				.where(PROPSVIEW.PAGENAME.eq(pageName));
 		List<Object> returnList = new ArrayList<Object>();
 		Result<?> result = x.fetch();
 		List<Object> fields = new ArrayList<Object>();
@@ -433,9 +434,11 @@ public class LibDatabase {
 		Result<Record2<String, String>> result = DbManager.getOpenContext().select(TYPES.CLASS,TYPES.PROPERTYMAP).from(TYPES).where(TYPES.HASEXTENDEDPROPS.isTrue()).fetch();
 		Map<String, List<String>> xPropertyMap = result.intoGroups(TYPES.CLASS,TYPES.PROPERTYMAP);
 		for (Record r : selectProperties.fetch()) {
-			String jSon = null;
-			if (r.get(PROPWRITERVIEW.MAPPEDCLASS)!=null && !r.get(PROPWRITERVIEW.MAPPEDCLASS).equalsIgnoreCase("(No Maping)"))
-				jSon=	xPropertyMap.get(r.get(PROPWRITERVIEW.MAPPEDCLASS)).get(0);
+			HashMap<String,String> exmap= null;
+			if (r.get(PROPWRITERVIEW.MAPPEDCLASS)!=null && !r.get(PROPWRITERVIEW.MAPPEDCLASS).equalsIgnoreCase("(No Maping)")){
+				String jSon=	xPropertyMap.get(r.get(PROPWRITERVIEW.MAPPEDCLASS)).get(0);
+				exmap= new Gson().fromJson(jSon, new TypeToken<HashMap<String, String>>(){}.getType());
+			}
 			LinkedHashMap<String, Object> propertyMap = new LinkedHashMap<String, Object>();
 			for (Field<?> ep : r.fields()){
 				propertyMap.put(ep.getName(), r.get(ep));

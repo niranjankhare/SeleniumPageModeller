@@ -27,115 +27,115 @@ import org.jooq.impl.TableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements Record8<String, Integer, String, String, String, String, String, String> {
 
-    private static final long serialVersionUID = -87152332;
+    private static final long serialVersionUID = 1612815604;
 
     /**
-     * Setter for <code>automation.propsview.PAGENAME</code>.
+     * Setter for <code>automation.PROPSVIEW.PAGENAME</code>.
      */
     public void setPagename(String value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>automation.propsview.PAGENAME</code>.
+     * Getter for <code>automation.PROPSVIEW.PAGENAME</code>.
      */
     public String getPagename() {
         return (String) get(0);
     }
 
     /**
-     * Setter for <code>automation.propsview.GUIMAPID</code>.
+     * Setter for <code>automation.PROPSVIEW.GUIMAPID</code>.
      */
     public void setGuimapid(Integer value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>automation.propsview.GUIMAPID</code>.
+     * Getter for <code>automation.PROPSVIEW.GUIMAPID</code>.
      */
     public Integer getGuimapid() {
         return (Integer) get(1);
     }
 
     /**
-     * Setter for <code>automation.propsview.MAPPEDCLASS</code>.
+     * Setter for <code>automation.PROPSVIEW.MAPPEDCLASS</code>.
      */
     public void setMappedclass(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>automation.propsview.MAPPEDCLASS</code>.
+     * Getter for <code>automation.PROPSVIEW.MAPPEDCLASS</code>.
      */
     public String getMappedclass() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>automation.propsview.CONTROLNAME</code>.
+     * Setter for <code>automation.PROPSVIEW.CONTROLNAME</code>.
      */
     public void setControlname(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>automation.propsview.CONTROLNAME</code>.
+     * Getter for <code>automation.PROPSVIEW.CONTROLNAME</code>.
      */
     public String getControlname() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>automation.propsview.CONTROLDESCRIPTION</code>.
+     * Setter for <code>automation.PROPSVIEW.CONTROLDESCRIPTION</code>.
      */
     public void setControldescription(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>automation.propsview.CONTROLDESCRIPTION</code>.
+     * Getter for <code>automation.PROPSVIEW.CONTROLDESCRIPTION</code>.
      */
     public String getControldescription() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>automation.propsview.LOCATORVALUE</code>.
+     * Setter for <code>automation.PROPSVIEW.LOCATORVALUE</code>.
      */
     public void setLocatorvalue(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>automation.propsview.LOCATORVALUE</code>.
+     * Getter for <code>automation.PROPSVIEW.LOCATORVALUE</code>.
      */
     public String getLocatorvalue() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>automation.propsview.LOCATORTYPE</code>.
+     * Setter for <code>automation.PROPSVIEW.LOCATORTYPE</code>.
      */
     public void setLocatortype(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>automation.propsview.LOCATORTYPE</code>.
+     * Getter for <code>automation.PROPSVIEW.LOCATORTYPE</code>.
      */
     public String getLocatortype() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>automation.propsview.STANDARDCLASS</code>.
+     * Setter for <code>automation.PROPSVIEW.STANDARDCLASS</code>.
      */
     public void setStandardclass(String value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>automation.propsview.STANDARDCLASS</code>.
+     * Getter for <code>automation.PROPSVIEW.STANDARDCLASS</code>.
      */
     public String getStandardclass() {
         return (String) get(7);

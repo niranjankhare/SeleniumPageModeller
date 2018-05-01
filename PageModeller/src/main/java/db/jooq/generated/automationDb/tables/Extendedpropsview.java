@@ -31,10 +31,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Extendedpropsview extends TableImpl<ExtendedpropsviewRecord> {
 
-    private static final long serialVersionUID = -2110396145;
+    private static final long serialVersionUID = -1674608241;
 
     /**
-     * The reference instance of <code>automation.extendedpropsview</code>
+     * The reference instance of <code>automation.EXTENDEDPROPSVIEW</code>
      */
     public static final Extendedpropsview EXTENDEDPROPSVIEW = new Extendedpropsview();
 
@@ -47,76 +47,76 @@ public class Extendedpropsview extends TableImpl<ExtendedpropsviewRecord> {
     }
 
     /**
-     * The column <code>automation.extendedpropsview.GUIMAPID</code>.
+     * The column <code>automation.EXTENDEDPROPSVIEW.GUIMAPID</code>.
      */
     public final TableField<ExtendedpropsviewRecord, Integer> GUIMAPID = createField("GUIMAPID", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>automation.extendedpropsview.MAPPEDCLASS</code>.
+     * The column <code>automation.EXTENDEDPROPSVIEW.MAPPEDCLASS</code>.
      */
     public final TableField<ExtendedpropsviewRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
 
     /**
-     * The column <code>automation.extendedpropsview.EXPROP1</code>.
+     * The column <code>automation.EXTENDEDPROPSVIEW.EXPROP1</code>.
      */
     public final TableField<ExtendedpropsviewRecord, String> EXPROP1 = createField("EXPROP1", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.extendedpropsview.EXPROP2</code>.
+     * The column <code>automation.EXTENDEDPROPSVIEW.EXPROP2</code>.
      */
     public final TableField<ExtendedpropsviewRecord, String> EXPROP2 = createField("EXPROP2", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.extendedpropsview.EXPROP3</code>.
+     * The column <code>automation.EXTENDEDPROPSVIEW.EXPROP3</code>.
      */
     public final TableField<ExtendedpropsviewRecord, String> EXPROP3 = createField("EXPROP3", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.extendedpropsview.EXPROP4</code>.
+     * The column <code>automation.EXTENDEDPROPSVIEW.EXPROP4</code>.
      */
     public final TableField<ExtendedpropsviewRecord, String> EXPROP4 = createField("EXPROP4", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.extendedpropsview.EXPROP5</code>.
+     * The column <code>automation.EXTENDEDPROPSVIEW.EXPROP5</code>.
      */
     public final TableField<ExtendedpropsviewRecord, String> EXPROP5 = createField("EXPROP5", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.extendedpropsview.EXPROP6</code>.
+     * The column <code>automation.EXTENDEDPROPSVIEW.EXPROP6</code>.
      */
     public final TableField<ExtendedpropsviewRecord, String> EXPROP6 = createField("EXPROP6", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.extendedpropsview.EXPROP7</code>.
+     * The column <code>automation.EXTENDEDPROPSVIEW.EXPROP7</code>.
      */
     public final TableField<ExtendedpropsviewRecord, String> EXPROP7 = createField("EXPROP7", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.extendedpropsview.EXPROP8</code>.
+     * The column <code>automation.EXTENDEDPROPSVIEW.EXPROP8</code>.
      */
     public final TableField<ExtendedpropsviewRecord, String> EXPROP8 = createField("EXPROP8", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.extendedpropsview.EXPROP9</code>.
+     * The column <code>automation.EXTENDEDPROPSVIEW.EXPROP9</code>.
      */
     public final TableField<ExtendedpropsviewRecord, String> EXPROP9 = createField("EXPROP9", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * Create a <code>automation.extendedpropsview</code> table reference
+     * Create a <code>automation.EXTENDEDPROPSVIEW</code> table reference
      */
     public Extendedpropsview() {
-        this(DSL.name("extendedpropsview"), null);
+        this(DSL.name("EXTENDEDPROPSVIEW"), null);
     }
 
     /**
-     * Create an aliased <code>automation.extendedpropsview</code> table reference
+     * Create an aliased <code>automation.EXTENDEDPROPSVIEW</code> table reference
      */
     public Extendedpropsview(String alias) {
         this(DSL.name(alias), EXTENDEDPROPSVIEW);
     }
 
     /**
-     * Create an aliased <code>automation.extendedpropsview</code> table reference
+     * Create an aliased <code>automation.EXTENDEDPROPSVIEW</code> table reference
      */
     public Extendedpropsview(Name alias) {
         this(alias, EXTENDEDPROPSVIEW);

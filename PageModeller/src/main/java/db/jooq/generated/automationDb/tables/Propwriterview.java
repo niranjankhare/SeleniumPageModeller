@@ -31,10 +31,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Propwriterview extends TableImpl<PropwriterviewRecord> {
 
-    private static final long serialVersionUID = -1335282659;
+    private static final long serialVersionUID = -2020167651;
 
     /**
-     * The reference instance of <code>automation.propwriterview</code>
+     * The reference instance of <code>automation.PROPWRITERVIEW</code>
      */
     public static final Propwriterview PROPWRITERVIEW = new Propwriterview();
 
@@ -47,101 +47,101 @@ public class Propwriterview extends TableImpl<PropwriterviewRecord> {
     }
 
     /**
-     * The column <code>automation.propwriterview.PAGENAME</code>.
+     * The column <code>automation.PROPWRITERVIEW.PAGENAME</code>.
      */
     public final TableField<PropwriterviewRecord, String> PAGENAME = createField("PAGENAME", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
 
     /**
-     * The column <code>automation.propwriterview.GUIMAPID</code>.
+     * The column <code>automation.PROPWRITERVIEW.GUIMAPID</code>.
      */
     public final TableField<PropwriterviewRecord, Integer> GUIMAPID = createField("GUIMAPID", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.inline("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
-     * The column <code>automation.propwriterview.CONTROLNAME</code>.
+     * The column <code>automation.PROPWRITERVIEW.CONTROLNAME</code>.
      */
     public final TableField<PropwriterviewRecord, String> CONTROLNAME = createField("CONTROLNAME", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
 
     /**
-     * The column <code>automation.propwriterview.CONTROLDESCRIPTION</code>.
+     * The column <code>automation.PROPWRITERVIEW.CONTROLDESCRIPTION</code>.
      */
     public final TableField<PropwriterviewRecord, String> CONTROLDESCRIPTION = createField("CONTROLDESCRIPTION", org.jooq.impl.SQLDataType.VARCHAR(150), this, "");
 
     /**
-     * The column <code>automation.propwriterview.MAPPEDCLASS</code>.
+     * The column <code>automation.PROPWRITERVIEW.MAPPEDCLASS</code>.
      */
     public final TableField<PropwriterviewRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
 
     /**
-     * The column <code>automation.propwriterview.LOCATORVALUE</code>.
+     * The column <code>automation.PROPWRITERVIEW.LOCATORVALUE</code>.
      */
     public final TableField<PropwriterviewRecord, String> LOCATORVALUE = createField("LOCATORVALUE", org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "");
 
     /**
-     * The column <code>automation.propwriterview.LOCATORTYPE</code>.
+     * The column <code>automation.PROPWRITERVIEW.LOCATORTYPE</code>.
      */
     public final TableField<PropwriterviewRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(10).nullable(false), this, "");
 
     /**
-     * The column <code>automation.propwriterview.EXPROP1</code>.
+     * The column <code>automation.PROPWRITERVIEW.EXPROP1</code>.
      */
     public final TableField<PropwriterviewRecord, String> EXPROP1 = createField("EXPROP1", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.propwriterview.EXPROP2</code>.
+     * The column <code>automation.PROPWRITERVIEW.EXPROP2</code>.
      */
     public final TableField<PropwriterviewRecord, String> EXPROP2 = createField("EXPROP2", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.propwriterview.EXPROP3</code>.
+     * The column <code>automation.PROPWRITERVIEW.EXPROP3</code>.
      */
     public final TableField<PropwriterviewRecord, String> EXPROP3 = createField("EXPROP3", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.propwriterview.EXPROP4</code>.
+     * The column <code>automation.PROPWRITERVIEW.EXPROP4</code>.
      */
     public final TableField<PropwriterviewRecord, String> EXPROP4 = createField("EXPROP4", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.propwriterview.EXPROP5</code>.
+     * The column <code>automation.PROPWRITERVIEW.EXPROP5</code>.
      */
     public final TableField<PropwriterviewRecord, String> EXPROP5 = createField("EXPROP5", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.propwriterview.EXPROP6</code>.
+     * The column <code>automation.PROPWRITERVIEW.EXPROP6</code>.
      */
     public final TableField<PropwriterviewRecord, String> EXPROP6 = createField("EXPROP6", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.propwriterview.EXPROP7</code>.
+     * The column <code>automation.PROPWRITERVIEW.EXPROP7</code>.
      */
     public final TableField<PropwriterviewRecord, String> EXPROP7 = createField("EXPROP7", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.propwriterview.EXPROP8</code>.
+     * The column <code>automation.PROPWRITERVIEW.EXPROP8</code>.
      */
     public final TableField<PropwriterviewRecord, String> EXPROP8 = createField("EXPROP8", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * The column <code>automation.propwriterview.EXPROP9</code>.
+     * The column <code>automation.PROPWRITERVIEW.EXPROP9</code>.
      */
     public final TableField<PropwriterviewRecord, String> EXPROP9 = createField("EXPROP9", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
-     * Create a <code>automation.propwriterview</code> table reference
+     * Create a <code>automation.PROPWRITERVIEW</code> table reference
      */
     public Propwriterview() {
-        this(DSL.name("propwriterview"), null);
+        this(DSL.name("PROPWRITERVIEW"), null);
     }
 
     /**
-     * Create an aliased <code>automation.propwriterview</code> table reference
+     * Create an aliased <code>automation.PROPWRITERVIEW</code> table reference
      */
     public Propwriterview(String alias) {
         this(DSL.name(alias), PROPWRITERVIEW);
     }
 
     /**
-     * Create an aliased <code>automation.propwriterview</code> table reference
+     * Create an aliased <code>automation.PROPWRITERVIEW</code> table reference
      */
     public Propwriterview(Name alias) {
         this(alias, PROPWRITERVIEW);
