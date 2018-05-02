@@ -159,9 +159,7 @@ Promise.all([someData, stdClasses]).then(function (allData){
 			  cellPopupDiv.appendChild(popupDiv); 
 				
 			}
-		add_Row(stdClassesData,dbColumns );
-			  
-			 
+	 
 		});
 	}
 
