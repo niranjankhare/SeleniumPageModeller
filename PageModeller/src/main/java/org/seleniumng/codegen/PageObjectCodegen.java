@@ -44,16 +44,14 @@ public class PageObjectCodegen {
 	private static JCodeModel resourceModel = new JCodeModel();
 	private static String sourceDirPath = "src/main/java";
 	private static String resourceDirPath = "src/main/resources";
-
-	static Boolean overriteLib = true;
+	
+	private static Boolean reWriteUserDefinedLibs = tafConfig.getBoolean("PageModeller.reWriteUserDefinedLibs");
 
 	private static JClass objectRepositoryBaseClass = codeModel
 			.directClass("org.seleniumng.utils.PageObjectRepository");
 	private static JClass pageClassBaseClass = codeModel.directClass("org.seleniumng.utils.PageObjectBaseClass");
 
 	public static void main(String... args) {
-		// List<HashMap<String, String>> h = LibDatabase.getPageHeirarchy();
-
 		try {
 			PageObjectCodegen.generateSource();
 
@@ -108,7 +106,13 @@ public class PageObjectCodegen {
 		try {
 			if (codeModel._getClass(classFQN) == null) {
 				mainClass = codeModel._class(classFQN);
-				if (overriteLib) {
+				Boolean classExists = false;
+				try {
+					classExists = null != Class.forName(userImplClassFQN);
+				}catch (Exception e){
+					e.printStackTrace();
+				}
+				if (reWriteUserDefinedLibs || !classExists) {
 					userImplClass = codeModel._class(userImplClassFQN);
 					((JDefinedClass) userImplClass)._extends(mainClass);
 				} else {
@@ -117,7 +121,7 @@ public class PageObjectCodegen {
 			}
 			if (parent != null) {
 				parentClass = codeModel._getClass(parentFQN);
-				if (parentClass == null && overriteLib) {
+				if (parentClass == null && reWriteUserDefinedLibs) {
 					parentClass: codeModel._class(parentFQN);
 					mainClass._extends(parentClass);
 				} else {
