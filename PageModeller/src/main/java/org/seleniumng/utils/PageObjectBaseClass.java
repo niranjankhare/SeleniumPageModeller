@@ -104,11 +104,21 @@ public class PageObjectBaseClass {
 	protected Config loadPageConfig (Class<?> class1){
 		String langPath = tafConfig.getString("language");
 		String langDefault = tafConfig.hasPath("language.fallback")?tafConfig.getString("language.fallback"): "en_us"; 
-		String propFile = class1.getSimpleName()+ ".p";
+		String propFile = class1.getSimpleName()+ ".conf";
 		URL u_lang = class1.getResource(langPath + "/"+propFile);
-		URL u_en_us = class1.getResource(langDefault + "/"+propFile);
-		Config c_lang = ConfigFactory.parseURL(u_lang);
-		Config c_fallback = ConfigFactory.parseURL(u_en_us );
+		URL u_langFallback = class1.getResource(langDefault + "/"+propFile);
+		Config c_lang = null, c_fallback = null;
+		try {
+			c_lang = ConfigFactory.parseURL(u_lang);
+		} catch (Exception e){
+			System.out.println("Got Exception trying to load : "+ u_lang );
+			System.exit(1);
+		}
+		try {
+			c_fallback = ConfigFactory.parseURL(u_langFallback );
+		} catch (Exception e){
+			System.out.println("Got Exception trying to load : "+ u_langFallback );
+		}
 		Config cf = c_lang.withFallback(c_fallback);
 		return cf;
 	}

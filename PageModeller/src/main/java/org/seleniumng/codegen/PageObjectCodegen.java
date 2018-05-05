@@ -130,7 +130,7 @@ public class PageObjectCodegen {
 				}
 			} else
 				mainClass._extends(pageClassBaseClass);
-			retResource = resourceModel._package(uPackage + ".en");
+			retResource = resourceModel._package(pPackage +"." +tafConfig.getString("language"));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -149,7 +149,7 @@ public class PageObjectCodegen {
 			mainClass.field(JMod.PROTECTED, jc, classAbrv + control, JExpr._null());
 
 		}
-		String rsrcPath = userImplClassSN + ".conf";
+		String rsrcPath = mainClass.name() + ".conf";
 		JTextFile rsrc = new JTextFile(rsrcPath);
 
 		String propertyMap = c.root().render(ConfigRenderOptions.concise().setFormatted(true).setJson(true));
