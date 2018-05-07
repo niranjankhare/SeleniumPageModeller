@@ -30,7 +30,7 @@ import org.jooq.Field;
 import org.jooq.InsertValuesStepN;
 import org.jooq.Record;
 import org.jooq.Record1;
-import org.jooq.Record15;
+import org.jooq.Record16;
 import org.jooq.Record2;
 import org.jooq.Record3;
 import org.jooq.Result;
@@ -425,8 +425,8 @@ public class LibDatabase {
 	public static Map<String, Object> getPageGuiPropertyData(String webPage) {
 		Map<String,Object> pageData = new LinkedHashMap<String, Object>();
 
-		SelectConditionStep<Record15<Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> selectProperties = DbManager.getOpenContext()
-				.select(PROPWRITERVIEW.GUIMAPID, PROPWRITERVIEW.CONTROLNAME , PROPWRITERVIEW.CONTROLDESCRIPTION, PROPWRITERVIEW.LOCATORTYPE, PROPWRITERVIEW.LOCATORVALUE,
+		SelectConditionStep<Record16<Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> selectProperties = DbManager.getOpenContext()
+				.select(PROPWRITERVIEW.GUIMAPID,PROPWRITERVIEW.ABRV, PROPWRITERVIEW.CONTROLNAME , PROPWRITERVIEW.CONTROLDESCRIPTION, PROPWRITERVIEW.LOCATORTYPE, PROPWRITERVIEW.LOCATORVALUE,
 						PROPWRITERVIEW.MAPPEDCLASS,	PROPWRITERVIEW.EXPROP1,PROPWRITERVIEW.EXPROP2,PROPWRITERVIEW.EXPROP3,PROPWRITERVIEW.EXPROP4,PROPWRITERVIEW.EXPROP5,
 						PROPWRITERVIEW.EXPROP6, PROPWRITERVIEW.EXPROP7,PROPWRITERVIEW.EXPROP8,PROPWRITERVIEW.EXPROP9 ).from(PROPWRITERVIEW)
 				.where(PROPWRITERVIEW.PAGENAME.equal(webPage));
@@ -451,7 +451,7 @@ public class LibDatabase {
 			}
 			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
 			Object o = (Object)propertyMap;
-			pageData.put(r.get(PROPSVIEW.CONTROLNAME).toString(),o);
+			pageData.put(r.get(PROPWRITERVIEW.ABRV)+r.get(PROPWRITERVIEW.CONTROLNAME).toString(),o);
 			
 		}
 		return pageData;

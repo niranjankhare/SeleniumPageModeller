@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Propwriterview extends TableImpl<PropwriterviewRecord> {
 
-    private static final long serialVersionUID = -2020167651;
+    private static final long serialVersionUID = -1078846510;
 
     /**
      * The reference instance of <code>automation.PROPWRITERVIEW</code>
@@ -55,6 +55,11 @@ public class Propwriterview extends TableImpl<PropwriterviewRecord> {
      * The column <code>automation.PROPWRITERVIEW.GUIMAPID</code>.
      */
     public final TableField<PropwriterviewRecord, Integer> GUIMAPID = createField("GUIMAPID", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.inline("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
+
+    /**
+     * The column <code>automation.PROPWRITERVIEW.ABRV</code>.
+     */
+    public final TableField<PropwriterviewRecord, String> ABRV = createField("ABRV", org.jooq.impl.SQLDataType.VARCHAR(10).nullable(false), this, "");
 
     /**
      * The column <code>automation.PROPWRITERVIEW.CONTROLNAME</code>.

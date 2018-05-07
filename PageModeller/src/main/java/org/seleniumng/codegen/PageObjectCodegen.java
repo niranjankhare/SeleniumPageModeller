@@ -25,6 +25,7 @@ import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JPackage;
 import com.sun.codemodel.fmt.JTextFile;
@@ -78,7 +79,7 @@ public class PageObjectCodegen {
 			for (String webPage : webPages.keySet()) {
 				JClass pageClassToCreate = generatePageObject(pagePackage, userLibrariesPackage, webPage,
 						webPages.get(webPage));
-				repositoryToCreate.field(JMod.PUBLIC, pageClassToCreate, "page" + webPage);
+				repositoryToCreate.field(JMod.STATIC| JMod.PUBLIC, pageClassToCreate, "page" + webPage);
 
 			}
 		}
@@ -98,6 +99,7 @@ public class PageObjectCodegen {
 		JDefinedClass parentClass = null;
 		JClass userImplClass = null;
 		JPackage retResource = null;
+		JPackage uLibResource = null;
 		String classFQN = pPackage + "._Page" + webPage;
 		String parentSN = "Page" + parent;
 		String parentFQN = uPackage + "." + parentSN;
@@ -131,6 +133,7 @@ public class PageObjectCodegen {
 			} else
 				mainClass._extends(pageClassBaseClass);
 			retResource = resourceModel._package(pPackage +"." +tafConfig.getString("language"));
+			uLibResource = resourceModel._package(uPackage+"." +tafConfig.getString("language"));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -146,15 +149,18 @@ public class PageObjectCodegen {
 					? stdClass : customClass;
 
 			JClass jc = codeModel.ref("org.seleniumng.controls." + customClass);
-			mainClass.field(JMod.PROTECTED, jc, classAbrv + control, JExpr._null());
+			mainClass.field(JMod.PUBLIC, jc, classAbrv + control, JExpr._null());
 
 		}
 		String rsrcPath = mainClass.name() + ".conf";
+		String uLibRsrcPath = userImplClassSN+ ".conf";
 		JTextFile rsrc = new JTextFile(rsrcPath);
-
+		JTextFile uLibRrc = new JTextFile(uLibRsrcPath);
 		String propertyMap = c.root().render(ConfigRenderOptions.concise().setFormatted(true).setJson(true));
 		rsrc.setContents(propertyMap);
+		uLibRrc.setContents("\"somePropertyName\" = \""+ userImplClassSN+"\"");
 		retResource.addResourceFile(rsrc);
+		uLibResource.addResourceFile(uLibRrc);
 
 		return userImplClass;
 	}
