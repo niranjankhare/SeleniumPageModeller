@@ -27,7 +27,7 @@ public class AppTest extends TestTemplate {
 	@Parameters({"username","password"})
 	public void sampleLogin(@Optional("nkh@ums.no")String username, @Optional("Admin1") String password) throws InterruptedException {
 		new PageRepository();
-		browse ("https://dev.ums2.no");
+		browse ("https://example.com/login");
 		pageLogin.Login(username,password);
 	  Thread.sleep(10000);  // Let the user actually see something!
 	}
