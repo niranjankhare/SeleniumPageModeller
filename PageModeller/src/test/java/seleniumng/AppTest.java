@@ -23,7 +23,7 @@ public class AppTest extends TestTemplate {
 		DriverInventory.getDriver().get(url);
 	}
 	
-	@Test (dataProvider="parallelDataProvider", dataProviderClass= TestDataProvider.class)
+	@Test (dataProvider="defaultDataProvider", dataProviderClass= TestDataProvider.class)
 	@Parameters({"username","password"})
 	public void sampleLogin(@Optional("nkh@ums.no")String username, @Optional("Admin1") String password) throws InterruptedException {
 		new PageRepository();

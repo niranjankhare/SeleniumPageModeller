@@ -34,7 +34,6 @@ public class GuiControl extends RemoteWebElement {
 	public String locType;
 	public String locValue;
 	public GuiControl (Config config){
-		this.parent = (RemoteWebDriver) DriverInventory.getDriver();
 		friendlyName = config.getString("CONTROLDESCRIPTION");
 		locType= config.getString("LOCATORTYPE");
 		locValue = config.getString("LOCATORVALUE");

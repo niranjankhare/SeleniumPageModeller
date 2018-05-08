@@ -30,4 +30,10 @@ public class TAFConfig {
 	public static String sysPropChromeDriverPath = tafConfig.getString("webdriver.chrome.driver");
 	public static String sysPropMozGeckoDriverPath = tafConfig.getString("webdriver.gecko.driver");
 	
+	public static Config getConfig (String atPath){
+		if (tafConfig.hasPath(atPath))
+			return tafConfig.getConfig(atPath);
+		else return null;
+				
+	}
 }
