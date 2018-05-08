@@ -1,6 +1,8 @@
 # Compiled class file
 *.class
 
+# runtime local test artifacts
+test-output/
 # Log file
 *.log
 
@@ -33,7 +35,6 @@ bin/
 build/
 # Ignore Gradle GUI config
 gradle-app.setting
-
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
 
