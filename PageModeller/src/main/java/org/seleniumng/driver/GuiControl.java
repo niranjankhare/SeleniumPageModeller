@@ -60,90 +60,107 @@ public class GuiControl extends RemoteWebElement {
 	/*All interface methods below?*/
 	@Override
 	public void click() {
-		super.click();
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		we.click();
 
 	}
 
 	@Override
 	public void submit() {
-		super.submit();
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		we.submit();
 	}
 
 	@Override
 	public void sendKeys(CharSequence... keysToSend) {
-		super.sendKeys (keysToSend);
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		we.sendKeys (keysToSend);
 	}
 
 	@Override
 	public void clear() {
-		super.clear();
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		we.clear();
 
 	}
 
 	@Override
 	public String getTagName() {
-		return super.getTagName();
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.getTagName();
 	}
 
 	@Override
 	public String getAttribute(String name) {
-		return super.getAttribute(name);
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.getAttribute(name);
 	}
 
 	@Override
 	public boolean isSelected() {
-		return super.isSelected();
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.isSelected();
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return super.isEnabled();
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.isEnabled();
 	}
 
 	@Override
 	public String getText() {
-		return super.getText();
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.getText();
 	}
 
 	@Override
 	public List<WebElement> findElements(By by) {
-		return super.findElements(by);
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.findElements(by);
 	}
 
 	@Override
 	public WebElement findElement(By by) {
-		return super.findElement(by);
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.findElement(by);
 	}
 
 	@Override
 	public boolean isDisplayed() {
-		return super.isDisplayed();	}
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.isDisplayed();	}
 
 	@Override
 	public Point getLocation() {
-		return super.getLocation();
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.getLocation();
 	}
 
 	@Override
 	public Dimension getSize() {
-		return super.getSize();
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.getSize();
 	}
 
 	@Override
 	public String getCssValue(String propertyName) {
-		return super.getCssValue(propertyName);
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.getCssValue(propertyName);
 	}
 
 
 	@Override
 	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
-		return super.getScreenshotAs(target);
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.getScreenshotAs(target);
 	}
 
 
 	@Override
 	public Rectangle getRect() {
-		return super.getRect();
+		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
+		return we.getRect();
 	}
 
 }
