@@ -16,11 +16,18 @@
 package org.seleniumng.driver;
 
 import java.util.LinkedHashMap;
+import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.seleniumng.utils.TAFConfig;
 
 public class DriverInventory {
 	
@@ -32,14 +39,19 @@ public class DriverInventory {
 		
 	}
 	
-	public static WebDriver getDriver (String testName){
-		System.setProperty("webdriver.chrome.driver", "C:\\Program Files\\Google\\Chrome\\Application\\chromedriver.exe");
-		Long threadId = Thread.currentThread().getId();
+	public static WebDriver getDriver (){
+		
+		return getDriver(Thread.currentThread().getId());
+	}
+	
+	public static WebDriver getDriver (Long threadId){
+		System.setProperty("webdriver.chrome.driver", TAFConfig.sysPropChromeDriverPath);
+//		Long threadId = Thread.currentThread().getId();
 		WebDriver driver = driverInventory.get(threadId);
 		if (driver == null) {
 //			driver =new ChromeDriver(); 
-			System.setProperty("webdriver.gecko.driver","D:/Users/niru/workspace/TestAutomationFramework/src/main/resources/geckodriver.exe");
-			driver =new FirefoxDriver(); 
+			System.setProperty("webdriver.gecko.driver",TAFConfig.sysPropMozGeckoDriverPath);
+			driver =new ChromeDriver(); 
 			driverInventory.put(threadId, driver);
 			System.out.println("Returning new instance!!");
 		} else {
@@ -47,4 +59,91 @@ public class DriverInventory {
 		}
 		return driver;
 	} 
+	/**
+	 * Sets up the browser to be used for running automation
+	 * @param browser : See {@link BrowserType}
+	 * This method is most probably not goign to be used, as 
+	 * we will need some additional param to specify profile related to 
+	 * localized language etc. See setWebDriver (Browser, profile)
+	 */
+	public static void setWebDriver(BrowserType browser) {
+		DesiredCapabilities desiredCapabilities = null;
+		switch (browser.toString()){
+		case BrowserType.FIREFOX:
+			FirefoxProfile profile = new FirefoxProfile();
+			profile.setPreference("browser.helperApps.neverAsk.saveToDisk","text/csv");
+			desiredCapabilities = DesiredCapabilities.firefox();
+			desiredCapabilities.setCapability(FirefoxDriver.PROFILE, profile);
+
+			break;
+		case BrowserType.GOOGLECHROME:
+			desiredCapabilities = DesiredCapabilities.chrome();
+			ChromeOptions options = new ChromeOptions();
+			options.addArguments("--test-type");
+			desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
+
+			break;
+//		case IE:
+//			desiredCapabilities = DesiredCapabilities.internetExplorer();
+//			break;
+		}
+		setWebDriver (browser, desiredCapabilities);
+
+	}
+
+	/**
+	 * Sets up the Webdriver for running automation using the supplied browser type and 
+	 * Profile
+	 * @param browser : See {@link BrowserType}
+	 * @param ffProfilePath
+	 */
+	public static WebDriver setWebDriver(BrowserType browser, DesiredCapabilities desiredCapabilities) {
+
+		WebDriver webDriver = null;
+			//		if (SuiteConfiguration.useGrid){
+//			String remoteDriverUrlString ;
+//			if (!SuiteConfiguration.targetPort.equals("")){
+//				remoteDriverUrlString =  "http://"+ SuiteConfiguration.targetHost + ":" + SuiteConfiguration.targetPort + SuiteConfiguration.urlPath;
+//			} else {
+//				remoteDriverUrlString =  "http://"+ SuiteConfiguration.targetHost + SuiteConfiguration.urlPath;
+//				
+//			}
+//			URL remoteDriverUrl = null;
+//			try {
+//				remoteDriverUrl = new URL(remoteDriverUrlString);
+//			} catch (MalformedURLException e) {
+//				e.printStackTrace();
+//			}
+//			webDriver = new RemoteWebDriver(remoteDriverUrl,desiredCapabilities);
+//			((RemoteWebDriver) webDriver).setFileDetector(new LocalFileDetector());
+//		} 
+//		else{
+//
+			switch (browser.toString()){
+			case BrowserType.FIREFOX:
+				webDriver  = new FirefoxDriver(desiredCapabilities);
+				break;
+//			case IE:
+//				System.setProperty("webdriver.ie.driver", SuiteConfiguration.sysPropIEDriverPath);
+//				webDriver = new InternetExplorerDriver(desiredCapabilities);
+//				break;
+			case BrowserType.GOOGLECHROME:
+				System.setProperty("webdriver.chrome.driver", TAFConfig.sysPropChromeDriverPath);
+				webDriver = new ChromeDriver(desiredCapabilities);
+				break;
+			}
+//
+//		}
+		webDriver.manage().timeouts().implicitlyWait(TAFConfig.DEFAULT_IMPLICIT_WAIT, TimeUnit.SECONDS);
+		Dimension d = new Dimension(1280,1024);
+		//Resize the current window to the given dimension
+		
+//		if (!SuiteConfiguration.fullscreen) {
+			webDriver.manage().window().setSize(d);
+//		}else {			
+			webDriver.manage().window().maximize();
+//		}
+		
+			return webDriver;
+	}
 }

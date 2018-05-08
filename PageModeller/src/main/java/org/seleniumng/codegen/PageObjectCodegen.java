@@ -149,7 +149,7 @@ public class PageObjectCodegen {
 					? stdClass : customClass;
 
 			JClass jc = codeModel.ref("org.seleniumng.controls." + customClass);
-			mainClass.field(JMod.PUBLIC, jc, classAbrv + control, JExpr._null());
+			mainClass.field(JMod.PUBLIC, jc, classAbrv + control);
 
 		}
 		String rsrcPath = mainClass.name() + ".conf";

@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.seleniumng.driver.DriverInventory;
 import org.testng.annotations.Test;
 
 import myAut.PageLibraries.PageRepository;
@@ -15,6 +16,7 @@ public class AppTest {
 
 	public static void main(String[] args) {
 		new PageRepository();
+		browse ("https://dev.ums2.no");
 		
 //		pageDashboard.userRole.select ("WHere are you");
 		pageLogin.Login("NKH", "somepass");
@@ -27,6 +29,10 @@ public class AppTest {
 
 	}
 	
+	public static void browse (String url){
+		DriverInventory.getDriver().get(url);
+//		pageLogin.getWebDriver().get(url);
+	}
 	@Test
 	public void testGoogleSearch() throws InterruptedException {
 	  // Optional, if not specified, WebDriver will search your path for chromedriver.

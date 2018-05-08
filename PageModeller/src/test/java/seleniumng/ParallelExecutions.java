@@ -26,7 +26,7 @@ public class ParallelExecutions {
 	@Test
 	public void testCaseOne() throws UnsupportedEncodingException {
 		//Printing Id of the thread on using which test method got executed
-		DriverInventory.getDriver("testCaseOne");
+		DriverInventory.getDriver(Thread.currentThread().getId());
 	
 
 	    System.out.println("Done");
@@ -36,19 +36,19 @@ public class ParallelExecutions {
 	@Test
 	public void testCaseTwo() {
 		////Printing Id of the thread on using which test method got executed
-		DriverInventory.getDriver("testCaseTwo");
+		DriverInventory.getDriver(Thread.currentThread().getId());
 	}
 	
 	@Test
 	public void testCaseThree() {
 		////Printing Id of the thread on using which test method got executed
-		DriverInventory.getDriver("testCaseThree");
+		DriverInventory.getDriver(Thread.currentThread().getId());
 	}
 	
 	@Test
 	public void testCaseFour() {
 		////Printing Id of the thread on using which test method got executed
-		DriverInventory.getDriver("testCaseFour");
+		DriverInventory.getDriver(Thread.currentThread().getId());
 	}
 
 }

@@ -80,7 +80,7 @@ public class PageObjectBaseClass {
 			Object o = constructor.newInstance(confControl);
 			return o;
 		} catch (Exception e){
-			
+			e.printStackTrace();
 		}
 		return null;
 	}
