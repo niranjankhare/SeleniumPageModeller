@@ -71,10 +71,7 @@ public class PageObjectBaseClass {
 		
 		Config confControl = pageConf.getConfig(field.getName());
 		Constructor<?> constructor = null;
-//		for (int i = classHeirarchy.size()-1; i>0; i--){
-//			confControl = loadPageConfig(classHeirarchy.get(i-1)).withFallback(confControl);
-//		}
-		
+
 		try {
 			constructor = ftype.getConstructor(new Class[]{Config.class});
 			Object o = constructor.newInstance(confControl);
@@ -105,22 +102,25 @@ public class PageObjectBaseClass {
 		String langPath = tafConfig.getString("language");
 		String langDefault = tafConfig.hasPath("language.fallback")?tafConfig.getString("language.fallback"): "en_us"; 
 		String propFile = class1.getSimpleName()+ ".conf";
-		URL u_lang = class1.getResource(langPath + "/"+propFile);
-		URL u_langFallback = class1.getResource(langDefault + "/"+propFile);
-		Config c_lang = null, c_fallback = null;
-		try {
-			c_lang = ConfigFactory.parseURL(u_lang);
-		} catch (Exception e){
-			System.out.println("Got Exception trying to load : "+ u_lang );
-			System.exit(1);
-		}
-		try {
-			c_fallback = ConfigFactory.parseURL(u_langFallback );
-		} catch (Exception e){
-			System.out.println("Got Exception trying to load : "+ u_langFallback );
-		}
+//		URL u_lang = class1.getResource(langPath + "/"+propFile);
+//		URL u_langFallback = class1.getResource(langDefault + "/"+propFile);
+		Config c_lang = getPropConfig (class1,langPath + "/"+propFile ),
+				c_fallback = getPropConfig (class1,langDefault + "/"+propFile );
+
 		Config cf = c_lang.withFallback(c_fallback);
 		return cf;
 	}
 	
+	private Config getPropConfig (Class<?> class1, String resourceFile){
+		
+		Config retConfig = null;
+		URL resourceAsURL = class1.getResource(resourceFile);
+		try {
+			retConfig = 	ConfigFactory.parseURL(resourceAsURL);
+		} catch (Exception e){
+			System.out.println("Got Exception trying to load : "+ resourceFile );
+			retConfig = ConfigFactory.parseString("");
+		}
+		return retConfig;
+	}
 }

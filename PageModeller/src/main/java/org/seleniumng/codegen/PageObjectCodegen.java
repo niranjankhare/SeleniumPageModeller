@@ -40,16 +40,53 @@ import java.util.LinkedHashMap;
 
 import org.seleniumng.ui.LibDatabase;
 
+/**
+ * @author niru
+ * The main class that will generated the source code and metadata 
+ * for the PageModeller.
+ * This uses the 
+ */
 public class PageObjectCodegen {
+	/**
+	 * The code modeller to generate the source code for 
+	 * Page Modeller
+	 */
 	private static JCodeModel codeModel = new JCodeModel();
+	/**
+	 * The code modeller to generate the metadata resources for 
+	 * Page Modeller
+	 * 
+	 */
 	private static JCodeModel resourceModel = new JCodeModel();
+	
+	/**
+	 * Location under which the classes representing the 
+	 * Page Objects will be generated
+	 */
 	private static String sourceDirPath = "src/main/java";
+	/**
+	 * Location under which the Page Objects metadata will be 
+	 * generated
+	 */
 	private static String resourceDirPath = "src/main/resources";
 	
+	/**
+	 * Controls whether to overwrite existing user defined library templates
+	 */
 	private static Boolean reWriteUserDefinedLibs = tafConfig.getBoolean("PageModeller.reWriteUserDefinedLibs");
 
+	/**
+	 * The superclass for the PageRepository class generated for your
+	 * application under test. This class defines constructors to auto-
+	 * initialize your PageRepository 
+	 */
 	private static JClass objectRepositoryBaseClass = codeModel
 			.directClass("org.seleniumng.utils.PageObjectRepository");
+	/**
+	 * The superclass for the Page Object class heirarchy.
+	 * This class defines constructors to auto-initialize your Page objects
+	 * using the Pages metadata.
+	 */
 	private static JClass pageClassBaseClass = codeModel.directClass("org.seleniumng.utils.PageObjectBaseClass");
 
 	public static void main(String... args) {
@@ -59,21 +96,29 @@ public class PageObjectCodegen {
 		} catch (JClassAlreadyExistsException ex) {
 			ex.printStackTrace();
 		} catch (IOException ex) {
+			System.out.println("Uncaught error in generating page library!");
 			ex.printStackTrace();
 		}
-		// System.out.println(b.toString());
-		System.out.println("Done");
+		
 	}
+	
+	
 
+	/**
+	 * Starting point for generating the Page Object Model. 
+	 * Defines the Page Repository for your application based on the 
+	 * metadata saved in the source database. 
+	 * @throws JClassAlreadyExistsException
+	 * @throws IOException
+	 */
 	public static void generateSource() throws JClassAlreadyExistsException, IOException {
 		// Instantiate an instance of the JCodeModel class
 		String myApplication = tafConfig.getString("application");
 		String pagePackage = myApplication + ".webPages";
 		String userLibrariesPackage = myApplication + ".PageLibraries";
 		JDefinedClass repositoryToCreate = codeModel._class(userLibrariesPackage + ".PageRepository");
-
 		repositoryToCreate._extends(objectRepositoryBaseClass);
-		// HashMap<String, String> webPages = fetchPageList();
+	
 		List<HashMap<String, String>> orderedList = LibDatabase.getPageHeirarchy();
 		for (HashMap<String, String> webPages : orderedList) {
 			for (String webPage : webPages.keySet()) {
@@ -87,11 +132,22 @@ public class PageObjectCodegen {
 		resourceModel.build(new File(resourceDirPath));
 	}
 
-	// private static HashMap<String, String> fetchPageList() {
-	// List<HashMap<String, String>> set = LibDatabase.getPageHeirarchy();
-	// return (HashMap<String, String>) set;
-	// }
-
+	/**
+	 * @param pPackage the package to be used to generate the classes for Page objects
+	 * Note that this should be a package will have only generatede code. Any manual edits
+	 * in the package can be overwritten the next time code generation is done.
+	 * @param uPackage the package to be used to generate the classes for 
+	 * User to extend the generated Page objects where he can write his libraries  
+	 * @param webPage Name for the Class representing the Page Object
+	 * @param parent super class for the webPage class
+	 * @return the class to include in the page repository for users
+	 * this would be where the user is expected to implement his re-usable
+	 * actions on this page. this could be the JDefinedClass or JClass 
+	 * depending on whether the Library class exists or not and if user has
+	 * specifically asked for re-writing the class 
+	 * See: reWriteUserDefinedLibs
+	 * @throws IOException in case of problems with writing the source code
+	 */
 	private static JClass generatePageObject(String pPackage, String uPackage, String webPage, String parent)
 			throws IOException {
 
@@ -158,7 +214,8 @@ public class PageObjectCodegen {
 		JTextFile uLibRrc = new JTextFile(uLibRsrcPath);
 		String propertyMap = c.root().render(ConfigRenderOptions.concise().setFormatted(true).setJson(true));
 		rsrc.setContents(propertyMap);
-		uLibRrc.setContents("\"somePropertyName\" = \""+ userImplClassSN+"\"");
+//		uLibRrc.setContents("\"somePropertyName\" = \""+ userImplClassSN+"\"");
+		uLibRrc.setContents("");
 		retResource.addResourceFile(rsrc);
 		uLibResource.addResourceFile(uLibRrc);
 

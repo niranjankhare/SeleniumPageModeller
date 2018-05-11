@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 //version = '1.0'
 
 jar {
@@ -17,7 +17,7 @@ ext {
 	log4jCoreVersion = '2.6.1'
 	log4jApiVersion = '2.6.1'
 	testngVersion = '6.9.12'
-	seleniumJavaVersion = '3.0.0'
+	seleniumJavaVersion = '3.12.0'
 	jooqVersion = '3.10.0'
 	jsoupVersion = '1.10.3'
 	javaxServletApiVersion = '3.1.0'
