@@ -36,7 +36,12 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.seleniumng.utils.TAFConfig;
 
 import com.typesafe.config.Config;
-
+/**
+ * Class to manage webdriver sessions.. for now based only on thread
+ * but would need it to manage multiple webdriver sessions for a single thread
+ * @author niru
+ *
+ */
 public class DriverInventory {
 	private static Config gridHub = TAFConfig.getConfig("seleniumGrid");
 	private static LinkedHashMap<Long, WebDriver> driverInventory = new LinkedHashMap<Long, WebDriver>();

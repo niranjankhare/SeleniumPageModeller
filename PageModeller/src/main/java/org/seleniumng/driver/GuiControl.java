@@ -28,7 +28,12 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 import com.typesafe.config.Config;
-
+/**
+ * Wrapper for Seleniums Remote Web element, to be able to provide
+ * methods wrappers on top of what selenium webdriver provides
+ * @author niru
+ *
+ */
 public class GuiControl extends RemoteWebElement {
 	public String friendlyName ;
 	public String locType;
