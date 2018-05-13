@@ -103,14 +103,15 @@ function add_UpdateRow(someData){
 	var elTable = document.getElementById(tname);
 	var stdClasses = Promise.resolve(getData('/fetch/libdatabase/getstandardypes'));
 	var oper = document.getElementById('oper').value;
-
-Promise.all([someData, stdClasses]).then(function (allData){
+	var locatoryTypes = Promise.resolve(getData('/fetch/getlocatorytypes'));
+	Promise.all([someData, stdClasses,locatoryTypes]).then(function (allData){
 	var tableData = allData[0];
 	var stdClassesData = allData[1];
+	var supportedLocatorTypes = allData[2];
 	var dbColumns = tableData[0];
 	console.log (dbColumns);
 	var indexToHide = dbColumns.indexOf('CONTROLNAME');
-	var selectIndex = dbColumns.indexOf('STANDARDCLASS');
+	var selectIndex = dbColumns.indexOf('LOCATORTYPE');
 	var rowIterator;
 
 		rowIterator = tableData.length;
@@ -123,11 +124,16 @@ Promise.all([someData, stdClasses]).then(function (allData){
 					var rowId = rowIdmain + '.' + dbColumns[r];
 					var cell = row.insertCell(-1);
 					var inputElement ;
-					if (r != selectIndex){
+					if (r < selectIndex){
 						inputElement = document.createElement('input');
 					} else{
 						inputElement = document.createElement('select');
-						getSelectControlt(stdClassesData, inputElement);
+						if (r == selectIndex){
+							getSelectControlt(supportedLocatorTypes, inputElement);
+						}
+						if (r > selectIndex){
+							getSelectControlt(stdClassesData, inputElement);
+						}
 					} 
 						
 					if (r< indexToHide){

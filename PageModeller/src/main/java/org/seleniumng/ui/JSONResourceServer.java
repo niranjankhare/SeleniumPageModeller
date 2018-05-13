@@ -18,7 +18,9 @@ package org.seleniumng.ui;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -64,58 +66,68 @@ public class JSONResourceServer extends HttpServlet {
         
         String responseStr = "";
         switch (sPath) {
-            case "/libdatabase/gettablefields":
-            	tableName = getParameter(req, "tableName");
-                Object sFields = LibDatabase.getTableFields(tableName);
-                responseStr = new Gson().toJson(sFields);
-                break;
-            case "/libdatabase/getcustomtypes":
-                Object cTypes = LibDatabase.getCustomTypes();
-                responseStr = new Gson().toJson(cTypes);
-                break;
-            case "/libdatabase/getstandardypes":
-                Object sTypes = LibDatabase.getStandardTypes();
-                responseStr = new Gson().toJson(sTypes);
-                break;
-            case "/libdatabase/gettabledata":
-            	tableName = getParameter(req, "tableName");
-            	pageName = getParameter(req, "pageName");
-                Object oTableData = LibDatabase.getUIPropsView(tableName, pageName);
-                responseStr = new Gson().toJson(oTableData);
-                break;
-            case "/libdatabase/pageguiextendedprops":
-            	String guiId = getParameter(req, "guiId");
-            	Object oMoreProps = LibDatabase.getPageExtendedProperties(Integer.parseInt(guiId));
-                responseStr = new Gson().toJson(oMoreProps);
-                System.out.println(responseStr);
-            	break;
-            case "/libdatabase/getextendedproptypes":
-            	tableName = getParameter(req, "tableName");
-            	pageName = getParameter(req, "pageName");
-            	Object oExtendedPropTypes = LibDatabase.getExtendedProptypes(tableName);
-                responseStr = new Gson().toJson(oExtendedPropTypes);
-                System.out.println(responseStr);
-            	break;
-            case "/favicon.ico":
-                break;
-            case "/test":
-                LinkedHashMap<String, LinkedHashMap<String, String>> cleanParamMap = processRequestInput(
-                        req.getParameterMap());
-//                LibDatabase.updateTable(tableName, cleanParamMap);
-                responseStr = req.getParameterMap().toString();
+		case "/getlocatorytypes":
+			List<String> byMethods = Arrays.asList("By.ByClassName", "By.ByCssSelector", "By.ById", "By.ByLinkText",
+					"By.ByName", "By.ByPartialLinkText", "By.ByTagName", "By.ByXPath");
+			LinkedHashMap<String, Object> toReturnMap = new LinkedHashMap<String, Object>();
 
-                break;
-            case "/freeform":
-                responseStr = LibHtml.getTableEntryForm("entryform", null, null);
-                break;
-            case "":
-            case "/":
-            default:
-                responseStr = LibHtml.getWelcomeForm();
+			for (String method : byMethods) {
+				toReturnMap.put(method.split("\\.")[1], Arrays.asList(method,null));
+			}
+			responseStr = new Gson().toJson(toReturnMap);
+			break;
+        case "/libdatabase/gettablefields":
+        	tableName = getParameter(req, "tableName");
+            Object sFields = LibDatabase.getTableFields(tableName);
+            responseStr = new Gson().toJson(sFields);
+            break;
+        case "/libdatabase/getcustomtypes":
+            Object cTypes = LibDatabase.getCustomTypes();
+            responseStr = new Gson().toJson(cTypes);
+            break;
+        case "/libdatabase/getstandardypes":
+            Object sTypes = LibDatabase.getStandardTypes();
+            responseStr = new Gson().toJson(sTypes);
+            break;
+        case "/libdatabase/gettabledata":
+        	tableName = getParameter(req, "tableName");
+        	pageName = getParameter(req, "pageName");
+            Object oTableData = LibDatabase.getUIPropsView(tableName, pageName);
+            responseStr = new Gson().toJson(oTableData);
+            break;
+        case "/libdatabase/pageguiextendedprops":
+        	String guiId = getParameter(req, "guiId");
+        	Object oMoreProps = LibDatabase.getPageExtendedProperties(Integer.parseInt(guiId));
+            responseStr = new Gson().toJson(oMoreProps);
+            System.out.println(responseStr);
+        	break;
+        case "/libdatabase/getextendedproptypes":
+        	tableName = getParameter(req, "tableName");
+        	pageName = getParameter(req, "pageName");
+        	Object oExtendedPropTypes = LibDatabase.getExtendedProptypes(tableName);
+            responseStr = new Gson().toJson(oExtendedPropTypes);
+            System.out.println(responseStr);
+        	break;
+        case "/favicon.ico":
+            break;
+        case "/test":
+            LinkedHashMap<String, LinkedHashMap<String, String>> cleanParamMap = processRequestInput(
+                    req.getParameterMap());
+//            LibDatabase.updateTable(tableName, cleanParamMap);
+            responseStr = req.getParameterMap().toString();
 
-        }
-        writeResponse(resp, responseStr,"Content-type: application/json; charset=utf-8", null);
+            break;
+        case "/freeform":
+            responseStr = LibHtml.getTableEntryForm("entryform", null, null);
+            break;
+        case "":
+        case "/":
+        default:
+            responseStr = LibHtml.getWelcomeForm();
+
     }
+    writeResponse(resp, responseStr,"Content-type: application/json; charset=utf-8", null);
+}
 
     protected void processPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sPath = req.getPathInfo().toLowerCase();
