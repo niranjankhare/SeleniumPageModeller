@@ -213,11 +213,6 @@ public class LibDatabase {
 								GUIMAP, guimapFields, guimapValues);
 						updateGuiMap.where(GUIMAP.GUIMAPID.eq(currentGuiMapId)).execute();
 					}
-					String locatorValue = row.getValue().get("LOCATORVALUE");
-					propertiesFields.add(PROPERTIES.LOCATORTYPE);
-					String locatorType = (locatorValue.startsWith("/")) ? "XPATH" : "ID";
-					propertiesValues.add(locatorType);
-
 					if (propertiesFields.size() > 0) {
 						UpdateSetMoreStep<PropertiesRecord> updateProperties = (UpdateSetMoreStep<PropertiesRecord>) getTableUpdateStatement(
 								PROPERTIES, propertiesFields, propertiesValues);
@@ -240,10 +235,6 @@ public class LibDatabase {
 
 					propertiesFields.add(PROPERTIES.GUIMAPID);
 					propertiesValues.add(currentGuiMapId);
-					String locatorValue = row.getValue().get("LOCATORVALUE");
-					propertiesFields.add(PROPERTIES.LOCATORTYPE);
-					String locatorType = (locatorValue.startsWith("/")) ? "XPATH" : "ID";
-					propertiesValues.add(locatorType);
 
 					InsertValuesStepN<?> insertSetStepProperties = DbManager.getOpenContext().insertInto(PROPERTIES,
 							propertiesFields);

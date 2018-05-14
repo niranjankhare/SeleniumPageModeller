@@ -72,7 +72,8 @@ public class JSONResourceServer extends HttpServlet {
 			LinkedHashMap<String, Object> toReturnMap = new LinkedHashMap<String, Object>();
 
 			for (String method : byMethods) {
-				toReturnMap.put(method.split("\\.")[1], Arrays.asList(method,null));
+				String key = method.split("\\.")[1];
+				toReturnMap.put(key, Arrays.asList(key.substring(2),null));
 			}
 			responseStr = new Gson().toJson(toReturnMap);
 			break;
