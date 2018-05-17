@@ -257,7 +257,9 @@ public class DriverInventory {
 	}
 
 	public static void closeSession() {
-		System.out.println("Closing Session:"+ Thread.currentThread().getId());
+		Long sessionKey = Thread.currentThread().getId();
+		System.out.println("Closing Session:"+ sessionKey);
 		getDriver().close();
+		driverInventory.remove(sessionKey);
 	}
 }
