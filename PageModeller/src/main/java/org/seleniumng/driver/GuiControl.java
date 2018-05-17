@@ -28,143 +28,161 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 import com.typesafe.config.Config;
+
 /**
- * Wrapper for Seleniums Remote Web element, to be able to provide
- * methods wrappers on top of what selenium webdriver provides
+ * Wrapper for Seleniums Remote Web element, to be able to provide methods
+ * wrappers on top of what selenium webdriver provides
+ * 
  * @author niru
  *
  */
 public class GuiControl extends RemoteWebElement {
-	public String friendlyName ;
+	public String friendlyName;
 	public String locType;
 	public String locValue;
-	public GuiControl (Config config){
+
+	public GuiControl(Config config) {
 		friendlyName = config.getString("CONTROLDESCRIPTION");
-		locType= config.getString("LOCATORTYPE");
+		locType = config.getString("LOCATORTYPE");
 		locValue = config.getString("LOCATORVALUE");
 		this.id = locValue;
-		
+
 	}
+
+	private WebElement findMe() {
+		WebElement me = null;
+		By byMethod = null;
+		switch (this.locType) {
+		case "ByClassName":
+			byMethod = By.className(locValue);
+			break;
+		case "ByCssSelector":
+			byMethod = By.cssSelector(locValue);
+			break;
+		case "ByLinkText":
+			byMethod = By.linkText(locValue);
+			break;
+		case "ByName":
+			byMethod = By.name(locValue);
+			break;
+		case "ByPartialLinkText":
+			byMethod = By.partialLinkText(locValue);
+			break;
+		case "ByTagName":
+			byMethod = By.tagName(locValue);
+			break;
+		case "ByXPath":
+			byMethod = By.xpath(locValue);
+			break;
+		case "ById":
+		default:
+			byMethod = By.id(locValue);
+		}
+		me = DriverInventory.getDriver().findElement(byMethod);
+		return me;
+	}
+
 	public void playAround(Integer... keysToSend) {
 		// TODO Auto-generated method stub
 
 	}
-	
-	
+
 	public void setText(CharSequence... keysToSend) {
-		clear ();
+		clear();
 		sendKeys(keysToSend);
 	}
-	
-	
-	public void typeAt(Integer positionReference, CharSequence... keysToSend ) {
+
+	public void typeAt(Integer positionReference, CharSequence... keysToSend) {
 		// TODO Auto-generated method stub
 
 	}
-	/*All interface methods below?*/
+
+	/* All interface methods below? */
 	@Override
 	public void click() {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		we.click();
+		findMe().click();
 
 	}
 
 	@Override
 	public void submit() {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		we.submit();
+		findMe().submit();
 	}
 
 	@Override
 	public void sendKeys(CharSequence... keysToSend) {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		we.sendKeys (keysToSend);
+		findMe().sendKeys(keysToSend);
 	}
 
 	@Override
 	public void clear() {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		we.clear();
+		findMe().clear();
 
 	}
 
 	@Override
 	public String getTagName() {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.getTagName();
+		return findMe().getTagName();
 	}
 
 	@Override
 	public String getAttribute(String name) {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.getAttribute(name);
+		return findMe().getAttribute(name);
 	}
 
 	@Override
 	public boolean isSelected() {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.isSelected();
+		return findMe().isSelected();
 	}
 
 	@Override
 	public boolean isEnabled() {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.isEnabled();
+		return findMe().isEnabled();
 	}
 
 	@Override
 	public String getText() {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.getText();
+		return findMe().getText();
 	}
 
 	@Override
 	public List<WebElement> findElements(By by) {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.findElements(by);
+		return findMe().findElements(by);
 	}
 
 	@Override
 	public WebElement findElement(By by) {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.findElement(by);
+		return findMe().findElement(by);
 	}
 
 	@Override
 	public boolean isDisplayed() {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.isDisplayed();	}
+		return findMe().isDisplayed();
+	}
 
 	@Override
 	public Point getLocation() {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.getLocation();
+		return findMe().getLocation();
 	}
 
 	@Override
 	public Dimension getSize() {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.getSize();
+		return findMe().getSize();
 	}
 
 	@Override
 	public String getCssValue(String propertyName) {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.getCssValue(propertyName);
+		return findMe().getCssValue(propertyName);
 	}
-
 
 	@Override
 	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.getScreenshotAs(target);
+		return findMe().getScreenshotAs(target);
 	}
-
 
 	@Override
 	public Rectangle getRect() {
-		WebElement we = DriverInventory.getDriver().findElement(By.id(locValue));
-		return we.getRect();
+		return findMe().getRect();
 	}
 
 }
