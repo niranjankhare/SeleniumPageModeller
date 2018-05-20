@@ -63,12 +63,12 @@ public class PageObjectCodegen {
 	 * Location under which the classes representing the 
 	 * Page Objects will be generated
 	 */
-	private static String sourceDirPath = "src/main/java";
+	private static String sourceDirPath =  tafConfig.getString("PageModeller.sourceDirPath");
 	/**
 	 * Location under which the Page Objects metadata will be 
 	 * generated
 	 */
-	private static String resourceDirPath = "src/main/resources";
+	private static String resourceDirPath =  tafConfig.getString("PageModeller.resourceDirPath"); 
 	
 	/**
 	 * Controls whether to overwrite existing user defined library templates
