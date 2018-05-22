@@ -89,7 +89,7 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 
 
-task jooqGenerate (type: JavaExec) {
+task jooqGenerate {
 	def config = ConfigFactory.load();
 	def dbUrl = config.getString("db.url");
 	def dbUsername = config.getString("db.username");
