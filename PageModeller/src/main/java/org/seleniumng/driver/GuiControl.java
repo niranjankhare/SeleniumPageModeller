@@ -24,7 +24,6 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 import com.typesafe.config.Config;
@@ -40,12 +39,14 @@ public class GuiControl extends RemoteWebElement {
 	public String friendlyName;
 	public String locType;
 	public String locValue;
+	public String session;
 
 	public GuiControl(Config config) {
 		friendlyName = config.getString("CONTROLDESCRIPTION");
 		locType = config.getString("LOCATORTYPE");
 		locValue = config.getString("LOCATORVALUE");
 		this.id = locValue;
+		this.session = config.getString("session");
 
 	}
 
@@ -78,7 +79,7 @@ public class GuiControl extends RemoteWebElement {
 		default:
 			byMethod = By.id(locValue);
 		}
-		me = DriverInventory.getDriver().findElement(byMethod);
+		me = DriverInventory.getDriver(session).findElement(byMethod);
 		return me;
 	}
 

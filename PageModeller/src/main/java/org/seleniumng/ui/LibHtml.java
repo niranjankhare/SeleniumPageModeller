@@ -134,22 +134,15 @@ public class LibHtml {
         return Parser.unescapeEntities(html.toString(), false);
     }
 
-    public static String getPageAddGUIForm(String pageName, String operation) {
-        String mainPropertiesView = "propsview";
+    public static String getPageProvisioningForm(String pageName, String operation) {
+        String mainPropertiesView = "PAGES";
 
         mainPropertiesView.replaceAll(mainPropertiesView, mainPropertiesView.toLowerCase());
         List<String> mainFieldsList = LibDatabase.getTableFields(mainPropertiesView);
 
         Element table = new Element("table").attr("id", mainPropertiesView);
         Element headerRow = new Element("tr").attr("id", "headerRow").attr("style", "visibility:visible;");
-        /*
-        // Add columns to the displayed table as header row
-        for (String field : mainFieldsList) {
-            headerRow.appendElement("th").text(field);
-        }
 
-        headerRow.appendElement("th").text("More properties");
-*/
         String scriptBlock = addRowScriptTemplateN;
 
         Document html = Jsoup.parse("<html></html>");
@@ -168,23 +161,23 @@ public class LibHtml {
         elTableName.attr("id", "tableName");
         elTableName.attr("name", "tableName");
         elTableName.attr("value", mainPropertiesView);
+// 		This will become appName ?
+//        Element elPageName = new Element("input");
+//        elPageName.attr("type", "hidden");
+//        elPageName.attr("id", "pageName");
+//        elPageName.attr("name", "pageName");
+//        elPageName.attr("value", pageName);
 
-        Element elPageName = new Element("input");
-        elPageName.attr("type", "hidden");
-        elPageName.attr("id", "pageName");
-        elPageName.attr("name", "pageName");
-        elPageName.attr("value", pageName);
-
-        Element elOperation = new Element("input");
-        elOperation.attr("type", "hidden");
-        elOperation.attr("id", "oper");
-        elOperation.attr("name", "oper");
-        elOperation.attr("value", operation);
+//        Element elOperation = new Element("input");
+//        elOperation.attr("type", "hidden");
+//        elOperation.attr("id", "oper");
+//        elOperation.attr("name", "oper");
+//        elOperation.attr("value", operation);
 
         Element addMore = new Element("input");
         addMore.attr("type", "button");
         addMore.attr("id", "addRow");
-        addMore.attr("onclick", "add_UpdateRow(getTableData('propsview',document.getElementById('pageName').value));");
+        addMore.attr("onclick", "add_UpdateRow(getTableData('"+mainPropertiesView +"',document.getElementById('pageName').value));");
         addMore.attr("value", "Add row");
 
         Element submit = new Element("input");
@@ -197,8 +190,8 @@ public class LibHtml {
         form.appendChild(parentPageDiv);
         form.appendChild(addMore);
         form.appendChild(elTableName);
-        form.appendChild(elPageName);
-        form.appendChild( elOperation);
+//        form.appendChild(elPageName);
+//        form.appendChild( elOperation);
         form.appendChild(submit);
         html.body().before(scriptElement);
         html.body().appendChild(form);
@@ -217,32 +210,6 @@ public class LibHtml {
         return replaceText;
     }
 
-//    private static void WriteFile(String fileName, String content) {
-//        File f = new File(fileName);
-//
-//        System.out.println(f.getName());
-//        FileOutputStream fo = null;
-//        if (!f.exists()) {
-//            try {
-//                f.createNewFile();
-//            } catch (IOException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
-//        }
-//        try {
-//
-//            fo = new FileOutputStream(f);
-//            String b = content;
-//            fo.write(b.getBytes());
-//            fo.close();
-//        } catch (IOException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//
-//    }
-
     public static Element getTextArea(String columnName) {
 
         String idNameStr = "Row" + "'+rowCount+'" + "." + columnName;
@@ -257,10 +224,9 @@ public class LibHtml {
         Document html = Jsoup.parse("<html></html>");
         html.body().appendElement("h2").text("Welcome to automation GUI map maintenance portal!");
 
-        Element selectPage = new Element("select").attr("name", "pageName");
-        selectPage = addAvailablePages(selectPage);
-        Element enterNew = new Element("input").attr("name", "oper").attr("type", "radio").attr("value", "new").text("Add New GUI");
-        Element update = new Element("input").attr("name", "oper").attr("type", "radio").attr("value", "update").attr("checked", "checked").text("Update existing GUI");
+        Element selectPage = getPageSelect();         
+        Element enterNew = new Element("input").attr("name", "oper").attr("type", "radio").attr("value", "new").text("Add New Page");
+        Element update = new Element("input").attr("name", "oper").attr("type", "radio").attr("value", "update").attr("checked", "checked").text("Update existing Page");
         Element form = new Element("form").attr("id", "guimap").attr("method", "post").attr("action", "/fetchPage");
         form.appendChild(selectPage);
         form.appendChild(enterNew);
@@ -270,7 +236,8 @@ public class LibHtml {
         return Parser.unescapeEntities(html.toString(), false);
     }
 
-    private static Element addAvailablePages(Element selectElement) {
+    private static Element getPageSelect() {
+    	Element selectElement = new Element("select").attr("name", "pageName");
         LinkedHashMap<String, String> availablePages = LibDatabase.getAvailablePages();
         return addOptionsToSelect(selectElement, availablePages);
     }
@@ -284,7 +251,7 @@ public class LibHtml {
 
 
 
-	public static String getPageUpdateGUIForm(String pageName, String operation) {
+	public static String getPageUpdateGUIForm(String pageName, String operationc) {
         String mainPropertiesView = "propsview";
        
         mainPropertiesView.replaceAll(mainPropertiesView, mainPropertiesView.toLowerCase());
@@ -328,11 +295,11 @@ public class LibHtml {
         elPageName.attr("name", "pageName");
         elPageName.attr("value", pageName);
 
-        Element elOperation = new Element("input");
-        elOperation.attr("type", "hidden");
-        elOperation.attr("id", "oper");
-        elOperation.attr("name", "oper");
-        elOperation.attr("value", operation);
+//        Element elOperation = new Element("input");
+//        elOperation.attr("type", "hidden");
+//        elOperation.attr("id", "oper");
+//        elOperation.attr("name", "oper");
+//        elOperation.attr("value", operation);
         
         Element addMore = new Element("input");
         addMore.attr("type", "button");
@@ -350,7 +317,7 @@ public class LibHtml {
         form.appendChild(parentPageDiv);
         form.appendChild(elTableName);
         form.appendChild(elPageName);
-        form.appendChild( elOperation);
+//        form.appendChild( elOperation);
         form.appendChild(addMore);
         form.appendChild(submit);
         html.body().before(scriptElement);

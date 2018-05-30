@@ -102,7 +102,7 @@ function add_UpdateRow(someData){
 	var pageName = document.getElementById('pageName').value;
 	var elTable = document.getElementById(tname);
 	var stdClasses = Promise.resolve(getData('/fetch/libdatabase/getstandardypes'));
-	var oper = document.getElementById('oper').value;
+	/*var oper = document.getElementById('oper').value;*/
 	var locatoryTypes = Promise.resolve(getData('/fetch/getlocatorytypes'));
 	Promise.all([someData, stdClasses,locatoryTypes]).then(function (allData){
 	var tableData = allData[0];
@@ -148,7 +148,7 @@ function add_UpdateRow(someData){
 				var popupBtn = document.createElement('button'); 
 				popupBtn.type = 'button'; 
 				popupBtn.setAttribute
-					  ('onclick','showMoreProps(this, "' + oper + '")');
+					  ('onclick','showMoreProps(this)');
 				popupBtn.id = rowIdmain +
 					  '.popupBtn'; 
 				popupBtn.appendChild(document.createTextNode("Define More\nProperties")); 
@@ -217,16 +217,16 @@ function getSelectControlt (options, element){
 	}
 }
 
-function showMoreProps(e , op){
+function showMoreProps(e){
 	e.disabled = true;
 	var rowId = e.getAttribute('rowid');
 	var popup = document.getElementById(rowId+'.popupDiv');
 	if (!popup.contains(popup.querySelector('div[id=\'popupTitle\']')))
-		fillPopup_new (popup, op);
+		fillPopup_new (popup);
 	popup.style.visibility = 'visible';
 	popup.style.display = 'inline';
 	showRowById(rowId);
-	disableMainForm(op);		
+	disableMainForm();		
 }
 
 function showRowById (id){
@@ -235,34 +235,34 @@ function showRowById (id){
 
 }
 
-function disableMainForm (op){
-	disableMainFormButtions(op);
+function disableMainForm (){
+	disableMainFormButtions();
 	var form = document.getElementById('formMainDiv');
 	form.style.visibility = 'hidden';
 }
 
-function disableMainFormButtions(op){
-	if (op === 'new'){
+function disableMainFormButtions(){
+/*	if (op === 'new'){*/
 		document.getElementById('addRow').disabled = true;
-	}
+/*	}*/
 	document.getElementById('submit').disabled = true;
 }
 
-function getPopupCloseButtonForRowId (rowId, op) {
+function getPopupCloseButtonForRowId (rowId) {
 	var divCloseX = document.createElement('button');
 	divCloseX.type = 'button';
 	divCloseX.setAttribute ('rowid', rowId);
 	divCloseX.setAttribute ('style','background: none; border:none; color:red; cursor:pointer;');
-	divCloseX.setAttribute ('onclick','closeMoreProps(this, "'+op+'")');
+	divCloseX.setAttribute ('onclick','closeMoreProps(this)');
 	divCloseX.appendChild(document.createTextNode("X"));
 	return divCloseX;
 }
 
-function closeMoreProps(e, op){
+function closeMoreProps(e){
 	var id = e.getAttribute('rowid');
 	var idPopup = id+'.popupDiv';
 	document.getElementById(id+'.popupBtn').disabled = false;
-	enableMainForm(op);
+	enableMainForm();
 	resetRowById(id);
 	var form = document.getElementById('formMainDiv');
 	form.style.visibility = 'inherit';
@@ -273,16 +273,16 @@ function closeMoreProps(e, op){
 	popup.style.display = 'none';
 }
 
-function enableMainForm (oper){
-	enableMainFormButtions(oper);
+function enableMainForm (){
+	enableMainFormButtions();
 	var form = document.getElementById('formMainDiv');
 	form.style.visibility = 'inherit';
 }
-function enableMainFormButtions(op){
+function enableMainFormButtions(){
 	
-	if (op === 'new'){
+/*	if (op === 'new'){*/
 		document.getElementById('addRow').disabled = false;
-	}
+	/*}*/
 	document.getElementById('submit').disabled = false;
 }
 
@@ -382,12 +382,12 @@ function getOptionId (el, mapClass){
 }
 	
 	
-function fillPopup_new(p, op){
+function fillPopup_new(p){
 	var rowId = p.getAttribute('rowId');
 	var title = document.createElement ('div');
 	title.setAttribute('id', 'popupTitle');
 	title.appendChild(document.createTextNode("Define More\nProperties"));
-	title.appendChild (getPopupCloseButtonForRowId(rowId, op));
+	title.appendChild (getPopupCloseButtonForRowId(rowId));
 	p.appendChild(title);
 	var content = document.createElement('div');
 	content.setAttribute ('id', rowId+'.contentDiv');
@@ -413,10 +413,10 @@ function fillPopup_new(p, op){
 		}
 		getSelectControlt(resp, sel);
 		
-		addExtendedPropsTableToPopup (p, op);
+		addExtendedPropsTableToPopup (p);
 		p.appendChild(content);
-		
-		if (op==='update'){
+		/*
+		if (op==='update'){*/
 			Promise.resolve(getExtendedPageGuiData(guimapId))
 			 .then(function(resp){
 				var flds = resp[0];
@@ -439,7 +439,7 @@ function fillPopup_new(p, op){
 			.catch (function(error){
 				
 			});
-			
+	/*		
 			}
 		else {
 			
@@ -447,7 +447,7 @@ function fillPopup_new(p, op){
 			content.style.visibility='inherit';
 			content.style.display='inline';
 		}
-		
+		*/
 		
 		
 		

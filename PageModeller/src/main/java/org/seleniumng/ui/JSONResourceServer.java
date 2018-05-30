@@ -67,13 +67,12 @@ public class JSONResourceServer extends HttpServlet {
         String responseStr = "";
         switch (sPath) {
 		case "/getlocatorytypes":
-			List<String> byMethods = Arrays.asList("By.ByClassName", "By.ByCssSelector", "By.ById", "By.ByLinkText",
-					"By.ByName", "By.ByPartialLinkText", "By.ByTagName", "By.ByXPath","ByAll", "ByChained", "ByIdOrName");
+			List<String> byMethods = Arrays.asList("ByClassName", "ByCssSelector", "ById", "ByLinkText",
+					"ByName", "ByPartialLinkText", "ByTagName", "ByXPath","ByAll", "ByChained", "ByIdOrName");
 			LinkedHashMap<String, Object> toReturnMap = new LinkedHashMap<String, Object>();
 
 			for (String method : byMethods) {
-				String key = method.split("\\.")[1];
-				toReturnMap.put(key, Arrays.asList(key.substring(2),null));
+				toReturnMap.put(method, Arrays.asList(method.substring(2),null));
 			}
 			responseStr = new Gson().toJson(toReturnMap);
 			break;

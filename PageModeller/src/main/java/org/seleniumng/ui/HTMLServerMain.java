@@ -107,7 +107,7 @@ public class HTMLServerMain extends HttpServlet {
                 break;
             case "/fetchpage":
                 if (operation.equalsIgnoreCase("new"))
-                	responseStr = LibHtml.getPageAddGUIForm(pageName, operation);
+                	responseStr = LibHtml.getPageProvisioningForm(pageName, operation);
                 else 
                 	responseStr = LibHtml.getPageUpdateGUIForm(pageName, operation);
                 break;

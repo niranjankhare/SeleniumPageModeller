@@ -29,7 +29,7 @@ import static org.seleniumng.utils.TAFConfig.tafConfig;
 public class PageObjectBaseClass {
 
 	protected Config pageConf = null;
-
+	protected String session = null;
 	public PageObjectBaseClass (){
 		List <Class<?>> classHeirarchy = new ArrayList<Class<?>>();
 		classHeirarchy.add(this.getClass());
@@ -43,7 +43,21 @@ public class PageObjectBaseClass {
 			conf = loadPageConfig(classHeirarchy.get(i-1)).withFallback(conf);
 		}
 		this.pageConf = conf;
-		
+//		List<Field> fields = listAllFields();
+//		for (Field f:fields){
+//			Object o = getField (f);
+//			try {
+//				f.set(this, o);
+//			} catch (IllegalArgumentException e) {
+//				e.printStackTrace();
+//			} catch (IllegalAccessException e) {
+//				e.printStackTrace();
+//			}
+//		}
+	}
+
+	public void initializeFields (String driver){
+		this.session = driver;
 		List<Field> fields = listAllFields();
 		for (Field f:fields){
 			Object o = getField (f);
@@ -70,6 +84,7 @@ public class PageObjectBaseClass {
 		}
 		
 		Config confControl = pageConf.getConfig(field.getName());
+		confControl = confControl.withFallback(ConfigFactory.parseString("session = "+ this.session));
 		Constructor<?> constructor = null;
 
 		try {

@@ -18,12 +18,19 @@ package org.seleniumng.utils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import org.seleniumng.driver.SessionInventory;
+import java.lang.reflect.Method;
+
+import org.seleniumng.driver.DriverInventory;
 
 public class SessionManager {
 
+    public String session;
+    public void get (String url){
+    	DriverInventory.getDriver(session).get(url);
+    }
 	public SessionManager() {
         Class<?> cls = this.getClass();
+        session = DriverInventory.getNewDriver();
         
         Field[] fields = cls.getDeclaredFields();
         
@@ -33,9 +40,12 @@ public class SessionManager {
             try {
                 constructor = ftype.getConstructor();
                 Object o = constructor.newInstance();
+                System.out.println("need to call method  initializeFields ON o");
+                Class[] paramWebDriver = new Class[1];	
+                paramWebDriver[0] = String.class;
+                Method method = ftype.getMethod("initializeFields", paramWebDriver);
+        		method.invoke(o, session);
                 f.set(this, o);
-                System.out.println("need to call method to assign session to 'o'");
-                assignSession (o);
             } catch (InstantiationException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -58,12 +68,5 @@ public class SessionManager {
 
         }
     }
-
-	private void assignSession(Object o) {
-		SessionInventory.getDriver();
-		
-	}
-	
-	
 	
 }
