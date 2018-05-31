@@ -42,7 +42,7 @@ function add_Row(stdClasses, resp){
 	var tname = 'propsview';
 	var pageName = document.getElementById('pageName').value;
 	var elTable = document.getElementById(tname);
-	var oper = document.getElementById('oper').value;
+	/*var oper = document.getElementById('oper').value;*/
 	
 	Promise.all([stdClasses, resp]).then(function(allData){
 		var stdClassesData = allData[0];
@@ -519,7 +519,7 @@ function addTableToPopupDeprecated(popup,tbit, rowContent, operation){
 	
 }
 
-function addExtendedPropsTableToPopup(popup, operation){
+function addExtendedPropsTableToPopup(popup/*, operation*/){
 
 	var rowId = popup.getAttribute('rowId');
 	var content = document.getElementById(rowId+'.contentDiv');
