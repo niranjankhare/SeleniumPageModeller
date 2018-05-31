@@ -15,25 +15,36 @@
  *******************************************************************************/
 package org.seleniumng.utils;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import javax.naming.ConfigurationException;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigException;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigException.Missing;
 public class TAFConfig {
 	private static final Config resolver = ConfigFactory.parseResourcesAnySyntax("resolver");
 	public static final long DEFAULT_IMPLICIT_WAIT = 0;
 	public static Config tafConfig = ConfigFactory.load().withFallback(resolver).resolve();
 	
-	public static String dbURL = tafConfig.getString("db.url");
-	public static String dbUser = tafConfig.getString("db.username");
-	public static String dbPass = tafConfig.getString("db.password");
+	public static String dbURL = getValue("db.url");
+	public static String dbUser = getValue("db.username");
+	public static String dbPass = getValue("db.password");
 	
-	public static String sysPropChromeDriverPath = tafConfig.getString("webdriver.chrome.driver");
-	public static String sysPropMozGeckoDriverPath = tafConfig.getString("webdriver.gecko.driver");
+	public static String sysPropChromeDriverPath = getValue("webdriver.chrome.driver");
+	public static String sysPropMozGeckoDriverPath = getValue("webdriver.gecko.driver");
 	
 	public static Config getConfig (String atPath){
 		if (tafConfig.hasPath(atPath))
 			return tafConfig.getConfig(atPath);
-		else return null;
-				
+		else 
+			throw new Missing(atPath);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static  <T> T getValue (String atPath){
+		if (tafConfig.hasPath(atPath))
+			return (T) tafConfig.getAnyRef(atPath);
+		else
+			throw new Missing (atPath);
 	}
 }

@@ -29,11 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("serial")
 public class HTMLServerMain extends HttpServlet {
-
-    public HTMLServerMain() {
-
-    }
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         processGet(req, resp);
@@ -64,11 +59,7 @@ public class HTMLServerMain extends HttpServlet {
             case "/favicon.ico":
                 break;
 //            case "/test":
-//                LinkedHashMap<String, LinkedHashMap<String, String>> cleanParamMap = processRequestInput(
-//                        req.getParameterMap());
-//                LibDatabase.updateTable(tableName, cleanParamMap);
-//                responseStr = req.getParameterMap().toString();
-//
+//	
 //                break;
             case "/freeform":
                 responseStr = LibHtml.getTableEntryForm("entryform", null, null);
@@ -88,20 +79,16 @@ public class HTMLServerMain extends HttpServlet {
         String pageName = getParameter(req, "pageName");
         String operation = getParameter(req, "oper");
         String responseStr = "";
-        LinkedHashMap<String, LinkedHashMap<String, String>> cleanParamMap = processRequestInput(
+        LinkedHashMap<String, LinkedHashMap<String, String>> postParamMap = processRequestParamMap(
                 req.getParameterMap());
         switch (sPath.toLowerCase()) {
             case "/insertpagegui":
-//                LinkedHashMap<String, LinkedHashMap<String, String>> cleanParamMap = processRequestInput(
-//                        req.getParameterMap());
-                LibDatabase.insertGuiMap(pageName, cleanParamMap);
+                LibDatabase.insertGuiMap(pageName, postParamMap);
                 responseStr = req.getParameterMap().toString();
 
                 break;
             case "/updatepagegui":
-//                LinkedHashMap<String, LinkedHashMap<String, String>> cleanParamMap = processRequestInput(
-//                        req.getParameterMap());
-                LibDatabase.updateGuiMap(pageName, cleanParamMap);
+                LibDatabase.updateGuiMap(pageName, postParamMap);
                 responseStr = req.getParameterMap().toString();
 
                 break;
@@ -126,7 +113,7 @@ public class HTMLServerMain extends HttpServlet {
 
     }
 
-    private LinkedHashMap<String, LinkedHashMap<String, String>> processRequestInput(
+    private LinkedHashMap<String, LinkedHashMap<String, String>> processRequestParamMap(
             Map<String, String[]> parameterMap) {
         LinkedHashMap<String, LinkedHashMap<String, String>> toReturn = new LinkedHashMap<String, LinkedHashMap<String, String>>();
         for (Entry<String, String[]> e : parameterMap.entrySet()) {
@@ -144,7 +131,7 @@ public class HTMLServerMain extends HttpServlet {
                 columnValues.put(columnKey, e.getValue()[0]);
                 toReturn.put(rowKey, columnValues);
             }
-            System.out.println(e.getKey() + ":" + e.getValue());
+//            System.out.println(e.getKey() + ":" + e.getValue());
         }
 
         return toReturn;
@@ -159,7 +146,6 @@ public class HTMLServerMain extends HttpServlet {
             respStr = writer.toString();
 
         }
-        // TODO: write jsoup document
         response.setContentType(contentType);
         response.getWriter().println(respStr);
         response.getWriter().close();
