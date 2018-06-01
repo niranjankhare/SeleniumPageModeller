@@ -118,7 +118,7 @@ public class JSONResourceServer extends HttpServlet {
 
             break;
         case "/freeform":
-            responseStr = LibHtml.getTableEntryForm("entryform", null, null);
+//            responseStr = LibHtml.getTableEntryForm("entryform", null, null);
             break;
         case "":
         case "/":
