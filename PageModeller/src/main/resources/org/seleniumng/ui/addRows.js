@@ -38,83 +38,29 @@ function add_HeaderRow(){
 
 var propertyMap = null;
 
-function add_Row(stdClasses, resp){
-	var tname = 'propsview';
-	var pageName = document.getElementById('pageName').value;
-	var elTable = document.getElementById(tname);
-	/*var oper = document.getElementById('oper').value;*/
-	
-	Promise.all([stdClasses, resp]).then(function(allData){
-		var stdClassesData = allData[0];
-		var dbColumns = allData[1];
-		
-		console.log (dbColumns);
-		var indexToHide = dbColumns.indexOf('CONTROLNAME');
-		var selectIndex = dbColumns.indexOf('STANDARDCLASS');
-		
-		var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
-		var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
-		var rowIdmain = 'Row'+ (rowCount-1);
-		row.id = rowIdmain;
-		for (var r=0; r<dbColumns.length; r++){
-			var rowId = rowIdmain + '.' + dbColumns[r];
-			var cell = row.insertCell(-1);
-			var inputElement ;
-			if (r != selectIndex){
-				inputElement = document.createElement('input');
-			} else{
-				inputElement = document.createElement('select');
-				getSelectControlt(stdClassesData, inputElement);
-			} 
-				
-			if (r< indexToHide){
-				cell.setAttribute ('style', 'display:none;');
-			} 
-			inputElement.setAttribute ('name', rowId);
-			inputElement.id = inputElement.name;
-			if (dbColumns.indexOf('PAGENAME')== r){
-				inputElement.value= pageName;
-			}
-			cell.appendChild(inputElement);
-		}
-		 var popupBtn = document.createElement('button');
-         popupBtn.type = 'button';
-         popupBtn.setAttribute('onclick', 'showMoreProps(this, "' + 'new' + '")');
-         popupBtn.id = rowIdmain + '.popupBtn';
-         popupBtn.appendChild(document.createTextNode("Define More\nProperties"));
-         popupBtn.style.resize = 'none';
-         popupBtn.setAttribute('rowid', rowIdmain);
-         var cellButton = row.insertCell(-1);
-         cellButton.appendChild(popupBtn);
-         var cellPopupDiv = row.insertCell(-1);
-         cellPopupDiv.setAttribute('style', 'visibility:hidden;');
-         var popupDiv = document.createElement('div');
-         popupDiv.id = rowIdmain + '.popupDiv';
-         popupDiv.setAttribute('style', 'visibility:hidden;display:block');
-         popupDiv.setAttribute('rowid', rowIdmain);
-         cellPopupDiv.appendChild(popupDiv);
-	});
-	
-	}
-
-function add_UpdateRow(someData){
+function add_UpdateRow(someData, cols){
 	var tname = 'propsview';
 	var pageName = document.getElementById('pageName').value;
 	var elTable = document.getElementById(tname);
 	var stdClasses = Promise.resolve(getData('/fetch/libdatabase/getstandardypes'));
-	/*var oper = document.getElementById('oper').value;*/
 	var locatoryTypes = Promise.resolve(getData('/fetch/getlocatorytypes'));
-	Promise.all([someData, stdClasses,locatoryTypes]).then(function (allData){
+	Promise.all([someData, stdClasses,locatoryTypes,cols]).then(function (allData){
 	var tableData = allData[0];
 	var stdClassesData = allData[1];
 	var supportedLocatorTypes = allData[2];
-	var dbColumns = tableData[0];
+	var dbColumns ;
+	if (tableData != null)
+		dbColumns = tableData[0];
+	else
+		dbColumns = allData[3];
 	console.log (dbColumns);
 	var indexToHide = dbColumns.indexOf('CONTROLNAME');
 	var selectIndex = dbColumns.indexOf('LOCATORTYPE');
 	var rowIterator;
-
+	if (tableData != null)
 		rowIterator = tableData.length;
+	else 
+		rowIterator = 2; /* To force it to run once for row addition */
 		for (var k = 1; k < rowIterator; k++) {
 			var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
 				var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
@@ -141,8 +87,11 @@ function add_UpdateRow(someData){
 					} 
 					inputElement.setAttribute ('name', rowId);
 					inputElement.id = inputElement.name;
-					inputElement.value = tableData[k][r];
+					
 					cell.appendChild(inputElement);
+					if (tableData != null)
+						inputElement.value = tableData[k][r];
+					
 				}
 				
 				var popupBtn = document.createElement('button'); 
@@ -163,7 +112,8 @@ function add_UpdateRow(someData){
 			  popupDiv.setAttribute ('style', 'visibility:hidden;display:block'); 
 			  popupDiv.setAttribute ('rowid', rowIdmain); 
 			  cellPopupDiv.appendChild(popupDiv); 
-				
+			  if (tableData == null)
+					break;	
 			}
 	 
 		});
@@ -198,16 +148,6 @@ function getExtendedPageGuiData(guiId){
 	return r;
 }
 
-function getSelectControl (options){
-	var opt = document.createElement('option');
-	for (var j = 0; j < options.length; j++) {
-		opt.text = options[j][1];
-		opt.value = options[j][0];
-	} 
-	
-	return opt;
-}
-
 function getSelectControlt (options, element){
 	for (var key in options){
 		var opt = document.createElement('option');
@@ -232,7 +172,6 @@ function showMoreProps(e){
 function showRowById (id){
 	var row = document.getElementById(id);
 	row.style.visibility = 'visible';
-
 }
 
 function disableMainForm (){
@@ -242,9 +181,7 @@ function disableMainForm (){
 }
 
 function disableMainFormButtions(){
-/*	if (op === 'new'){*/
-		document.getElementById('addRow').disabled = true;
-/*	}*/
+	document.getElementById('addRow').disabled = true;
 	document.getElementById('submit').disabled = true;
 }
 
@@ -279,10 +216,7 @@ function enableMainForm (){
 	form.style.visibility = 'inherit';
 }
 function enableMainFormButtions(){
-	
-/*	if (op === 'new'){*/
-		document.getElementById('addRow').disabled = false;
-	/*}*/
+	document.getElementById('addRow').disabled = false;
 	document.getElementById('submit').disabled = false;
 }
 
@@ -295,8 +229,8 @@ function resetRowById (id){
 function sleep(ms) {
 	  return new Promise(resolve => setTimeout(resolve, ms));
 }
-
-function addRowToPopup(popup,rowContent){
+/*
+function addRowToPopupXXXXX(popup,rowContent){
 	var rowId = popup.getAttribute('rowId');
 	var tableId = rowId+'.exPropsTable';
 	console.log(tableId);
@@ -342,7 +276,7 @@ function addRowToPopup(popup,rowContent){
 	
 	
 }
-
+*/
 function refreshPopup (popup, e){
 	var val = e.value;
 	var keys = JSON.parse(propertyMap[val][1]);
@@ -411,18 +345,15 @@ function fillPopup_new(p){
 		if (propertyMap ===null){
 			propertyMap = resp;
 		}
-		getSelectControlt(resp, sel);
+		getSelectControlt(propertyMap, sel);
 		
 		addExtendedPropsTableToPopup (p);
 		p.appendChild(content);
-		/*
-		if (op==='update'){*/
 			Promise.resolve(getExtendedPageGuiData(guimapId))
-			 .then(function(resp){
-				var flds = resp[0];
-				var vals = resp[1];
+			 .then(function(respData){
+				var flds = respData[0];
+				var vals = respData[1];
 				var mapClass = vals[flds.indexOf('MAPPEDCLASS')];
-				
 				console.log (resp);
 				sel.value = mapClass;
 				refreshPopup (p,sel);
@@ -439,24 +370,6 @@ function fillPopup_new(p){
 			.catch (function(error){
 				
 			});
-	/*		
-			}
-		else {
-			
-			refreshPopup (p,sel);
-			content.style.visibility='inherit';
-			content.style.display='inline';
-		}
-		*/
-		
-		
-		
-		
-		
-		
-		
-		
-		
 	})
 	.catch (function(error){
 		
@@ -465,61 +378,7 @@ function fillPopup_new(p){
 	
 }
 
-function addTableToPopupDeprecated(popup,tbit, rowContent, operation){
-
-	var rowId = popup.getAttribute('rowId');
-	var content = document.getElementById(rowId+'.contentDiv');
-	var tableId = rowId+'.exPropsTable.'+ tbit ;
-	var exPropsTable = document.createElement('table');
-	exPropsTable.appendChild(document.createElement('tbody'));
-	exPropsTable.setAttribute("id", tableId);
-	content.appendChild(exPropsTable);
-	console.log(tableId);
-	var pTable = document.getElementById(tableId);
-	var existingRowCount = pTable.rows.length;
-	var contentIndex = 0;
-	var displayCell;
-	var displayText;
-	var cellContent;
-	var valueCell ;
-	for (var i in rowContent){
-		var row;
-		displayText = rowContent[i];
-		if (contentIndex>(existingRowCount-1)){
-			row = pTable.insertRow(-1);	
-			displayCell = row.insertCell(-1);
-			cellContent = document.createElement('textarea');
-			
-			
-			valueCell =	row.insertCell(-1);
-			
-		}	
-		else {
-			row =pTable.rows[contentIndex];
-			displayCell = row.cells[0];
-			valueCell = row.cells[1];
-			cellContent = valueCell.getElementsByTagName("textarea")[0];
-		}
-		row.id = rowId;
-		displayCell.innerHTML =displayText;
-		cellContent.name = rowId + '.' + i;
-		cellContent.id = cellContent.name;	
-		cellContent.placeholder = displayText;
-		valueCell.innerHTML = cellContent.outerHTML;
-		contentIndex++;
-	}
-	exPropsTable.disabled=true;
-	exPropsTable.style.visibility = 'hidden';
-	exPropsTable.style.display = 'none';
-	
-	console.log ('was: existingRowCount:' + existingRowCount);
-	console.log ('contentIndex:' + contentIndex);
-	console.log ('new:'+ pTable.rows.length);
-	
-	
-}
-
-function addExtendedPropsTableToPopup(popup/*, operation*/){
+function addExtendedPropsTableToPopup(popup/* , operation */){
 
 	var rowId = popup.getAttribute('rowId');
 	var content = document.getElementById(rowId+'.contentDiv');
@@ -557,17 +416,4 @@ function addExtendedPropsTableToPopup(popup/*, operation*/){
 	var footer = exPropsTable.appendChild(document.createElement('tfoot'));
 	var footerRow = footer.insertRow(-1);	
 	var btnContainer = footerRow.insertCell(-1);
-	/*
-	 * var btnRemoveExtended = document.createElement('button');
-	 * btnRemoveExtended.type = 'button';
-	 * btnRemoveExtended.setAttribute('rowId',rowId); btnRemoveExtended.text =
-	 * 'Remove Class Mapping'; btnRemoveExtended.setAttribute
-	 * ('onclick','removeExtendedProps(this)');
-	 * btnRemoveExtended.appendChild(document.createTextNode("Remove Mapping"));
-	 * btnContainer.appendChild(btnRemoveExtended);
-	 */
-}
-
-function removeExtendedProps (theRow){
-	console.log ('Remove extended properties for '+ theRow.getAttribute('rowId'));
 }

@@ -69,11 +69,8 @@ public class LibDatabase {
 
 	public static void main(String[] args) {
 
-		LinkedHashMap<String, String> parammap = new LinkedHashMap<String, String>();
-		parammap.put("EXPROP1", "showControlId");
-		parammap.put("EXPROP2", "options");
-		System.out.println(new Gson().toJson(parammap));
-		System.out.println();
+		String x = Utils.getScriptResource(LibDatabase.class, "DATABASE.sql");
+		System.out.println(x);
 	}
 
 	public static List<String> getTableFields(String tableName) {
@@ -200,7 +197,11 @@ public class LibDatabase {
 							guimapValues.add(fieldMap.get(key));
 						} else if (PROPERTIES.field(key) != null) {
 							propertiesFields.add((TableField<PropertiesRecord, ?>) PROPERTIES.field(key));
-							propertiesValues.add((Object) fieldMap.get(key));
+							if (key.equals("MAPPEDCLASS")){
+								propertiesValues.add((Object) "(No Maping)");
+							} 
+							else
+								propertiesValues.add((Object) fieldMap.get(key));
 						} else if (EXTENDEDPROPS.field(key) != null) {
 							expropertiesFields.add((TableField<ExtendedpropsRecord, ?>) EXTENDEDPROPS.field(key));
 							expropertiesValues.add(fieldMap.get(key));

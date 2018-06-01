@@ -41,7 +41,7 @@ public class LibHtml {
   <input type="radio" name="gender" value="other"> Other
 </form> 
  * */
-    private static String addRowScriptTemplateN = getScriptResource("addRows.js");                                                                                                                                                                                      // LibHtml.class.getResourceAsStream("");
+    private static String addRowScriptTemplateN = Utils.getScriptResource(LibHtml.class,"addRows.js");                                                                                                                                                                                      // LibHtml.class.getResourceAsStream("");
 
     public static void main(String[] args) {
 
@@ -51,26 +51,7 @@ public class LibHtml {
         // TODO Auto-generated method stub
         return "'" + str + "'";
     }
-
-    private static String getScriptResource(String resouceName) {
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int length;
-        InputStream inputStream = LibHtml.class.getResourceAsStream(resouceName);
-        try {
-            while ((length = inputStream.read(buffer)) != -1) {
-                result.write(buffer, 0, length);
-            }
-            // StandardCharsets.UTF_8.name() > JDK 7
-            return result.toString("UTF-8");
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // REQUIRED
+ 
     public static String getTableEntryForm(String tableName, String whereColumn, String hasValue) {
         // TODO: Get list of columns for the view/table
         tableName.replaceAll(tableName, tableName.toLowerCase());
@@ -304,7 +285,7 @@ public class LibHtml {
         Element addMore = new Element("input");
         addMore.attr("type", "button");
         addMore.attr("id", "addRow");
-        addMore.attr("onclick", "add_Row(getData('/fetch/libdatabase/getstandardypes'),getTableFields('propsview'));");
+        addMore.attr("onclick", "add_UpdateRow(null,getTableFields('propsview'));");         
         addMore.attr("value", "Add row");
 
         Element submit = new Element("input");

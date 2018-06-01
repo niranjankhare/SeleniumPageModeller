@@ -67,8 +67,8 @@ public class JSONResourceServer extends HttpServlet {
         String responseStr = "";
         switch (sPath) {
 		case "/getlocatorytypes":
-			List<String> byMethods = Arrays.asList("ByClassName", "ByCssSelector", "ById", "ByLinkText",
-					"ByName", "ByPartialLinkText", "ByTagName", "ByXPath","ByAll", "ByChained", "ByIdOrName");
+			List<String> byMethods = Arrays.asList("ByCssSelector", "ById", "ByName", "ByIdOrName", "ByChained", 
+					"ByXPath", "ByTagName", "ByClassName", "ByLinkText","ByPartialLinkText", "ByAll");
 			LinkedHashMap<String, Object> toReturnMap = new LinkedHashMap<String, Object>();
 
 			for (String method : byMethods) {
