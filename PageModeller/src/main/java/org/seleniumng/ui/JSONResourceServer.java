@@ -92,7 +92,11 @@ public class JSONResourceServer extends HttpServlet {
         case "/libdatabase/gettabledata":
         	tableName = getParameter(req, "tableName");
         	pageName = getParameter(req, "pageName");
-            Object oTableData = LibDatabase.getUIPropsView(tableName, pageName);
+        	Object oTableData = null;
+        	if (!pageName.equalsIgnoreCase("undefined"))
+            	oTableData = LibDatabase.getUIPropsView(tableName, pageName);
+        	else 
+        		oTableData = LibDatabase.getTableData(tableName);
             responseStr = new Gson().toJson(oTableData);
             break;
         case "/libdatabase/pageguiextendedprops":
@@ -118,7 +122,7 @@ public class JSONResourceServer extends HttpServlet {
 
             break;
         case "/freeform":
-            responseStr = LibHtml.getTableEntryForm("entryform", null, null);
+//            responseStr = LibHtml.getTableEntryForm("entryform", null, null);
             break;
         case "":
         case "/":

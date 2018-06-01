@@ -48,7 +48,12 @@ import com.typesafe.config.Config;
  *
  */
 public class DriverInventory {
-	private static Config gridHub = TAFConfig.getConfig("seleniumGrid");
+	private static Config gridHub = (TAFConfig.tafConfig.hasPath("seleniumGrid")) ? TAFConfig.getConfig("seleniumGrid")
+			: null;
+	private static Boolean useGrid = (gridHub == null) ? false
+			: (gridHub.hasPath("enabled")) ? gridHub.getBoolean("enabled") : false;
+	private static String browserType = (TAFConfig.tafConfig.hasPath("browser"))
+			? TAFConfig.tafConfig.getString("browser") : "FIREFOX";
 	private static LinkedHashMap<String, WebDriver> driverInventory = new LinkedHashMap<String, WebDriver>();
 
 	public static String registerDriver(WebDriver webDriver) {
@@ -56,26 +61,12 @@ public class DriverInventory {
 		driverInventory.put(key, webDriver);
 		return key;
 	}
-	//
-	// public static String registerDriver(int threadInstance, RemoteWebDriver
-	// remoteWebDriver) {
-	// String key =
-	// ((RemoteWebDriver)remoteWebDriver).getSessionId().toString();
-	// driverInventory.put(key , remoteWebDriver);
-	// return key;
-	//
-	// }
 
 	public static String getNewDriver() {
 		System.setProperty("webdriver.chrome.driver", TAFConfig.sysPropChromeDriverPath);
 		System.setProperty("webdriver.gecko.driver", TAFConfig.sysPropMozGeckoDriverPath);
-		return setupWebDriver(BrowserType.FIREFOX);
-		
-	}
+		return setupWebDriver(browserType);
 
-	private static String getDriver() {
-		// WebDriver driver = new ChromeDriver();
-		return setupWebDriver(BrowserType.FIREFOX);// registerDriver(driver);
 	}
 
 	/**
@@ -103,12 +94,7 @@ public class DriverInventory {
 			// desiredCapabilities.setCapability(FirefoxDriver.PROFILE,
 			// profile);
 			options = ffOptions;
-			clazz= FirefoxDriver.class;
-//			clazz.newInstance();
-			if (gridHub == null){
-				remoteWebDriver = new FirefoxDriver();
-			}
-			
+			clazz = FirefoxDriver.class;
 			break;
 		case BrowserType.GOOGLECHROME:
 			options = new ChromeOptions();
@@ -118,30 +104,29 @@ public class DriverInventory {
 			clazz = ChromeDriver.class;
 			break;
 		// case IE:
-//			https://docs.microsoft.com/en-us/microsoft-edge/webdriver
+		// https://docs.microsoft.com/en-us/microsoft-edge/webdriver
 		// desiredCapabilities = DesiredCapabilities.internetExplorer();
 		// break;
 		} // switch case brwosertype
-				
-		
-		if (gridHub !=null){
-		String remoteDriverUrlString;
-		if (!gridHub.getString("port").equals("")) {
-			remoteDriverUrlString = "http://" + gridHub.getString("host") + ":" + gridHub.getString("port") + "/wd/hub";
+
+		if (gridHub != null && useGrid) {
+			String remoteDriverUrlString;
+			if (!gridHub.getString("port").equals("")) {
+				remoteDriverUrlString = "http://" + gridHub.getString("host") + ":" + gridHub.getString("port")
+						+ "/wd/hub";
+			} else {
+				remoteDriverUrlString = "http://" + gridHub.getString("host") + "/wd/hub";
+			}
+			URL remoteDriverUrl = null;
+			try {
+				remoteDriverUrl = new URL(remoteDriverUrlString);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+
+			remoteWebDriver = new RemoteWebDriver(remoteDriverUrl, options);
+			remoteWebDriver.setFileDetector(new LocalFileDetector());
 		} else {
-			remoteDriverUrlString = "http://" + gridHub.getString("host") + "/wd/hub";
-		}
-		URL remoteDriverUrl = null;
-		try {
-			remoteDriverUrl = new URL(remoteDriverUrlString);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		
-		remoteWebDriver = new RemoteWebDriver(remoteDriverUrl, options);
-		remoteWebDriver.setFileDetector(new LocalFileDetector());
-		} 
-		else {
 			try {
 				remoteWebDriver = clazz.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
@@ -152,52 +137,8 @@ public class DriverInventory {
 		remoteWebDriver.manage().timeouts().implicitlyWait(TAFConfig.DEFAULT_IMPLICIT_WAIT, TimeUnit.SECONDS);
 		Dimension d = new Dimension(1280, 1024);
 		// Resize the current window to the given dimension
-
-		// if (!SuiteConfiguration.fullscreen) {
 		remoteWebDriver.manage().window().setSize(d);
-		// }else {
-		// webDriver.manage().window().maximize();
-		// }
-		
-		return registerDriver (remoteWebDriver);
-
-	}
-
-	private static String setWebDriver(String browser, MutableCapabilities options) {
-		RemoteWebDriver remoteWebDriver = null;
-		
-		if (gridHub !=null){
-		String remoteDriverUrlString;
-		if (!gridHub.getString("port").equals("")) {
-			remoteDriverUrlString = "http://" + gridHub.getString("host") + ":" + gridHub.getString("port") + "/wd/hub";
-		} else {
-			remoteDriverUrlString = "http://" + gridHub.getString("host") + "/wd/hub";
-		}
-		URL remoteDriverUrl = null;
-		try {
-			remoteDriverUrl = new URL(remoteDriverUrlString);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		
-		remoteWebDriver = new RemoteWebDriver(remoteDriverUrl, options);
-		remoteWebDriver.setFileDetector(new LocalFileDetector());
-} else {
-			remoteWebDriver = new FirefoxDriver(options);
-		}
-		
-		remoteWebDriver.manage().timeouts().implicitlyWait(TAFConfig.DEFAULT_IMPLICIT_WAIT, TimeUnit.SECONDS);
-		Dimension d = new Dimension(1280, 1024);
-		// Resize the current window to the given dimension
-
-		// if (!SuiteConfiguration.fullscreen) {
-		remoteWebDriver.manage().window().setSize(d);
-		// }else {
-		// webDriver.manage().window().maximize();
-		// }
-		
-		return registerDriver (remoteWebDriver);
-
+		return registerDriver(remoteWebDriver);
 	}
 
 	/**

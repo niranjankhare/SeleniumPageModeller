@@ -31,7 +31,7 @@ create table PROPERTIES (
 `STANDARDCLASS`  VARCHAR (50), -- same as element type from guimap
 `MAPPEDCLASS`  VARCHAR (50) DEFAULT '(No Maping)', 
 `LOCATORVALUE` VARCHAR  (100) NOT NULL, -- Select
-`LOCATORTYPE` VARCHAR (10) NOT NULL, -- Calculate based on value (xpath or id?)
+`LOCATORTYPE` VARCHAR (20) NOT NULL, -- Calculate based on value (xpath or id?)
 PRIMARY KEY (`PROPERTYID`),
 CONSTRAINT fk_guimap FOREIGN KEY (GUIMAPID)
   REFERENCES GUIMAP(`GUIMAPID`)

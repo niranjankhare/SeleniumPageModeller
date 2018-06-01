@@ -40,7 +40,6 @@ public class SessionManager {
             try {
                 constructor = ftype.getConstructor();
                 Object o = constructor.newInstance();
-                System.out.println("need to call method  initializeFields ON o");
                 Class[] paramWebDriver = new Class[1];	
                 paramWebDriver[0] = String.class;
                 Method method = ftype.getMethod("initializeFields", paramWebDriver);

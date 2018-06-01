@@ -15,12 +15,6 @@
  *******************************************************************************/
 package org.seleniumng.ui;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -32,27 +26,17 @@ import org.jsoup.parser.Parser;
 
 public class LibHtml {
 
-//    private static String addRowScriptTemplate  = "function add_fields() {var rowCount = document.getElementById('__TABLENAME__').getElementsByTagName(\"tbody\")[0].rows.length;document.getElementById(\"__TABLENAME__\").insertRow(-1).innerHTML = '__ROWHTML__';} ";
-/*
- <input type='radio' name=choice value=new onclick="document.getElementById('newPage').disabled=false;document.getElementById('selectPage').disabled=true">Enter new:</inpur><input type='radio' name=choice value=new onclick="document.getElementById('selectPage').disabled=false;document.getElementById('newPage').disabled=true">Update existing:</input>
-<form action="">
-  <input id=newPage type="text" name="newPage" value="NewPage" style=display:inherit; disabled=true></input><br>
-  <select id=selectPage name="selectPage" value="female" disabled=true><option value=a>value1</option>value2<option value=b></option></select> page<br>
-  <input type="radio" name="gender" value="other"> Other
-</form> 
- * */
-    private static String addRowScriptTemplateN = Utils.getScriptResource(LibHtml.class,"addRows.js");                                                                                                                                                                                      // LibHtml.class.getResourceAsStream("");
+    private static String addRowScriptTemplateN = Utils.getScriptResource(LibHtml.class,"addRows.js");
 
     public static void main(String[] args) {
 
     }
 
     private static String sq(String str) {
-        // TODO Auto-generated method stub
         return "'" + str + "'";
     }
- 
-    public static String getTableEntryForm(String tableName, String whereColumn, String hasValue) {
+ @Deprecated
+    public static String getTableEntryFormXXX(String tableName, String whereColumn, String hasValue) {
         // TODO: Get list of columns for the view/table
         tableName.replaceAll(tableName, tableName.toLowerCase());
         List<String> fieldsList = LibDatabase.getTableFields(tableName);
@@ -75,8 +59,6 @@ public class LibHtml {
 
         table.appendChild(tbody);
         tbody.appendChild(headerRow);
-        // tbody.appendChild(dataRow);
-
         // Form Submit elements:
         Element elTableName = new Element("input");
         elTableName.attr("type", "hidden");
@@ -116,12 +98,12 @@ public class LibHtml {
     }
 
     public static String getPageProvisioningForm(String pageName, String operation) {
-        String mainPropertiesView = "PAGES";
+        String targetTable = "PAGES";
 
-        mainPropertiesView.replaceAll(mainPropertiesView, mainPropertiesView.toLowerCase());
-        List<String> mainFieldsList = LibDatabase.getTableFields(mainPropertiesView);
+        targetTable.replaceAll(targetTable, targetTable.toUpperCase());
+        List<String> mainFieldsList = LibDatabase.getTableFields(targetTable);
 
-        Element table = new Element("table").attr("id", mainPropertiesView);
+        Element table = new Element("table").attr("id", targetTable);
         Element headerRow = new Element("tr").attr("id", "headerRow").attr("style", "visibility:visible;");
 
         String scriptBlock = addRowScriptTemplateN;
@@ -141,7 +123,7 @@ public class LibHtml {
         elTableName.attr("type", "hidden");
         elTableName.attr("id", "tableName");
         elTableName.attr("name", "tableName");
-        elTableName.attr("value", mainPropertiesView);
+        elTableName.attr("value", targetTable);
 // 		This will become appName ?
 //        Element elPageName = new Element("input");
 //        elPageName.attr("type", "hidden");
@@ -158,7 +140,7 @@ public class LibHtml {
         Element addMore = new Element("input");
         addMore.attr("type", "button");
         addMore.attr("id", "addRow");
-        addMore.attr("onclick", "add_UpdateRow(getTableData('"+mainPropertiesView +"',document.getElementById('pageName').value));");
+        addMore.attr("onclick", "add_UpdatePagesRows(null, getTableFields('"+targetTable +"'));");
         addMore.attr("value", "Add row");
 
         Element submit = new Element("input");
@@ -176,12 +158,12 @@ public class LibHtml {
         form.appendChild(submit);
         html.body().before(scriptElement);
         html.body().appendChild(form);
-        html.body().attr("onload", "add_HeaderRow()");
+        html.body().attr("onload", "add_PagesHeaderRow()");
 
         return Parser.unescapeEntities(html.toString(), false);
 
     }
-
+@Deprecated
     private static String getFieldsArray(List<String> fieldList) {
         String replaceText = "";
         for (String field : fieldList) {
@@ -190,8 +172,8 @@ public class LibHtml {
         replaceText = replaceText.replaceAll(",$", "");
         return replaceText;
     }
-
-    public static Element getTextArea(String columnName) {
+@Deprecated
+    private static Element getTextArea(String columnName) {
 
         String idNameStr = "Row" + "'+rowCount+'" + "." + columnName;
         Element textArea = new Element("textarea");
@@ -247,13 +229,6 @@ public class LibHtml {
         Element table = new Element("table").attr("id", mainPropertiesView);
         Element headerRow = new Element("tr").attr("id", "headerRow").attr("style", "visibility:visible;");
 
-        // Add columns to the displayed table as header row
-//        for (String field : mainFieldsList) {
-//            headerRow.appendElement("th").text(field);
-//        }
-//
-//        headerRow.appendElement("th").text("More properties");
-
         String scriptBlock = addRowScriptTemplateN;
 
         Document html = Jsoup.parse("<html></html>");
@@ -266,9 +241,6 @@ public class LibHtml {
         table.appendChild(thead);
         thead.appendChild(headerRow);
         table.appendChild(tbody);
-//        tbody.appendChild(headerRow);
-        
-       
 
         Element elPageName = new Element("input");
         elPageName.attr("type", "hidden");
@@ -306,7 +278,6 @@ public class LibHtml {
         html.body().attr("onload", "add_HeaderRow()");
 
         return Parser.unescapeEntities(html.toString(), false);
-
 
 	}
 }

@@ -38,6 +38,7 @@ import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectField;
 import org.jooq.SelectJoinStep;
+import org.jooq.SelectWhereStep;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableLike;
@@ -197,10 +198,9 @@ public class LibDatabase {
 							guimapValues.add(fieldMap.get(key));
 						} else if (PROPERTIES.field(key) != null) {
 							propertiesFields.add((TableField<PropertiesRecord, ?>) PROPERTIES.field(key));
-							if (key.equals("MAPPEDCLASS")){
+							if (key.equals("MAPPEDCLASS")) {
 								propertiesValues.add((Object) "(No Maping)");
-							} 
-							else
+							} else
 								propertiesValues.add((Object) fieldMap.get(key));
 						} else if (EXTENDEDPROPS.field(key) != null) {
 							expropertiesFields.add((TableField<ExtendedpropsRecord, ?>) EXTENDEDPROPS.field(key));
@@ -321,8 +321,7 @@ public class LibDatabase {
 		// PreparedStatement and ResultSet are handled by jOOQ, internally
 		Table<?> table = AUTOMATION.getTable(tableName.toUpperCase());
 		Collection<Condition> conditions = new ArrayList<Condition>();
-		SelectConditionStep<?> x = DbManager.getOpenContext().selectFrom(table)
-				.where(PROPSVIEW.PAGENAME.eq(pageName));
+		SelectConditionStep<?> x = DbManager.getOpenContext().selectFrom(table).where(PROPSVIEW.PAGENAME.eq(pageName));
 		List<Object> returnList = new ArrayList<Object>();
 		Result<?> result = x.fetch();
 		List<Object> fields = new ArrayList<Object>();
@@ -413,72 +412,107 @@ public class LibDatabase {
 		}
 		return pageData;
 	}
-	
-	public static Map<String, Object> getPageGuiPropertyData(String webPage) {
-		Map<String,Object> pageData = new LinkedHashMap<String, Object>();
 
-		SelectConditionStep<Record16<Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> selectProperties = DbManager.getOpenContext()
-				.select(PROPWRITERVIEW.GUIMAPID,PROPWRITERVIEW.ABRV, PROPWRITERVIEW.CONTROLNAME , PROPWRITERVIEW.CONTROLDESCRIPTION, PROPWRITERVIEW.LOCATORTYPE, PROPWRITERVIEW.LOCATORVALUE,
-						PROPWRITERVIEW.MAPPEDCLASS,	PROPWRITERVIEW.EXPROP1,PROPWRITERVIEW.EXPROP2,PROPWRITERVIEW.EXPROP3,PROPWRITERVIEW.EXPROP4,PROPWRITERVIEW.EXPROP5,
-						PROPWRITERVIEW.EXPROP6, PROPWRITERVIEW.EXPROP7,PROPWRITERVIEW.EXPROP8,PROPWRITERVIEW.EXPROP9 ).from(PROPWRITERVIEW)
-				.where(PROPWRITERVIEW.PAGENAME.equal(webPage));
-		
-		Result<Record2<String, String>> result = DbManager.getOpenContext().select(TYPES.CLASS,TYPES.PROPERTYMAP).from(TYPES).where(TYPES.HASEXTENDEDPROPS.isTrue()).fetch();
-		Map<String, List<String>> xPropertyMap = result.intoGroups(TYPES.CLASS,TYPES.PROPERTYMAP);
+	public static Map<String, Object> getPageGuiPropertyData(String webPage) {
+		Map<String, Object> pageData = new LinkedHashMap<String, Object>();
+
+		SelectConditionStep<Record16<Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> selectProperties = DbManager
+				.getOpenContext()
+				.select(PROPWRITERVIEW.GUIMAPID, PROPWRITERVIEW.ABRV, PROPWRITERVIEW.CONTROLNAME,
+						PROPWRITERVIEW.CONTROLDESCRIPTION, PROPWRITERVIEW.LOCATORTYPE, PROPWRITERVIEW.LOCATORVALUE,
+						PROPWRITERVIEW.MAPPEDCLASS, PROPWRITERVIEW.EXPROP1, PROPWRITERVIEW.EXPROP2,
+						PROPWRITERVIEW.EXPROP3, PROPWRITERVIEW.EXPROP4, PROPWRITERVIEW.EXPROP5, PROPWRITERVIEW.EXPROP6,
+						PROPWRITERVIEW.EXPROP7, PROPWRITERVIEW.EXPROP8, PROPWRITERVIEW.EXPROP9)
+				.from(PROPWRITERVIEW).where(PROPWRITERVIEW.PAGENAME.equal(webPage));
+
+		Result<Record2<String, String>> result = DbManager.getOpenContext().select(TYPES.CLASS, TYPES.PROPERTYMAP)
+				.from(TYPES).where(TYPES.HASEXTENDEDPROPS.isTrue()).fetch();
+		Map<String, List<String>> xPropertyMap = result.intoGroups(TYPES.CLASS, TYPES.PROPERTYMAP);
 		for (Record r : selectProperties.fetch()) {
-			HashMap<String,String> exmap= null;
-			if (r.get(PROPWRITERVIEW.MAPPEDCLASS)!=null && !r.get(PROPWRITERVIEW.MAPPEDCLASS).equalsIgnoreCase("(No Maping)")){
-				String jSon=	xPropertyMap.get(r.get(PROPWRITERVIEW.MAPPEDCLASS)).get(0);
-				exmap= new Gson().fromJson(jSon, new TypeToken<HashMap<String, String>>(){}.getType());
+			HashMap<String, String> exmap = null;
+			if (r.get(PROPWRITERVIEW.MAPPEDCLASS) != null
+					&& !r.get(PROPWRITERVIEW.MAPPEDCLASS).equalsIgnoreCase("(No Maping)")) {
+				String jSon = xPropertyMap.get(r.get(PROPWRITERVIEW.MAPPEDCLASS)).get(0);
+				exmap = new Gson().fromJson(jSon, new TypeToken<HashMap<String, String>>() {
+				}.getType());
 			}
 			LinkedHashMap<String, Object> propertyMap = new LinkedHashMap<String, Object>();
-			
+
 			propertyMap.put("CONTROLDESCRIPTION", r.get(PROPSVIEW.CONTROLDESCRIPTION));
 			propertyMap.put("LOCATORTYPE", r.get(PROPSVIEW.LOCATORTYPE));
 			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
-			if (exmap!=null){		
-			for (String xf : exmap.keySet()){
-				propertyMap.put(exmap.get(xf), r.get(xf));
-			}
+			if (exmap != null) {
+				for (String xf : exmap.keySet()) {
+					propertyMap.put(exmap.get(xf), r.get(xf));
+				}
 			}
 			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
-			Object o = (Object)propertyMap;
-			pageData.put(r.get(PROPWRITERVIEW.ABRV)+r.get(PROPWRITERVIEW.CONTROLNAME).toString(),o);
-			
+			Object o = (Object) propertyMap;
+			pageData.put(r.get(PROPWRITERVIEW.ABRV) + r.get(PROPWRITERVIEW.CONTROLNAME).toString(), o);
+
 		}
 		return pageData;
 	}
+
 	public static String getClassAbrv(String string) {
 		Record1<String> r = DbManager.getOpenContext().select(TYPES.ABRV).from(TYPES).where(TYPES.CLASS.equal(string))
 				.fetchOne();
 		return r.get(TYPES.ABRV);
 	}
 
-	public static List<HashMap <String,String>> getPageHeirarchy(Integer... pageId) {
-		List<HashMap<String,String>> returnList = new ArrayList<HashMap<String,String>>();
-		Select<?> selectStatement  = null;
-		if (pageId.length==0)
-			selectStatement  = DbManager.getOpenContext().select(PAGES.PAGEID, PAGES.PARENTID).from(PAGES).where(PAGES.PARENTID.isNull());
-		else 
-			selectStatement  = DbManager.getOpenContext().select(PAGES.PAGEID, PAGES.PARENTID).from(PAGES).where(PAGES.PARENTID.in(pageId));
-		HashMap<String,String> pageHeirarchy = new HashMap<String,String>();
+	public static List<HashMap<String, String>> getPageHeirarchy(Integer... pageId) {
+		List<HashMap<String, String>> returnList = new ArrayList<HashMap<String, String>>();
+		Select<?> selectStatement = null;
+		if (pageId.length == 0)
+			selectStatement = DbManager.getOpenContext().select(PAGES.PAGEID, PAGES.PARENTID).from(PAGES)
+					.where(PAGES.PARENTID.isNull());
+		else
+			selectStatement = DbManager.getOpenContext().select(PAGES.PAGEID, PAGES.PARENTID).from(PAGES)
+					.where(PAGES.PARENTID.in(pageId));
+		HashMap<String, String> pageHeirarchy = new HashMap<String, String>();
 		for (Record r : selectStatement.fetch()) {
 			Integer pId = r.get(PAGES.PAGEID);
 			Integer prId = r.get(PAGES.PARENTID);
-			String pageName = DbManager.getOpenContext().select(PAGES.PAGENAME).from(PAGES).where(PAGES.PAGEID.eq(pId)).fetchOne().get(PAGES.PAGENAME);
-			Record1<String> s = DbManager.getOpenContext().select(PAGES.PAGENAME).from(PAGES).where(PAGES.PAGEID.eq(prId)).fetchOne();
-			String parentName = (s==null)?null:s.get(PAGES.PAGENAME);
+			String pageName = DbManager.getOpenContext().select(PAGES.PAGENAME).from(PAGES).where(PAGES.PAGEID.eq(pId))
+					.fetchOne().get(PAGES.PAGENAME);
+			Record1<String> s = DbManager.getOpenContext().select(PAGES.PAGENAME).from(PAGES)
+					.where(PAGES.PAGEID.eq(prId)).fetchOne();
+			String parentName = (s == null) ? null : s.get(PAGES.PAGENAME);
 			pageHeirarchy.put(pageName, parentName);
-			
+
 		}
 		returnList.add(pageHeirarchy);
-		List<Integer> a = selectStatement.fetch().getValues(PAGES.PAGEID,Integer.class);
-		if (a.size()>0){
+		List<Integer> a = selectStatement.fetch().getValues(PAGES.PAGEID, Integer.class);
+		if (a.size() > 0) {
 			Integer list2[] = new Integer[a.size()];
-			returnList.addAll(getPageHeirarchy((Integer[])a.toArray(list2)));
-			}
+			returnList.addAll(getPageHeirarchy((Integer[]) a.toArray(list2)));
+		}
 		return returnList;
-		
+
+	}
+
+	public static Object getTableData(String tableName) {
+		SelectWhereStep<?> pages = DbManager.getOpenContext().selectFrom(AUTOMATION.getTable(tableName.toUpperCase()));
+		List<Object> returnList = new ArrayList<Object>();
+		Result<?> result = pages.fetch();
+		List<Object> fields = new ArrayList<Object>();
+		for (Field<?> f : result.fields()) {
+			fields.add(f.getName());
+		}
+		returnList.add(fields);
+		for (Record r : result) {
+			List<Object> values = new ArrayList<Object>();
+			for (Object f : fields) {
+				values.add(r.get((String) f));
+			}
+			returnList.add(values);
+		}
+		return returnList;
+	}
+
+	public static void insertUpdatePages(LinkedHashMap<String, LinkedHashMap<String, String>> postParamMap) {
+		// TODO Auto-generated method stub
+		System.out.println("Do Something here");
 	}
 
 }

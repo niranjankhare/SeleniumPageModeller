@@ -35,7 +35,78 @@ function add_HeaderRow(){
 	
 	});
 }
+function add_PagesHeaderRow (){
+	var tname = 'PAGES';
+	var elTable = document.getElementById(tname);
+	var respFields = Promise.resolve(getTableData(tname));
+	Promise.resolve(respFields).then(function (tableData ){
+	var headerRow = document.getElementById('headerRow');
+	var dbColumns = tableData[0];
+	var indexToHide = dbColumns.indexOf('PAGEqfNAME');
+	
+	for (var i = 0; i < dbColumns.length; i++) {
+		var th = document.createElement('th');
+		th.appendChild(document.createTextNode(dbColumns[i]));
+		th.setAttribute ('value', dbColumns[i]);
+		if (i< indexToHide){
+			th.setAttribute ('style', 'display:none;');
+		}
+        headerRow.appendChild(th);/*.innerHTML=dbColumns[i];*/
+    }
+	add_UpdatePagesRows (tableData);
+	});
+}
 
+function add_UpdatePagesRows (pageData){
+	var tname = document.getElementById('tableName').value;
+	var elTable = document.getElementById(tname);
+    var headerRow = document.getElementById('headerRow');
+    var headers = headerRow.getElementsByTagName('th');
+	var dbColumns = [];	
+	for (i = 0; i < headers.length; i++){
+		dbColumns.push(headers[i].textContent);
+	}
+	var indexToHide = dbColumns.indexOf('PAGENAMfadsE');
+	var selectIndex = 10;/*dbColumns.indexOf('PAGE PARENT');*/
+
+	var rowIterator;
+	if (pageData != null)
+		rowIterator = pageData.length;
+	else 
+		rowIterator = 2; /* To force it to run once for row addition */
+		for (var k = 1; k < rowIterator; k++) {
+			var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
+				var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
+				var rowIdmain = 'Row'+ (rowCount-1);
+				row.id = rowIdmain;
+				for (var r=0; r<dbColumns.length; r++){
+					var rowId = rowIdmain + '.' + dbColumns[r];
+					var cell = row.insertCell(-1);
+					var inputElement ;
+					if (r < selectIndex){
+						inputElement = document.createElement('input');
+					} else{
+						inputElement = document.createElement('select');
+						if (r == selectIndex){
+							getSelectControlt(parentpagedata, inputElement);
+						}
+					} 
+						
+					if (r< indexToHide){
+						cell.setAttribute ('style', 'display:none;');
+					} 
+					inputElement.setAttribute ('name', rowId);
+					inputElement.id = inputElement.name;
+					
+					cell.appendChild(inputElement);
+					if (pageData != null)
+						inputElement.value = pageData[k][r];
+					
+				}
+			  if (pageData == null)
+					break;	
+			}
+}
 var propertyMap = null;
 
 function add_UpdateRow(someData, cols){
@@ -139,7 +210,11 @@ function getTableFields(tname){
 }
 
 function getTableData(tname,pname){
-	r = Promise.resolve(getData('/fetch/libdatabase/gettabledata?tableName='+tname+"&pageName="+ pname)); 
+	var r;
+	if (pname !== undefined)
+		r = Promise.resolve(getData('/fetch/libdatabase/gettabledata?tableName='+tname+"&pageName="+ pname));
+	else
+		r = Promise.resolve(getData('/fetch/libdatabase/gettabledata?tableName='+tname+"&pageName="+ pname));
 	return r;
 }
 
