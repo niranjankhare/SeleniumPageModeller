@@ -52,6 +52,7 @@ import com.google.gson.reflect.TypeToken;
 import db.jooq.generated.automationDb.*;
 import db.jooq.generated.automationDb.tables.records.ExtendedpropsRecord;
 import db.jooq.generated.automationDb.tables.records.GuimapRecord;
+import db.jooq.generated.automationDb.tables.records.PagesRecord;
 import db.jooq.generated.automationDb.tables.records.PropertiesRecord;
 
 import static db.jooq.generated.automationDb.Automation.AUTOMATION;
@@ -98,68 +99,55 @@ public class LibDatabase {
 		return returnList;
 	}
 
-	public static void insertGuiMap(String pageName,
-			LinkedHashMap<String, LinkedHashMap<String, String>> cleanParamMap) {
+	public static void insertUpdatePages(LinkedHashMap<String, LinkedHashMap<String, String>> postParamMap) {
+
 		try {
-			for (Entry<String, LinkedHashMap<String, String>> row : cleanParamMap.entrySet()) {
+			for (Entry<String, LinkedHashMap<String, String>> row : postParamMap.entrySet()) {
+				Boolean isInsert = false;
 				LinkedHashMap<String, String> fieldMap = row.getValue();
 				Set<String> keys = fieldMap.keySet();
 
-				List<TableField<GuimapRecord, ?>> guimapFields = new ArrayList<TableField<GuimapRecord, ?>>();
-				List<Object> guimapValues = new ArrayList<Object>();
-				guimapFields.add(GUIMAP.PAGEID);
+				List<TableField<?, ?>> pagesFields = new ArrayList<TableField<?, ?>>();
+				List<Object> pagesValues = new ArrayList<Object>();
 
-				Integer pageId = DbManager.getOpenContext().select(PAGES.PAGEID).from(PAGES)
-						.where(PAGES.PAGENAME.eq(pageName)).execute();
-				guimapValues.add(pageId);
-
-				List<TableField<PropertiesRecord, ?>> propertiesFields = new ArrayList<TableField<PropertiesRecord, ?>>();
-				List<Object> propertiesValues = new ArrayList<Object>();
-
-				List<TableField<ExtendedpropsRecord, ?>> expropertiesFields = new ArrayList<TableField<ExtendedpropsRecord, ?>>();
-				List<Object> expropertiesValues = new ArrayList<Object>();
+				Integer pageId = null;
 				for (String key : keys) {
-					if (GUIMAP.field(key) != null) {
-						guimapFields.add((TableField<GuimapRecord, ?>) GUIMAP.field(key));
-						guimapValues.add(fieldMap.get(key));
-					} else if (PROPERTIES.field(key) != null) {
-						propertiesFields.add((TableField<PropertiesRecord, ?>) PROPERTIES.field(key));
-						propertiesValues.add((Object) fieldMap.get(key));
-					} else if (EXTENDEDPROPS.field(key) != null) {
-						expropertiesFields.add((TableField<ExtendedpropsRecord, ?>) EXTENDEDPROPS.field(key));
-						expropertiesValues.add(fieldMap.get(key));
+
+					if (key.equalsIgnoreCase("PAGEID")) {
+						isInsert = fieldMap.get(key).equalsIgnoreCase("");
+						if (!isInsert)
+							pageId = Integer.parseInt(fieldMap.get(key));
+						else
+							;
+					} else {
+						pagesFields.add((TableField<PagesRecord, ?>) PAGES.field(key));
+						if (key.equalsIgnoreCase("PARENTID"))
+							pagesValues.add(null);
+						else
+							pagesValues.add(fieldMap.get(key));
 					}
 				}
+				if (!isInsert) {
+					if (pagesFields.size() > 0) {
+						UpdateSetMoreStep<PagesRecord> updateGuiMap = (UpdateSetMoreStep<PagesRecord>) getTableUpdateStatement(
+								PAGES, pagesFields, pagesValues);
+						updateGuiMap.where(PAGES.PAGEID.eq(pageId)).execute();
+					} else {
+						pagesFields.add(PAGES.PAGEID);
+						pagesValues.add(pageId);
+						InsertValuesStepN<?> insertSetStepGuiMap = DbManager.getOpenContext().insertInto(PAGES,
+								pagesFields);
+						insertSetStepGuiMap.values(pagesValues);
+						Result<?> x = insertSetStepGuiMap.returning(PAGES.PAGEID).fetch();
+						pageId = x.getValue(0, PAGES.PAGEID);
 
-				InsertValuesStepN<?> insertSetStepGuiMap = DbManager.getOpenContext().insertInto(GUIMAP, guimapFields);
-				insertSetStepGuiMap.values(guimapValues);
-				Result<?> x = insertSetStepGuiMap.returning(GUIMAP.GUIMAPID).fetch();
-				Integer guiMapId = x.getValue(0, GUIMAP.GUIMAPID);
-
-				propertiesFields.add(PROPERTIES.GUIMAPID);
-				propertiesValues.add(guiMapId);
-				String locatorValue = row.getValue().get("LOCATORVALUE");
-				propertiesFields.add(PROPERTIES.LOCATORTYPE);
-				String locatorType = (locatorValue.startsWith("/")) ? "XPATH" : "ID";
-				propertiesValues.add(locatorType);
-
-				InsertValuesStepN<?> insertSetStepProperties = DbManager.getOpenContext().insertInto(PROPERTIES,
-						propertiesFields);
-				insertSetStepProperties.values(propertiesValues).execute();
-
-				expropertiesFields.add(EXTENDEDPROPS.GUIMAPID);
-				expropertiesValues.add(guiMapId);
-				InsertValuesStepN<?> insertSetStepExtendedProps = DbManager.getOpenContext().insertInto(EXTENDEDPROPS,
-						expropertiesFields);
-				insertSetStepExtendedProps.values(expropertiesValues).execute();
-
-			}
-
-			System.out.println("done");
-
+					} // else isInsert
+				} // for
+			} // for
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
+
+		System.out.println("done");
 
 	}
 
@@ -508,11 +496,6 @@ public class LibDatabase {
 			returnList.add(values);
 		}
 		return returnList;
-	}
-
-	public static void insertUpdatePages(LinkedHashMap<String, LinkedHashMap<String, String>> postParamMap) {
-		// TODO Auto-generated method stub
-		System.out.println("Do Something here");
 	}
 
 }
