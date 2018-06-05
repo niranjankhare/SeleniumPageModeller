@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Properties extends TableImpl<PropertiesRecord> {
 
-    private static final long serialVersionUID = 798955159;
+    private static final long serialVersionUID = -1019187754;
 
     /**
      * The reference instance of <code>automation.PROPERTIES</code>
@@ -73,7 +73,7 @@ public class Properties extends TableImpl<PropertiesRecord> {
     /**
      * The column <code>automation.PROPERTIES.MAPPEDCLASS</code>.
      */
-    public final TableField<PropertiesRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
+    public final TableField<PropertiesRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50).defaultValue(org.jooq.impl.DSL.inline("(No Maping)", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>automation.PROPERTIES.LOCATORVALUE</code>.
@@ -83,7 +83,7 @@ public class Properties extends TableImpl<PropertiesRecord> {
     /**
      * The column <code>automation.PROPERTIES.LOCATORTYPE</code>.
      */
-    public final TableField<PropertiesRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(10).nullable(false), this, "");
+    public final TableField<PropertiesRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(20), this, "");
 
     /**
      * Create a <code>automation.PROPERTIES</code> table reference

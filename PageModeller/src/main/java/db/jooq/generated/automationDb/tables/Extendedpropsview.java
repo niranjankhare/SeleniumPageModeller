@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Extendedpropsview extends TableImpl<ExtendedpropsviewRecord> {
 
-    private static final long serialVersionUID = -1674608241;
+    private static final long serialVersionUID = 528555336;
 
     /**
      * The reference instance of <code>automation.EXTENDEDPROPSVIEW</code>
@@ -54,7 +54,7 @@ public class Extendedpropsview extends TableImpl<ExtendedpropsviewRecord> {
     /**
      * The column <code>automation.EXTENDEDPROPSVIEW.MAPPEDCLASS</code>.
      */
-    public final TableField<ExtendedpropsviewRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
+    public final TableField<ExtendedpropsviewRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50).defaultValue(org.jooq.impl.DSL.inline("(No Maping)", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>automation.EXTENDEDPROPSVIEW.EXPROP1</code>.

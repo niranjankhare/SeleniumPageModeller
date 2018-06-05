@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Propsview extends TableImpl<PropsviewRecord> {
 
-    private static final long serialVersionUID = 540527125;
+    private static final long serialVersionUID = 1180631374;
 
     /**
      * The reference instance of <code>automation.PROPSVIEW</code>
@@ -59,7 +59,7 @@ public class Propsview extends TableImpl<PropsviewRecord> {
     /**
      * The column <code>automation.PROPSVIEW.MAPPEDCLASS</code>.
      */
-    public final TableField<PropsviewRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
+    public final TableField<PropsviewRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50).defaultValue(org.jooq.impl.DSL.inline("(No Maping)", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>automation.PROPSVIEW.CONTROLNAME</code>.
@@ -79,7 +79,7 @@ public class Propsview extends TableImpl<PropsviewRecord> {
     /**
      * The column <code>automation.PROPSVIEW.LOCATORTYPE</code>.
      */
-    public final TableField<PropsviewRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(10).nullable(false), this, "");
+    public final TableField<PropsviewRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(20), this, "");
 
     /**
      * The column <code>automation.PROPSVIEW.STANDARDCLASS</code>.

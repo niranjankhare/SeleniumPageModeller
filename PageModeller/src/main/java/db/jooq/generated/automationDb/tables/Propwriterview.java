@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Propwriterview extends TableImpl<PropwriterviewRecord> {
 
-    private static final long serialVersionUID = -1078846510;
+    private static final long serialVersionUID = -1185679263;
 
     /**
      * The reference instance of <code>automation.PROPWRITERVIEW</code>
@@ -74,7 +74,7 @@ public class Propwriterview extends TableImpl<PropwriterviewRecord> {
     /**
      * The column <code>automation.PROPWRITERVIEW.MAPPEDCLASS</code>.
      */
-    public final TableField<PropwriterviewRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
+    public final TableField<PropwriterviewRecord, String> MAPPEDCLASS = createField("MAPPEDCLASS", org.jooq.impl.SQLDataType.VARCHAR(50).defaultValue(org.jooq.impl.DSL.inline("(No Maping)", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>automation.PROPWRITERVIEW.LOCATORVALUE</code>.
@@ -84,7 +84,7 @@ public class Propwriterview extends TableImpl<PropwriterviewRecord> {
     /**
      * The column <code>automation.PROPWRITERVIEW.LOCATORTYPE</code>.
      */
-    public final TableField<PropwriterviewRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(10).nullable(false), this, "");
+    public final TableField<PropwriterviewRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(20), this, "");
 
     /**
      * The column <code>automation.PROPWRITERVIEW.EXPROP1</code>.

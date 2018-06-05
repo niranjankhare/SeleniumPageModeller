@@ -259,7 +259,7 @@ public class LibDatabase {
 	}
 	
 	public static LinkedHashMap getAvailablePageIds() {
-		LinkedHashMap<String, String> pageData = getKeyValues(PAGES.PAGEID, PAGES.PAGEDESCRIPTION, PAGES);
+		LinkedHashMap<String, String> pageData = getKeyValues(PAGES.PAGEID, PAGES.PAGENAME, PAGES);
 		LinkedHashMap <String, Object> toReturn = new LinkedHashMap<String,Object>();
 		for (String key : pageData.keySet()){
 			toReturn.put(key, Arrays.asList(pageData.get(key), null));
