@@ -42,7 +42,7 @@ function add_PagesHeaderRow (){
 	Promise.resolve(respFields).then(function (tableData ){
 	var headerRow = document.getElementById('headerRow');
 	var dbColumns = tableData[0];
-	var indexToHide = dbColumns.indexOf('PAGEqfNAME');
+	var indexToHide = dbColumns.indexOf('PAGENAME');
 	
 	for (var i = 0; i < dbColumns.length; i++) {
 		var th = document.createElement('th');
@@ -51,7 +51,7 @@ function add_PagesHeaderRow (){
 		if (i< indexToHide){
 			th.setAttribute ('style', 'display:none;');
 		}
-        headerRow.appendChild(th);/*.innerHTML=dbColumns[i];*/
+        headerRow.appendChild(th);
     }
 	add_UpdatePagesRows (tableData);
 	});
@@ -66,9 +66,12 @@ function add_UpdatePagesRows (pageData){
 	for (i = 0; i < headers.length; i++){
 		dbColumns.push(headers[i].textContent);
 	}
-	var indexToHide = dbColumns.indexOf('PAGENAMfadsE');
-	var selectIndex = 10;/*dbColumns.indexOf('PAGE PARENT');*/
-
+	var parentSelect = getData ('/fetch/libdatabase/availablepages');
+	
+	Promise.resolve(parentSelect).then(function (parentData){
+	var indexToHide = dbColumns.indexOf('PAGENAME');
+	var selectIndex = dbColumns.indexOf('PARENTID');
+	
 	var rowIterator;
 	if (pageData != null)
 		rowIterator = pageData.length;
@@ -83,13 +86,13 @@ function add_UpdatePagesRows (pageData){
 					var rowId = rowIdmain + '.' + dbColumns[r];
 					var cell = row.insertCell(-1);
 					var inputElement ;
-					if (r < selectIndex){
+					if (r !== selectIndex){
 						inputElement = document.createElement('input');
 					} else{
 						inputElement = document.createElement('select');
-						if (r == selectIndex){
-							getSelectControlt(parentpagedata, inputElement);
-						}
+						/*if (r == selectIndex){*/
+						getSelectControlt(parentData, inputElement);
+						/*}*/
 					} 
 						
 					if (r< indexToHide){
@@ -101,29 +104,39 @@ function add_UpdatePagesRows (pageData){
 					cell.appendChild(inputElement);
 					if (pageData != null)
 						inputElement.value = pageData[k][r];
-					
+					else 
+						inputElement.value = '';
 				}
 			  if (pageData == null)
 					break;	
 			}
+	});
+	
 }
 var propertyMap = null;
 
-function add_UpdateRow(someData, cols){
+function add_UpdateRow(someData){
 	var tname = 'propsview';
 	var pageName = document.getElementById('pageName').value;
 	var elTable = document.getElementById(tname);
+	var headerRow = document.getElementById('headerRow');
+    var headers = headerRow.getElementsByTagName('th');
+	var dbColumns = [];	
+	for (i = 0; i < headers.length-1; i++){
+		dbColumns.push(headers[i].textContent);
+	}
 	var stdClasses = Promise.resolve(getData('/fetch/libdatabase/getstandardypes'));
 	var locatoryTypes = Promise.resolve(getData('/fetch/getlocatorytypes'));
-	Promise.all([someData, stdClasses,locatoryTypes,cols]).then(function (allData){
+	Promise.all([someData, stdClasses,locatoryTypes]).then(function (allData){
 	var tableData = allData[0];
 	var stdClassesData = allData[1];
 	var supportedLocatorTypes = allData[2];
-	var dbColumns ;
+	/*var dbColumns ;
 	if (tableData != null)
 		dbColumns = tableData[0];
 	else
 		dbColumns = allData[3];
+	*/
 	console.log (dbColumns);
 	var indexToHide = dbColumns.indexOf('CONTROLNAME');
 	var selectIndex = dbColumns.indexOf('LOCATORTYPE');

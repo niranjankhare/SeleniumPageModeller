@@ -16,6 +16,7 @@
 package org.seleniumng.ui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -102,7 +103,8 @@ public class LibDatabase {
 	public static void insertUpdatePages(LinkedHashMap<String, LinkedHashMap<String, String>> postParamMap) {
 
 		try {
-			for (Entry<String, LinkedHashMap<String, String>> row : postParamMap.entrySet()) {
+			for (Entry<String, LinkedHashMap<String, String>> row : postParamMap.entrySet()) { // for
+																								// 1
 				Boolean isInsert = false;
 				LinkedHashMap<String, String> fieldMap = row.getValue();
 				Set<String> keys = fieldMap.keySet();
@@ -118,13 +120,10 @@ public class LibDatabase {
 						if (!isInsert)
 							pageId = Integer.parseInt(fieldMap.get(key));
 						else
-							;
+							continue;
 					} else {
 						pagesFields.add((TableField<PagesRecord, ?>) PAGES.field(key));
-						if (key.equalsIgnoreCase("PARENTID"))
-							pagesValues.add(null);
-						else
-							pagesValues.add(fieldMap.get(key));
+						pagesValues.add(fieldMap.get(key));
 					}
 				}
 				if (!isInsert) {
@@ -132,19 +131,21 @@ public class LibDatabase {
 						UpdateSetMoreStep<PagesRecord> updateGuiMap = (UpdateSetMoreStep<PagesRecord>) getTableUpdateStatement(
 								PAGES, pagesFields, pagesValues);
 						updateGuiMap.where(PAGES.PAGEID.eq(pageId)).execute();
-					} else {
-						pagesFields.add(PAGES.PAGEID);
-						pagesValues.add(pageId);
-						InsertValuesStepN<?> insertSetStepGuiMap = DbManager.getOpenContext().insertInto(PAGES,
-								pagesFields);
-						insertSetStepGuiMap.values(pagesValues);
-						Result<?> x = insertSetStepGuiMap.returning(PAGES.PAGEID).fetch();
-						pageId = x.getValue(0, PAGES.PAGEID);
+					}
+				} else {
+					InsertValuesStepN<?> insertSetStepGuiMap = DbManager.getOpenContext().insertInto(PAGES,
+							pagesFields);
+					insertSetStepGuiMap.values(pagesValues);
+					Result<?> x = insertSetStepGuiMap.returning(PAGES.PAGEID).fetch();
+					pageId = x.getValue(0, PAGES.PAGEID);
+				}
 
-					} // else isInsert
-				} // for
-			} // for
-		} catch (Exception e) {
+			}
+		} catch (
+
+		Exception e)
+
+		{
 		}
 
 		System.out.println("done");
@@ -256,11 +257,16 @@ public class LibDatabase {
 	public static LinkedHashMap getAvailablePages() {
 		return getKeyValues(PAGES.PAGENAME, PAGES.PAGEDESCRIPTION, PAGES);
 	}
-
-	public static LinkedHashMap getAvailableTypes() {
-		return getKeyValues(TYPES.ABRV, TYPES.CLASS, TYPES);
+	
+	public static LinkedHashMap getAvailablePageIds() {
+		LinkedHashMap<String, String> pageData = getKeyValues(PAGES.PAGEID, PAGES.PAGEDESCRIPTION, PAGES);
+		LinkedHashMap <String, Object> toReturn = new LinkedHashMap<String,Object>();
+		for (String key : pageData.keySet()){
+			toReturn.put(key, Arrays.asList(pageData.get(key), null));
+		}
+		return toReturn;
 	}
-
+	
 	public static LinkedHashMap getStandardTypes() {
 		// LinkedHashMap oldMap = getTypes("STANDARD");
 		LinkedHashMap<String, String[]> list = new LinkedHashMap<String, String[]>();
@@ -280,7 +286,7 @@ public class LibDatabase {
 		return getTypes("CUSTOM");
 	}
 
-	public static LinkedHashMap getTypes(String classType) {
+	private static LinkedHashMap getTypes(String classType) {
 		LinkedHashMap<String, String[]> list = new LinkedHashMap<String, String[]>();
 		SelectConditionStep<Record3<String, String, String>> x = DbManager.getOpenContext()
 				.select(TYPES.ABRV, TYPES.CLASS, TYPES.PROPERTYMAP).from(TYPES).where(TYPES.TYPE.eq(classType));
@@ -297,11 +303,9 @@ public class LibDatabase {
 		LinkedHashMap<String, String> list = new LinkedHashMap<String, String>();
 		SelectJoinStep<Record2<String, String>> x = DbManager.getOpenContext().select(keyField, valueField).from(table);
 		for (Record rec : x.fetch()) {
-
-			list.put(rec.get(PAGES.PAGENAME), rec.get(PAGES.PAGEDESCRIPTION));
+			list.put(rec.get(keyField.getName()).toString(), rec.get(valueField.getName()).toString());
 		}
 		return list;
-
 	}
 
 	public static Object getUIPropsView(String tableName, String pageName) {

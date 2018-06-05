@@ -257,7 +257,8 @@ public class LibHtml {
         Element addMore = new Element("input");
         addMore.attr("type", "button");
         addMore.attr("id", "addRow");
-        addMore.attr("onclick", "add_UpdateRow(null,getTableFields('propsview'));");         
+/*        addMore.attr("onclick", "add_UpdateRow(null,getTableFields('propsview'));");         */
+        addMore.attr("onclick", "add_UpdateRow(null);");
         addMore.attr("value", "Add row");
 
         Element submit = new Element("input");

@@ -66,6 +66,10 @@ public class JSONResourceServer extends HttpServlet {
         
         String responseStr = "";
         switch (sPath) {
+        case "/libdatabase/availablepages":
+        	Object pPages = LibDatabase.getAvailablePageIds();
+        	responseStr = new Gson().toJson(pPages);
+        	break;
 		case "/getlocatorytypes":
 			List<String> byMethods = Arrays.asList("ByCssSelector", "ById", "ByName", "ByIdOrName", "ByChained", 
 					"ByXPath", "ByTagName", "ByClassName", "ByLinkText","ByPartialLinkText", "ByAll");
