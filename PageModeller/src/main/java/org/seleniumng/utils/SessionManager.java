@@ -15,12 +15,19 @@
  *******************************************************************************/
 package org.seleniumng.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.channels.FileChannel;
 
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.seleniumng.driver.DriverInventory;
 
@@ -44,9 +51,9 @@ public class SessionManager {
 		long timeOut = System.currentTimeMillis() + i * 1000;
 		Object o = null;
 		while (System.currentTimeMillis() < timeOut) {
-			
+
 			o = js.executeScript("return document.readyState");
-//			System.out.println(o.toString().equalsIgnoreCase("complete"));
+			// System.out.println(o.toString().equalsIgnoreCase("complete"));
 			if (o.toString().equalsIgnoreCase("complete")) {
 				System.out.println("exting loop after mills:" + (timer - System.currentTimeMillis()));
 				break;
@@ -101,6 +108,23 @@ public class SessionManager {
 			}
 
 		}
+
 	}
 
+	/**
+	 * Saves a screenshot of the session
+	 */
+	public void saveScreenshot() {
+		File scrFile = ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.FILE), destFile;
+
+		try {
+			destFile = File.createTempFile(TAFConfig.tafConfig.getString("browser"), "-ScreenShot.png");
+			FileChannel src = new FileInputStream(scrFile).getChannel();
+			FileChannel dest = new FileOutputStream(destFile).getChannel();
+			dest.transferFrom(src, 0, src.size());
+			System.out.println("Screenshot saved as:" + destFile.getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

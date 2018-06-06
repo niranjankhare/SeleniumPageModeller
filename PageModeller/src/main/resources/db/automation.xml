@@ -42,7 +42,7 @@
       <packageName>db.jooq.generated.automationDb</packageName>
 
       <!-- The destination directory of your generated classes. Using Maven directory layout here -->
-      <directory>./src/main/java</directory>
+      <directory>__JOOQ_DESTINATION_DIR__</directory>
     </target>
   </generator>
 </configuration>

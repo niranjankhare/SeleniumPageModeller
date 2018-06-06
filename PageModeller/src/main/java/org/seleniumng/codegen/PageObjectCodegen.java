@@ -99,8 +99,8 @@ public class PageObjectCodegen {
 	 * Repository for your application based on the metadata saved in the source
 	 * database.
 	 * 
-	 * @throws JClassAlreadyExistsException
-	 * @throws IOException
+	 * @throws JClassAlreadyExistsException thrown by codeModel
+	 * @throws IOException thrown by codeModel
 	 */
 	public static void generateSource() throws JClassAlreadyExistsException, IOException {
 		// Instantiate an instance of the JCodeModel class

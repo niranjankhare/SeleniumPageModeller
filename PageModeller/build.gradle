@@ -89,23 +89,28 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 
 
-task jooqGenerate {
+task jooqGenerate () {
+	
 	def config = ConfigFactory.load();
 	def dbUrl = config.getString("db.url");
 	def dbUsername = config.getString("db.username");
 	def dbPassword = config.getString("db.password");
+	
 	def f = sourceSets.main.resources.srcDirs[0].toString()+"/db/automation.xml"
-	def ftext =file(f).text.replaceAll("__JDBC_URL__",dbUrl).replaceAll("__DB_USERNAME__",dbUsername).replaceAll("__DB_PASSWORD__",dbPassword)
-	println "Generating jooq classes using:\n"
-	println dbUrl 
-	println dbUsername 
-	println dbPassword
-	org.jooq.util.GenerationTool.generate(
+	def ftext =file(f).text.replaceAll("__JDBC_URL__",dbUrl).replaceAll("__DB_USERNAME__",dbUsername).replaceAll("__DB_PASSWORD__",dbPassword).replaceAll("__JOOQ_DESTINATION_DIR__",sourceSets.main.java.srcDirs[0].toString().replace("\\","/"))
+	
+	doLast {
+	    println "Generating jooq classes:\n"
+		org.jooq.util.GenerationTool.generate(
 			javax.xml.bind.JAXB.unmarshal(new StringReader( ftext), org.jooq.util.jaxb.Configuration.class)
 			)
+	}
 
 }
 
+javadoc {
+ exclude  'db/jooq/generated/**'
+}
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
