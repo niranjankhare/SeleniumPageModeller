@@ -20,14 +20,27 @@ import org.seleniumng.driver.GuiControl;
 import com.typesafe.config.Config;
 
 /**
- * A class to represent the Button element
+ * A class to represent the Checkbox element
  * @author niru
  *
  */
-public class Button extends GuiControl{
+public class Checkbox extends GuiControl{
 
-	public Button(Config config) {
+	public Checkbox(Config config) {
 		super(config);
 	}
 	
+	public Boolean isChecked (){
+		String checked = i().getAttribute("checked");
+		return Boolean.parseBoolean(checked);
+	}
+	
+	public void setChecked(){
+		if (!isChecked())
+			i().click();
+	}
+	public void setUnChecked(){
+		if (isChecked())
+			i().click();
+	}
 }

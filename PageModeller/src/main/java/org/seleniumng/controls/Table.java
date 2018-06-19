@@ -15,19 +15,37 @@
  *******************************************************************************/
 package org.seleniumng.controls;
 
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.seleniumng.driver.GuiControl;
 
 import com.typesafe.config.Config;
 
 /**
- * A class to represent the Button element
+ * A class to represent the Table element
  * @author niru
  *
  */
-public class Button extends GuiControl{
+public class Table extends GuiControl{
 
-	public Button(Config config) {
+	public Table(Config config) {
 		super(config);
+		rowsLocator = config.getString("rowsLocator");
+		headerRowLocator = config.getString("headerRowLocator");
+	}
+	
+	private String rowsLocator;
+	private String headerRowLocator;
+	
+	
+	public List<WebElement> getRows(){
+		return i().findElements(By.cssSelector("tr"));
+	}
+	
+	public List<WebElement> getColumnNames(){
+		return i().findElements(By.cssSelector("thead tr th"));
 	}
 	
 }

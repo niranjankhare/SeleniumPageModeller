@@ -18,6 +18,7 @@ package org.seleniumng.driver;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
@@ -38,7 +39,9 @@ import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.seleniumng.utils.TAFConfig;
 
+import com.google.gson.Gson;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigValue;
 
 /**
  * Class to manage webdriver sessions.. for now based only on thread but would
@@ -52,63 +55,69 @@ public class DriverInventory {
 			: null;
 	private static Boolean useGrid = (gridHub == null) ? false
 			: (gridHub.hasPath("enabled")) ? gridHub.getBoolean("enabled") : false;
-	private static String browserType = (TAFConfig.tafConfig.hasPath("browser"))
-			? TAFConfig.tafConfig.getString("browser") : "FIREFOX";
+	private static String browserName = (TAFConfig.tafConfig.hasPath("browser"))
+			? TAFConfig.tafConfig.getString("browser") : "firefox";
+	private static Config capabilities = (TAFConfig.tafConfig.hasPath("capabilities"))
+			? TAFConfig.tafConfig.getConfig("capabilities") : null;
 	private static LinkedHashMap<String, WebDriver> driverInventory = new LinkedHashMap<String, WebDriver>();
 
+	/**
+	 * @param webDriver 
+	 * 				registers a new webdriver instance in the inventory HashMap
+	 * @return
+	 * 			the key for the webDriver entry
+	 *  Note: to get a WebDriver instance, use getDriver for the Session 
+	 */
 	public static String registerDriver(WebDriver webDriver) {
 		String key = ((RemoteWebDriver) webDriver).getSessionId().toString();
 		driverInventory.put(key, webDriver);
 		return key;
 	}
 
+	/**
+	 * @return
+	 *        the key for the webDriver entry
+	 */ 
 	public static String getNewDriver() {
 		System.setProperty("webdriver.chrome.driver", TAFConfig.sysPropChromeDriverPath);
 		System.setProperty("webdriver.gecko.driver", TAFConfig.sysPropMozGeckoDriverPath);
-		return setupWebDriver(browserType);
+		return setupWebDriver(capabilities);
+	}
 
+
+	/**
+	 * @param key the key for the WebDriver session to close 
+	 */
+	public static void closeSession(String key) {
+		System.out.println("Closing Session:" + key);
+		driverInventory.get(key).close();
+		driverInventory.remove(key);
 	}
 
 	/**
+	 * @param session the key representing the session
+	 * @return the WebDriver instance identified by the session key
+	 */
+	public static WebDriver getDriver(String session) {
+		return driverInventory.get(session);
+	}
+	
+	/**
 	 * Sets up the browser to be used for running automation
 	 * 
-	 * @param browser
-	 *            : See {@link BrowserType} This method is most probably not
-	 *            goign to be used, as we will need some additional param to
-	 *            specify profile related to localized language etc. See
-	 *            setWebDriver (Browser, profile)
+	 * @param Config
+	 *             The typesafe config object defining required capabilities 
+   *	           required for the webDriver session
 	 */
-	private static String setupWebDriver(String browser) {
-		DesiredCapabilities desiredCapabilities = null;
-		MutableCapabilities options = null;
+	private static String setupWebDriver (Config desiredCapabilities){
+		MutableCapabilities capabilities = new MutableCapabilities();
+		
+		for (Entry<String, ConfigValue> e: desiredCapabilities.entrySet()){
+			capabilities.setCapability(e.getKey(), e.getValue().unwrapped());
+		}
+		capabilities.setCapability("browserName", browserName);
 		RemoteWebDriver remoteWebDriver = null;
-		Class<? extends RemoteWebDriver> clazz = null;
-		switch (browser) {
-		case BrowserType.FIREFOX:
-			FirefoxOptions ffOptions = new FirefoxOptions();
-			// ffOptions.setCapability(capabilityName, value);
-			// FirefoxProfile profile = new FirefoxProfile();
-			// profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
-			// "text/csv");
-			// desiredCapabilities = DesiredCapabilities.firefox();
-			// desiredCapabilities.setCapability(FirefoxDriver.PROFILE,
-			// profile);
-			options = ffOptions;
-			clazz = FirefoxDriver.class;
-			break;
-		case BrowserType.GOOGLECHROME:
-			options = new ChromeOptions();
-			options.setCapability(CapabilityType.PLATFORM_NAME, Platform.LINUX);
-			options.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.ACCEPT);
-			options.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-			clazz = ChromeDriver.class;
-			break;
-		// case IE:
-		// https://docs.microsoft.com/en-us/microsoft-edge/webdriver
-		// desiredCapabilities = DesiredCapabilities.internetExplorer();
-		// break;
-		} // switch case brwosertype
-
+		WebDriver driver = null;
 		if (gridHub != null && useGrid) {
 			String remoteDriverUrlString;
 			if (!gridHub.getString("port").equals("")) {
@@ -124,30 +133,34 @@ public class DriverInventory {
 				e.printStackTrace();
 			}
 
-			remoteWebDriver = new RemoteWebDriver(remoteDriverUrl, options);
+			remoteWebDriver = new RemoteWebDriver(remoteDriverUrl, capabilities);
 			remoteWebDriver.setFileDetector(new LocalFileDetector());
+			driver = (WebDriver)remoteWebDriver;
 		} else {
-			try {
-				remoteWebDriver = clazz.newInstance();
-			} catch (InstantiationException | IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			switch (browserName){
+			case "firefox":
+				FirefoxOptions o= new FirefoxOptions(capabilities);
+				driver = new FirefoxDriver(o);
+				break;
+			case "chrome":
+			case "googlechrome":
+				ChromeOptions c = new ChromeOptions();
+				for (Entry<String, ConfigValue> e: desiredCapabilities.entrySet()){
+					c.setCapability(e.getKey(), e.getValue().unwrapped());
+				}
+				driver = new ChromeDriver(c);
+				break;
+			case "ie":
+				break;
+			case "safari":
+				break;
+			
 			}
 		}
-		remoteWebDriver.manage().timeouts().implicitlyWait(TAFConfig.DEFAULT_IMPLICIT_WAIT, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(TAFConfig.DEFAULT_IMPLICIT_WAIT, TimeUnit.SECONDS);
 		Dimension d = new Dimension(1280, 1024);
 		// Resize the current window to the given dimension
-		remoteWebDriver.manage().window().setSize(d);
-		return registerDriver(remoteWebDriver);
-	}
-
-	public static void closeSession(String key) {
-		System.out.println("Closing Session:" + key);
-		driverInventory.get(key).close();
-		driverInventory.remove(key);
-	}
-
-	public static WebDriver getDriver(String session) {
-		return driverInventory.get(session);
+		driver.manage().window().setSize(d);
+		return registerDriver(driver);
 	}
 }

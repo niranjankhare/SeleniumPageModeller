@@ -19,6 +19,12 @@ import org.seleniumng.driver.GuiControl;
 
 import com.typesafe.config.Config;
 
+/**
+ * A class to represent the Input element
+ * 
+ * @author niru
+ *
+ */
 public class InputText extends GuiControl{
 
 	public InputText(Config config) {

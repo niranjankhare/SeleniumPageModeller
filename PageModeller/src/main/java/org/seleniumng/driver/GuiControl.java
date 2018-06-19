@@ -49,6 +49,13 @@ public class GuiControl extends RemoteWebElement {
 		this.session = config.getString("session");
 
 	}
+	
+	/**
+	 * @return the WebElement wrapped by this instance
+	 */
+	public WebElement  i(){
+		return findMe();
+	}
 
 	private WebElement findMe() {
 		WebElement me = null;

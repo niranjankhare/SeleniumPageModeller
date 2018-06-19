@@ -91,7 +91,7 @@ function add_UpdatePagesRows (pageData){
 					} else{
 						inputElement = document.createElement('select');
 						/*if (r == selectIndex){*/
-						getSelectControlt(parentData, inputElement);
+						getSelectControlt(parentData, inputElement,  true);
 						/*}*/
 					} 
 						
@@ -159,10 +159,10 @@ function add_UpdateRow(someData){
 					} else{
 						inputElement = document.createElement('select');
 						if (r == selectIndex){
-							getSelectControlt(supportedLocatorTypes, inputElement);
+							getSelectControlt(supportedLocatorTypes, inputElement, false);
 						}
 						if (r > selectIndex){
-							getSelectControlt(stdClassesData, inputElement);
+							getSelectControlt(stdClassesData, inputElement, false);
 						}
 					} 
 						
@@ -206,7 +206,7 @@ function add_UpdateRow(someData){
 function getStandardtypes(e){
 	Promise.resolve(getData('/fetch/libdatabase/getstandardypes'))
 	.then(function(resp){
-		getSelectControlt(resp, e);
+		getSelectControlt(resp, e, false);
 	})
 	.catch (function(error){
 		return null;
@@ -236,12 +236,18 @@ function getExtendedPageGuiData(guiId){
 	return r;
 }
 
-function getSelectControlt (options, element){
+function getSelectControlt (options, element, withBlank){
 	for (var key in options){
 		var opt = document.createElement('option');
 		opt.text = options[key][0];
 		opt.value = key;
 		element.appendChild(opt);
+	}
+	if (withBlank == true){
+		var opt = document.createElement('option');
+		opt.text = '';
+		opt.value = '_blank';
+		element.insertBefore (opt, element.firstChild);
 	}
 }
 

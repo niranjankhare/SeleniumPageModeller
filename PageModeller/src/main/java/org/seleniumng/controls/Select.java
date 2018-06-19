@@ -16,30 +16,38 @@
 package org.seleniumng.controls;
 
 import org.seleniumng.driver.GuiControl;
-
 import com.typesafe.config.Config;
 
+/**
+ *  A class to represent the Select element
+ *  
+ * @author niru
+ *
+ */
 public class Select extends GuiControl{
 
 	public Select(Config config) {
 		super(config);
 	}
 	
-    public void select(CharSequence... option) {
-        System.out.println("Use selenium selectByVisibleText");
-        /*
-         * mySelectElement = driver.findElement(By.id("mySelect"));
-Select dropdown= new Select(mySelectElement);
-dropdown.selectByVisibleText("Italy");
-         */
+    /**
+     * @param option
+     *               the text representing the option to select
+     */
+    public void select(String option) {
+        System.out.println("Using selenium selectByVisibleText");
+        
+        org.openqa.selenium.support.ui.Select s = new org.openqa.selenium.support.ui.Select (i());
+        s.selectByVisibleText(option);
     }
+    /**
+     * @param index
+     *             the index of the option to select
+     */      
     public void select(Integer index) {
-        System.out.println("Use selenium selectByIndex");
-        /*
-         * mySelectElement = driver.findElement(By.id("mySelect"));
-Select dropdown= new Select(mySelectElement);
-dropdown.selectByIndex(2);
-         */
+        System.out.println("Using selenium selectByIndex");
+        org.openqa.selenium.support.ui.Select s = new org.openqa.selenium.support.ui.Select (i());
+        s.selectByIndex(index);
     }
 
 }

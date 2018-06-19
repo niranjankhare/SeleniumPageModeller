@@ -64,6 +64,9 @@ public class DbManager {
 		return datasource;
 	}
 
+	/**
+	 * @return teh DSL Context for JOOQ query exection
+	 */
 	public static DSLContext getOpenContext() {
 		return DSL.using(conn, SQLDialect.MYSQL);
 	}

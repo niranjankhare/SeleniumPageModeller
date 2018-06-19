@@ -53,8 +53,10 @@ insert into TYPES (`CLASS`, `TYPE`, `ABRV`,`HASEXTENDEDPROPS`,`PROPERTYMAP`)
 values  ('(No Maping)','STANDARD','null',true, null),
 ('Link','STANDARD','lnk',null, null),
 ('Button','STANDARD','btn',null, null),
+('Checkbox','STANDARD','chk',null, null),
 ('InputText','STANDARD','iTxt',null, null),
 ('Select','STANDARD','sel',true,'{"EXPROP1":"options"}'),
+('Table','STANDARD','tbl',null, null),
 ('ComplexSelect','CUSTOM','emSel',true, '{"EXPROP1":"options","EXPROP2":"showControlId"}');
 
 create table EXTENDEDPROPS (

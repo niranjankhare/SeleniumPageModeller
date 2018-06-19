@@ -19,6 +19,11 @@ import org.seleniumng.driver.GuiControl;
 
 import com.typesafe.config.Config;
 
+/**
+ *  A class to represent the Link element
+ * @author niru
+ *
+ */
 public class Link extends GuiControl{
 
 	public Link(Config config) {

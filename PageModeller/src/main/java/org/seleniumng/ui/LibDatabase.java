@@ -123,6 +123,13 @@ public class LibDatabase {
 							continue;
 					} else {
 						pagesFields.add((TableField<PagesRecord, ?>) PAGES.field(key));
+						if (key.equalsIgnoreCase(PAGES.PARENTID.getName())){
+							if (fieldMap.get(key).equals("")|| fieldMap.get(key).equals("_blank")){
+								pagesValues.add(null);
+								// over to next value
+								continue;
+							}  
+						} 
 						pagesValues.add(fieldMap.get(key));
 					}
 				}
@@ -141,11 +148,9 @@ public class LibDatabase {
 				}
 
 			}
-		} catch (
-
-		Exception e)
-
-		{
+		} catch (Exception e){
+			System.out.println("Some problem updating database:");
+			e.printStackTrace();
 		}
 
 		System.out.println("done");
