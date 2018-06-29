@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
@@ -52,7 +55,10 @@ public class PageObjectCodegen {
 	 * 
 	 */
 	private static JCodeModel resourceModel = new JCodeModel();
-
+	
+	private static String myApplication = tafConfig.getString("application");
+	private static String pagePackage = myApplication + ".webPages";
+	private static String userLibrariesPackage = myApplication + ".PageLibraries";
 	/**
 	 * Location under which the classes representing the Page Objects will be
 	 * generated
@@ -62,12 +68,19 @@ public class PageObjectCodegen {
 	 * Location under which the Page Objects metadata will be generated
 	 */
 	private static String resourceDirPath = tafConfig.getString("PageModeller.resourceDirPath");
-
+	
 	/**
 	 * Controls whether to overwrite existing user defined library templates
 	 */
 	private static Boolean reWriteUserDefinedLibs = tafConfig.getBoolean("PageModeller.reWriteUserDefinedLibs");
-
+	/**
+	 * user defined controls take precedence over library ones
+	 */
+	private static String additionalControlsPackage = tafConfig.getString("PageModeller.additionalControlsPackage");;
+	/**
+	 * class path to find if class exists
+	 */
+	private static ClassPath classPath = getClassPath();
 	/**
 	 * The superclass for the PageRepository class generated for your
 	 * application under test. This class defines constructors to auto-
@@ -81,6 +94,15 @@ public class PageObjectCodegen {
 	 */
 	private static JClass pageClassBaseClass = codeModel.directClass("org.seleniumng.utils.PageObjectBaseClass");
 
+	/**
+	 *  The package PageModeller references for Page control classes 
+	 */
+	private static String pageModellerControlsPackage = "org.seleniumng.controls";
+	
+	private static ImmutableSet<ClassInfo> pageModellerControlsSet =classPath.getTopLevelClasses (pageModellerControlsPackage);
+	private static ImmutableSet<ClassInfo> additionalControlsSet =classPath.getTopLevelClasses (additionalControlsPackage);
+	private static ImmutableSet<ClassInfo> userLibrariesPackageSet =classPath.getTopLevelClasses (userLibrariesPackage);
+	
 	public static void main(String... args) {
 		try {
 			PageObjectCodegen.generateSource();
@@ -90,9 +112,13 @@ public class PageObjectCodegen {
 		} catch (IOException ex) {
 			System.out.println("Uncaught error in generating page library!");
 			ex.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}
+
 
 	/**
 	 * Starting point for generating the Page Object Model. Defines the Page
@@ -101,12 +127,9 @@ public class PageObjectCodegen {
 	 * 
 	 * @throws JClassAlreadyExistsException thrown by codeModel
 	 * @throws IOException thrown by codeModel
+	 * @throws ClassNotFoundException if the controlClass for page fields does not exist
 	 */
-	public static void generateSource() throws JClassAlreadyExistsException, IOException {
-		// Instantiate an instance of the JCodeModel class
-		String myApplication = tafConfig.getString("application");
-		String pagePackage = myApplication + ".webPages";
-		String userLibrariesPackage = myApplication + ".PageLibraries";
+	public static void generateSource() throws JClassAlreadyExistsException, IOException, ClassNotFoundException {
 		JDefinedClass repositoryToCreate = codeModel._class(userLibrariesPackage + "." + myApplication + "Session");
 		repositoryToCreate._extends(objectRepositoryBaseClass);
 
@@ -114,7 +137,7 @@ public class PageObjectCodegen {
 
 		for (HashMap<String, String> webPages : orderedList) {
 			for (String webPage : webPages.keySet()) {
-				JClass pageClassToCreate = generatePageObject(pagePackage, userLibrariesPackage, webPage,
+				JClass pageClassToCreate = generatePageObject(  webPage,
 						webPages.get(webPage));
 				repositoryToCreate.field(JMod.PUBLIC, pageClassToCreate, "page" + webPage);
 
@@ -125,15 +148,6 @@ public class PageObjectCodegen {
 	}
 
 	/**
-	 * @param pPackage
-	 *            the package to be used to generate the classes for Page
-	 *            objects Note that this should be a package will have only
-	 *            generatede code. Any manual edits in the package can be
-	 *            overwritten the next time code generation is done.
-	 * @param uPackage
-	 *            the package to be used to generate the classes for User to
-	 *            extend the generated Page objects where he can write his
-	 *            libraries
 	 * @param webPage
 	 *            Name for the Class representing the Page Object
 	 * @param parent
@@ -144,31 +158,30 @@ public class PageObjectCodegen {
 	 *         on whether the Library class exists or not and if user has
 	 *         specifically asked for re-writing the class See:
 	 *         reWriteUserDefinedLibs
-	 * @throws IOException
+	 * @throws IOException, ClassNotFoundException
 	 *             in case of problems with writing the source code
 	 */
-	private static JClass generatePageObject(String pPackage, String uPackage, String webPage, String parent)
-			throws IOException {
+	private static JClass generatePageObject( String webPage, String parent)
+			throws IOException, ClassNotFoundException {
 
 		JDefinedClass mainClass = null;
 		JDefinedClass parentClass = null;
 		JClass userImplClass = null;
 		JPackage retResource = null;
 		JPackage uLibResource = null;
-		String classFQN = pPackage + "._Page" + webPage;
+		String classFQN = pagePackage + "._Page" + webPage;
 		String parentSN = "Page" + parent;
-		String parentFQN = uPackage + "." + parentSN;
+		String parentFQN = userLibrariesPackage + "." + parentSN;
 		String userImplClassSN = "Page" + webPage;
-		String userImplClassFQN = uPackage + "." + userImplClassSN;
+		String userImplClassFQN = userLibrariesPackage + "." + userImplClassSN;
+		String myApplication = tafConfig.getString("application");
+		String pagePackage = myApplication + ".webPages";
+		String userLibrariesPackage = myApplication + ".PageLibraries";
+
 		try {
 			if (codeModel._getClass(classFQN) == null) {
 				mainClass = codeModel._class(classFQN);
-				Boolean classExists = false;
-				try {
-					classExists = null != Class.forName(userImplClassFQN);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				Boolean classExists = getClassExists(userImplClassSN, userLibrariesPackageSet);
 				if (reWriteUserDefinedLibs || !classExists) {
 					userImplClass = codeModel._class(userImplClassFQN);
 					((JDefinedClass) userImplClass)._extends(mainClass);
@@ -179,7 +192,7 @@ public class PageObjectCodegen {
 			if (parent != null) {
 				parentClass = codeModel._getClass(parentFQN);
 				if (parentClass == null && reWriteUserDefinedLibs) {
-					parentClass: codeModel._class(parentFQN);
+					parentClass = codeModel._class(parentFQN);
 					mainClass._extends(parentClass);
 				} else {
 					JClass p = codeModel.directClass(parentFQN);
@@ -187,8 +200,8 @@ public class PageObjectCodegen {
 				}
 			} else
 				mainClass._extends(pageClassBaseClass);
-			retResource = resourceModel._package(pPackage + "." + tafConfig.getString("language"));
-			uLibResource = resourceModel._package(uPackage + "." + tafConfig.getString("language"));
+			retResource = resourceModel._package(pagePackage + "." + tafConfig.getString("language"));
+			uLibResource = resourceModel._package(userLibrariesPackage + "." + tafConfig.getString("language"));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -200,10 +213,12 @@ public class PageObjectCodegen {
 			String stdClass = fields.get(control).get("standardClass");
 			String classAbrv = LibDatabase.getClassAbrv(stdClass);
 			String customClass = fields.get(control).get("customClass");
-			customClass = (customClass == null || customClass.equals("") || customClass.equals("(No Maping)"))
+			String controlClass = (customClass == null || customClass.equals("") || customClass.equals("(No Maping)"))
 					? stdClass : customClass;
-
-			JClass jc = codeModel.ref("org.seleniumng.controls." + customClass);
+			
+			String controlClassPackage = getControlClassPackage (controlClass);
+			if (controlClassPackage==null) throw new ClassNotFoundException("You do not have a class:"+controlClass );
+			JClass jc = codeModel.ref(controlClassPackage+ "." + controlClass);
 			mainClass.field(JMod.PUBLIC, jc, classAbrv + control);
 
 		}
@@ -219,5 +234,33 @@ public class PageObjectCodegen {
 
 		return userImplClass;
 	}
-
+	
+	private static Boolean getClassExists (String clazz, ImmutableSet<ClassInfo> classInfoSet ){
+		
+		Boolean exists = false;
+		for (ClassInfo e: classInfoSet){
+			exists = e.getSimpleName().equals(clazz);
+			if (exists)break;
+		}
+		return exists;
+	}
+	private static String getControlClassPackage (String controlClass){
+		String clsPackage = null;
+		if (getClassExists (controlClass,additionalControlsSet )){
+			clsPackage = additionalControlsPackage;
+			return clsPackage;
+		}
+		if (getClassExists (controlClass,pageModellerControlsSet ))
+			clsPackage = pageModellerControlsPackage;
+		return clsPackage;
+	}
+	private static ClassPath getClassPath(){
+		ClassPath toReturn = null;
+		try {
+			toReturn = ClassPath.from(Thread.currentThread().getContextClassLoader());
+		} catch (Exception e){
+			
+		}
+		return toReturn; 
+	}
 }
