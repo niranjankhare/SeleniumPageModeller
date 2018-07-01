@@ -42,34 +42,7 @@ public class SessionManager {
 	public WebDriver getDriver() {
 		return DriverInventory.getDriver(session);
 	}
-
-	public void waitForPageToLoad(int i) {
-		long timer = System.currentTimeMillis();
-		sleep(3800); // some default wait for hte navigation to kick in
-		JavascriptExecutor js = (JavascriptExecutor) getDriver();
-
-		long timeOut = System.currentTimeMillis() + i * 1000;
-		Object o = null;
-		while (System.currentTimeMillis() < timeOut) {
-
-			o = js.executeScript("return document.readyState");
-			// System.out.println(o.toString().equalsIgnoreCase("complete"));
-			if (o.toString().equalsIgnoreCase("complete")) {
-				System.out.println("exting loop after mills:" + (timer - System.currentTimeMillis()));
-				break;
-			}
-			sleep(10);
-		}
-	}
-
-	public void sleep(int millisecs) {
-		try {
-			Thread.sleep(millisecs);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
+	
 	public SessionManager() {
 		Class<?> cls = this.getClass();
 		session = DriverInventory.getNewDriver();

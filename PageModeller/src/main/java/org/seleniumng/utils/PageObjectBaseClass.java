@@ -21,6 +21,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openqa.selenium.JavascriptExecutor;
+import org.seleniumng.driver.DriverInventory;
+
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -138,4 +141,31 @@ public class PageObjectBaseClass {
 		}
 		return retConfig;
 	}
+
+	public void waitForPageToLoad(int i) {
+		long timer = System.currentTimeMillis();
+		sleep(3800); // some default wait for hte navigation to kick in
+		JavascriptExecutor js = (JavascriptExecutor) DriverInventory.getDriver(session);
+	
+		long timeOut = System.currentTimeMillis() + i * 1000;
+		Object o = null;
+		while (System.currentTimeMillis() < timeOut) {
+	
+			o = js.executeScript("return document.readyState");
+			// System.out.println(o.toString().equalsIgnoreCase("complete"));
+			if (o.toString().equalsIgnoreCase("complete")) {
+				System.out.println("exting loop after mills:" + (timer - System.currentTimeMillis()));
+				break;
+			}
+			sleep(10);
+		}
+	}
+	public void sleep(int millisecs) {
+		try {
+			Thread.sleep(millisecs);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 }
