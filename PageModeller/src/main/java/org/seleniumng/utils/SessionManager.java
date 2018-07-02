@@ -92,9 +92,14 @@ public class SessionManager {
 
 		try {
 			destFile = File.createTempFile(TAFConfig.tafConfig.getString("browser"), "-ScreenShot.png");
-			FileChannel src = new FileInputStream(scrFile).getChannel();
-			FileChannel dest = new FileOutputStream(destFile).getChannel();
+			FileInputStream fileInputStream = new FileInputStream(scrFile);
+			FileChannel src = fileInputStream.getChannel();
+			FileOutputStream fileOutputStream = new FileOutputStream(destFile);
+			FileChannel dest = fileOutputStream.getChannel();
 			dest.transferFrom(src, 0, src.size());
+			fileInputStream.close();
+			fileOutputStream.close();
+			
 			System.out.println("Screenshot saved as:" + destFile.getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();

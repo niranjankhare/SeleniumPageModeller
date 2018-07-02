@@ -206,12 +206,14 @@ public class PageObjectCodegen {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LinkedHashMap<String, LinkedHashMap<String, String>> fields = LibDatabase.getPageGuiMapData(webPage);
-		Map<String, ? extends Object> properties = LibDatabase.getPageGuiPropertyData(webPage);
+		List<Object> fieldProperties = LibDatabase.getPageGuiMapData2(webPage);
+		LinkedHashMap<String, LinkedHashMap<String, String>> fields = (LinkedHashMap<String, LinkedHashMap<String, String>>) fieldProperties.get(0);//LibDatabase.getPageGuiMapData(webPage);
+		Map<String, ? extends Object> properties = (Map<String, ? extends Object>) fieldProperties.get(1);//LibDatabase.getPageGuiPropertyData(webPage);
 		Config c = ConfigFactory.parseMap(properties);
 		for (String control : fields.keySet()) {
 			String stdClass = fields.get(control).get("standardClass");
-			String classAbrv = LibDatabase.getClassAbrv(stdClass);
+//			String classAbrv = LibDatabase.getClassAbrv(stdClass);
+			String classAbrv = fields.get(control).get("typeAbrv");
 			String customClass = fields.get(control).get("customClass");
 			String controlClass = (customClass == null || customClass.equals("") || customClass.equals("(No Maping)"))
 					? stdClass : customClass;

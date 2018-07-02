@@ -33,6 +33,8 @@ public class PageObjectBaseClass {
 
 	protected Config pageConf = null;
 	protected String session = null;
+	protected Integer pageDirtyTimeout = tafConfig.getInt("PageModeller.pageDirtyTimeout");
+	protected Integer pageLoadTimeout = tafConfig.getInt("PageModeller.pageLoadTimeout");
 	public PageObjectBaseClass (){
 		List <Class<?>> classHeirarchy = new ArrayList<Class<?>>();
 		classHeirarchy.add(this.getClass());
@@ -141,20 +143,25 @@ public class PageObjectBaseClass {
 		}
 		return retConfig;
 	}
-
-	public void waitForPageToLoad(int i) {
+	public void waitForPageToLoad() {
+		waitForPageToLoad (pageDirtyTimeout,pageLoadTimeout);
+	}
+	
+	public void waitForPageToLoad(int loadTimeout) {
+		waitForPageToLoad (pageDirtyTimeout,loadTimeout);
+	}
+	
+	public void waitForPageToLoad(Integer dirtyTimeoutMills, Integer loadTimeoutSec) {
 		long timer = System.currentTimeMillis();
-		sleep(3800); // some default wait for hte navigation to kick in
+		sleep(dirtyTimeoutMills); // some default wait for hte navigation to kick in
 		JavascriptExecutor js = (JavascriptExecutor) DriverInventory.getDriver(session);
 	
-		long timeOut = System.currentTimeMillis() + i * 1000;
+		long timeOut = System.currentTimeMillis() + loadTimeoutSec * 1000;
 		Object o = null;
 		while (System.currentTimeMillis() < timeOut) {
-	
 			o = js.executeScript("return document.readyState");
-			// System.out.println(o.toString().equalsIgnoreCase("complete"));
 			if (o.toString().equalsIgnoreCase("complete")) {
-				System.out.println("exting loop after mills:" + (timer - System.currentTimeMillis()));
+				System.out.println("Exting loop after secs:" + (timer - System.currentTimeMillis())/1000);
 				break;
 			}
 			sleep(10);

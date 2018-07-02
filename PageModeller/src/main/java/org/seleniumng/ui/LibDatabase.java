@@ -34,6 +34,7 @@ import org.jooq.Record1;
 import org.jooq.Record16;
 import org.jooq.Record2;
 import org.jooq.Record3;
+import org.jooq.Record4;
 import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
@@ -397,19 +398,24 @@ public class LibDatabase {
 	public static LinkedHashMap<String, LinkedHashMap<String, String>> getPageGuiMapData(String webPage) {
 		LinkedHashMap<String, LinkedHashMap<String, String>> pageData = new LinkedHashMap<String, LinkedHashMap<String, String>>();
 
-		SelectConditionStep<Record3<String, String, String>> selectStatement = DbManager.getOpenContext()
-				.select(PROPSVIEW.CONTROLNAME, PROPSVIEW.MAPPEDCLASS, PROPSVIEW.STANDARDCLASS).from(PROPSVIEW)
+		SelectConditionStep<Record4<String, String, String,String>> selectStatement = DbManager.getOpenContext()
+				.select(PROPSVIEW.CONTROLNAME, PROPSVIEW.MAPPEDCLASS, PROPSVIEW.STANDARDCLASS,TYPES.ABRV).from(PROPSVIEW).innerJoin(TYPES).on(PROPSVIEW.STANDARDCLASS.eq(TYPES.CLASS))
 				.where(PROPSVIEW.PAGENAME.equal(webPage));
 
 		for (Record r : selectStatement.fetch()) {
 			LinkedHashMap<String, String> classmap = new LinkedHashMap<String, String>();
 			classmap.put("standardClass", r.get(PROPSVIEW.STANDARDCLASS));
 			classmap.put("customClass", r.get(PROPSVIEW.MAPPEDCLASS));
+			classmap.put("typeAbrv", r.get(TYPES.ABRV));
 			pageData.put(r.get(PROPSVIEW.CONTROLNAME), classmap);
 		}
 		return pageData;
 	}
-
+	public static List<Object> getPageGuiMapData2(String webPage) {
+		Object obj1 = getPageGuiMapData(webPage);
+		Object obj2 = getPageGuiPropertyData(webPage);
+		return Arrays.asList(obj1,obj2);
+	}
 	public static Map<String, Object> getPageGuiPropertyData(String webPage) {
 		Map<String, Object> pageData = new LinkedHashMap<String, Object>();
 
