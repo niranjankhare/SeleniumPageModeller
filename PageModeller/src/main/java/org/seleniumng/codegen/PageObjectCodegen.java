@@ -59,6 +59,12 @@ public class PageObjectCodegen {
 	private static String myApplication = tafConfig.getString("application");
 	private static String pagePackage = myApplication + ".webPages";
 	private static String userLibrariesPackage = myApplication + ".PageLibraries";
+	
+	private static List<String> languages = tafConfig.getStringList("languages");
+	private static String defaultLanguage = languages.get(0);
+	
+	private static JPackage retResource = resourceModel._package(pagePackage + "." + defaultLanguage);
+	private static JPackage uLibResource = resourceModel._package(userLibrariesPackage + "." + defaultLanguage);
 	/**
 	 * Location under which the classes representing the Page Objects will be
 	 * generated
@@ -133,7 +139,7 @@ public class PageObjectCodegen {
 		JDefinedClass repositoryToCreate = codeModel._class(userLibrariesPackage + "." + myApplication + "Session");
 		repositoryToCreate._extends(objectRepositoryBaseClass);
 
-		List<HashMap<String, String>> orderedList = LibDatabase.getPageHeirarchy();
+		List<HashMap<String, String>> orderedList = CodegenDatabase.getPageHeirarchy();
 
 		for (HashMap<String, String> webPages : orderedList) {
 			for (String webPage : webPages.keySet()) {
@@ -145,6 +151,8 @@ public class PageObjectCodegen {
 		}
 		codeModel.build(new File(sourceDirPath));
 		resourceModel.build(new File(resourceDirPath));
+		codeModel =  new JCodeModel();
+		resourceModel =  new JCodeModel();
 	}
 
 	/**
@@ -164,27 +172,22 @@ public class PageObjectCodegen {
 	private static JClass generatePageObject( String webPage, String parent)
 			throws IOException, ClassNotFoundException {
 
-		JDefinedClass mainClass = null;
+		JDefinedClass pageClass = null;
 		JDefinedClass parentClass = null;
 		JClass userImplClass = null;
-		JPackage retResource = null;
-		JPackage uLibResource = null;
-		String classFQN = pagePackage + "._Page" + webPage;
+		String pageSN = "_Page" + webPage;
+		String pageFQN = pagePackage + "." + pageSN;
 		String parentSN = "Page" + parent;
 		String parentFQN = userLibrariesPackage + "." + parentSN;
 		String userImplClassSN = "Page" + webPage;
 		String userImplClassFQN = userLibrariesPackage + "." + userImplClassSN;
-		String myApplication = tafConfig.getString("application");
-		String pagePackage = myApplication + ".webPages";
-		String userLibrariesPackage = myApplication + ".PageLibraries";
-
 		try {
-			if (codeModel._getClass(classFQN) == null) {
-				mainClass = codeModel._class(classFQN);
+			if (codeModel._getClass(pageFQN) == null) {
+				pageClass = codeModel._class(pageFQN);
 				Boolean classExists = getClassExists(userImplClassSN, userLibrariesPackageSet);
 				if (reWriteUserDefinedLibs || !classExists) {
 					userImplClass = codeModel._class(userImplClassFQN);
-					((JDefinedClass) userImplClass)._extends(mainClass);
+					((JDefinedClass) userImplClass)._extends(pageClass);
 				} else {
 					userImplClass = codeModel.directClass(userImplClassFQN);
 				}
@@ -193,26 +196,23 @@ public class PageObjectCodegen {
 				parentClass = codeModel._getClass(parentFQN);
 				if (parentClass == null && reWriteUserDefinedLibs) {
 					parentClass = codeModel._class(parentFQN);
-					mainClass._extends(parentClass);
+					pageClass._extends(parentClass);
 				} else {
 					JClass p = codeModel.directClass(parentFQN);
-					mainClass._extends(p);
+					pageClass._extends(p);
 				}
 			} else
-				mainClass._extends(pageClassBaseClass);
-			retResource = resourceModel._package(pagePackage + "." + tafConfig.getString("language"));
-			uLibResource = resourceModel._package(userLibrariesPackage + "." + tafConfig.getString("language"));
+				pageClass._extends(pageClassBaseClass);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		List<Object> fieldProperties = LibDatabase.getPageGuiMapData2(webPage);
-		LinkedHashMap<String, LinkedHashMap<String, String>> fields = (LinkedHashMap<String, LinkedHashMap<String, String>>) fieldProperties.get(0);//LibDatabase.getPageGuiMapData(webPage);
-		Map<String, ? extends Object> properties = (Map<String, ? extends Object>) fieldProperties.get(1);//LibDatabase.getPageGuiPropertyData(webPage);
+		List<Object> fieldProperties = CodegenDatabase.getPageGuiMapData2(webPage);
+		LinkedHashMap<String, LinkedHashMap<String, String>> fields = (LinkedHashMap<String, LinkedHashMap<String, String>>) fieldProperties.get(0);
+		Map<String, ? extends Object> properties = (Map<String, ? extends Object>) fieldProperties.get(1);
 		Config c = ConfigFactory.parseMap(properties);
 		for (String control : fields.keySet()) {
 			String stdClass = fields.get(control).get("standardClass");
-//			String classAbrv = LibDatabase.getClassAbrv(stdClass);
 			String classAbrv = fields.get(control).get("typeAbrv");
 			String customClass = fields.get(control).get("customClass");
 			String controlClass = (customClass == null || customClass.equals("") || customClass.equals("(No Maping)"))
@@ -221,13 +221,13 @@ public class PageObjectCodegen {
 			String controlClassPackage = getControlClassPackage (controlClass);
 			if (controlClassPackage==null) throw new ClassNotFoundException("You do not have a class:"+controlClass );
 			JClass jc = codeModel.ref(controlClassPackage+ "." + controlClass);
-			mainClass.field(JMod.PUBLIC, jc, classAbrv + control);
+			pageClass.field(JMod.PUBLIC, jc, classAbrv + control);
 
 		}
-		String rsrcPath = mainClass.name() + ".conf";
-		String uLibRsrcPath = userImplClassSN + ".conf";
-		JTextFile rsrc = new JTextFile(rsrcPath);
-		JTextFile uLibRrc = new JTextFile(uLibRsrcPath);
+		String rsrcFQN = pageClass.name() + ".conf";
+		String uLibRsrcFQN = userImplClassSN + ".conf";
+		JTextFile rsrc = new JTextFile(rsrcFQN);
+		JTextFile uLibRrc = new JTextFile(uLibRsrcFQN);
 		String propertyMap = c.root().render(ConfigRenderOptions.concise().setFormatted(true).setJson(true));
 		rsrc.setContents(propertyMap);
 		uLibRrc.setContents("");

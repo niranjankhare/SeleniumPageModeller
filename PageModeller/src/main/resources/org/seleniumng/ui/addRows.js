@@ -246,7 +246,7 @@ function getSelectControlt (options, element, withBlank){
 	if (withBlank == true){
 		var opt = document.createElement('option');
 		opt.text = '';
-		opt.value = '_blank';
+		opt.value = '-1';
 		element.insertBefore (opt, element.firstChild);
 	}
 }
@@ -439,7 +439,7 @@ function fillPopup_new(p){
 		if (propertyMap ===null){
 			propertyMap = resp;
 		}
-		getSelectControlt(propertyMap, sel);
+		getSelectControlt(propertyMap, sel, false);
 		
 		addExtendedPropsTableToPopup (p);
 		p.appendChild(content);
