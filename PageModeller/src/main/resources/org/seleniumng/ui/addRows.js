@@ -71,7 +71,7 @@ function add_selectorToRow (rowId){
 }
 function enableRow(rowId){
 	var chkValue = document.querySelectorAll('#'+rowId+' input[type=checkbox]')[0].checked;
-	var allRowInputs = document.querySelectorAll('#'+rowId+' input');
+	var allRowInputs = document.querySelectorAll('#'+rowId+' input,#'+rowId+' select');
 	for (var i=1;i<allRowInputs.length;i++){
 		allRowInputs[i].disabled = !chkValue;
 	}
