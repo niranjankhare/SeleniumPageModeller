@@ -54,9 +54,28 @@ function add_PagesHeaderRow (){
         headerRow.appendChild(th);
     }
 	add_UpdatePagesRows (tableData);
+	add_selectorToRow (headerRow.id);
 	});
 }
 
+function add_selectorToRow (rowId){
+	var row = document.getElementById(rowId);
+	var th = document.createElement('th');
+	var chkBox = document.createElement('input');
+	chkBox.setAttribute('type', 'checkbox');
+	chkBox.setAttribute ('id',row.id+'.selected');
+	chkBox.setAttribute ('onclick','enableRow("'+rowId+'")');
+	th.appendChild(chkBox);
+	/*th.appendChild(document.createTextNode('* All'));*/
+	row.insertBefore(th, row.firstChild);
+}
+function enableRow(rowId){
+	var chkValue = document.querySelectorAll('#'+rowId+' input[type=checkbox]')[0].checked;
+	var allRowInputs = document.querySelectorAll('#'+rowId+' input');
+	for (var i=1;i<allRowInputs.length;i++){
+		allRowInputs[i].disabled = !chkValue;
+	}
+}
 function add_UpdatePagesRows (pageData){
 	var tname = document.getElementById('tableName').value;
 	var elTable = document.getElementById(tname);
@@ -83,16 +102,14 @@ function add_UpdatePagesRows (pageData){
 				var rowIdmain = 'Row'+ (rowCount-1);
 				row.id = rowIdmain;
 				for (var r=0; r<dbColumns.length; r++){
+					var inputElement ;
 					var rowId = rowIdmain + '.' + dbColumns[r];
 					var cell = row.insertCell(-1);
-					var inputElement ;
 					if (r !== selectIndex){
 						inputElement = document.createElement('input');
 					} else{
 						inputElement = document.createElement('select');
-						/*if (r == selectIndex){*/
 						getSelectControlt(parentData, inputElement,  true);
-						/*}*/
 					} 
 						
 					if (r< indexToHide){
@@ -100,13 +117,14 @@ function add_UpdatePagesRows (pageData){
 					} 
 					inputElement.setAttribute ('name', rowId);
 					inputElement.id = inputElement.name;
-					
+					inputElement.disabled=true;
 					cell.appendChild(inputElement);
 					if (pageData != null)
 						inputElement.value = pageData[k][r];
 					else 
 						inputElement.value = '';
 				}
+				add_selectorToRow (row.id);
 			  if (pageData == null)
 					break;	
 			}
