@@ -104,6 +104,7 @@ public class LibDatabase {
 	public static void insertUpdatePages(LinkedHashMap<String, LinkedHashMap<String, String>> postParamMap) {
 
 		try {
+			List<Integer> pagesToDelete= new ArrayList<Integer>();
 			for (Entry<String, LinkedHashMap<String, String>> row : postParamMap.entrySet()) { // for
 																								// 1
 				Boolean isInsert = false;
@@ -112,10 +113,13 @@ public class LibDatabase {
 
 				List<TableField<?, ?>> pagesFields = new ArrayList<TableField<?, ?>>();
 				List<Object> pagesValues = new ArrayList<Object>();
-
+			
 				Integer pageId = null;
 				for (String key : keys) {
-
+					if (key.equalsIgnoreCase("delete")){
+						pagesToDelete.add(Integer.parseInt(fieldMap.get(key)));
+						continue;
+					}
 					if (key.equalsIgnoreCase("PAGEID")) {
 						isInsert = fieldMap.get(key).equalsIgnoreCase("");
 						if (!isInsert)
@@ -149,6 +153,7 @@ public class LibDatabase {
 				}
 
 			}
+			DbManager.getOpenContext().delete(PAGES).where(PAGES.PAGEID.in(pagesToDelete)).execute();
 		} catch (Exception e){
 			System.out.println("Some problem updating database:");
 			e.printStackTrace();

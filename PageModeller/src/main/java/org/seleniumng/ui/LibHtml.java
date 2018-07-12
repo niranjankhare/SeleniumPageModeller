@@ -146,6 +146,7 @@ public class LibHtml {
         Element submit = new Element("input");
         submit.attr("type", "submit");
         submit.attr("id", "submit");
+        submit.attr("onclick", "removeSelectCheckboxes();");
         submit.attr("value", "Go!");
         Element parentPageDiv = new Element("div").attr("id", "formMainDiv").attr("style", "visibility=inherit;");
         parentPageDiv.appendChild(table);

@@ -43,9 +43,9 @@ function add_PagesHeaderRow (){
 	var headerRow = document.getElementById('headerRow');
 	var dbColumns = tableData[0];
 	var indexToHide = dbColumns.indexOf('PAGENAME');
-	
+	var th;
 	for (var i = 0; i < dbColumns.length; i++) {
-		var th = document.createElement('th');
+		th = document.createElement('th');
 		th.appendChild(document.createTextNode(dbColumns[i]));
 		th.setAttribute ('value', dbColumns[i]);
 		if (i< indexToHide){
@@ -54,26 +54,132 @@ function add_PagesHeaderRow (){
         headerRow.appendChild(th);
     }
 	add_UpdatePagesRows (tableData);
-	add_selectorToRow (headerRow.id);
+/*	
+	var thEnable = document.createElement('th');
+	var thDelete = document.createElement('th');
+	var chkBoxSelect = document.createElement('input');
+	chkBoxSelect.setAttribute('type', 'checkbox');
+	chkBoxSelect.setAttribute ('onclick', 'enableRow(this)');
+	var chkBoxRow = chkBoxSelect.cloneNode(true); //need this for rows
+	chkBoxSelect.setAttribute ('rowId','headerRow');
+	chkBoxSelect.setAttribute ('onclick','selectAllClass(this);');
+	var chkBoxDelete = chkBoxSelect.cloneNode(true);
+	chkBoxSelect.setAttribute ('onclick','selectAllClass(this);document.querySelector("#headerRow .rowDelete").disabled=!this.checked;');
+	chkBoxSelect.setAttribute('class', 'rowSelect');
+	chkBoxDelete.setAttribute('class', 'rowDelete'); 
+	chkBoxSelect.setAttribute ('id',headerRow.id+'.select');
+	chkBoxDelete.setAttribute ('id',headerRow.id+'.delete');
+	chkBoxDelete.disabled=true;
+	thEnable.appendChild(chkBoxSelect);
+	thEnable.appendChild (document.createTextNode('All'));
+	
+	thDelete.appendChild(chkBoxDelete);
+	thDelete.appendChild (document.createTextNode('Delete'));
+	headerRow.insertBefore(thDelete, headerRow.firstChild);
+	headerRow.insertBefore(thEnable, headerRow.firstChild);
+*/
 	});
 }
 
-function add_selectorToRow (rowId){
-	var row = document.getElementById(rowId);
-	var th = document.createElement('th');
-	var chkBox = document.createElement('input');
-	chkBox.setAttribute('type', 'checkbox');
-	chkBox.setAttribute ('id',row.id+'.selected');
-	chkBox.setAttribute ('onclick','enableRow("'+rowId+'")');
-	th.appendChild(chkBox);
-	/*th.appendChild(document.createTextNode('* All'));*/
-	row.insertBefore(th, row.firstChild);
+function addCheckboxesToHeaderRow (h){
+	var thEnable = document.createElement('th');
+	var thDelete = document.createElement('th');
+	var chkBoxSelect = document.createElement('input');
+	chkBoxSelect.setAttribute('type', 'checkbox');
+	chkBoxSelect.setAttribute ('onclick', 'enableRow(this)');
+	var chkBoxRow = chkBoxSelect.cloneNode(true); /*need this for rows*/
+	chkBoxSelect.setAttribute ('rowId','headerRow');
+	chkBoxSelect.setAttribute ('onclick','selectAllClass(this);');
+	var chkBoxDelete = chkBoxSelect.cloneNode(true);
+	chkBoxSelect.setAttribute ('onclick','selectAllClass(this);document.querySelector("#headerRow .rowDelete").disabled=!this.checked;');
+	chkBoxSelect.setAttribute('class', 'rowSelect');
+	chkBoxDelete.setAttribute('class', 'rowDelete'); 
+	chkBoxSelect.setAttribute ('id',headerRow.id+'.select');
+	chkBoxDelete.setAttribute ('id',headerRow.id+'.delete');
+	chkBoxDelete.disabled=true;
+	thEnable.appendChild(chkBoxSelect);
+	thEnable.appendChild (document.createTextNode('All'));
+	
+	thDelete.appendChild(chkBoxDelete);
+	thDelete.appendChild (document.createTextNode('Delete'));
+	headerRow.insertBefore(thDelete, headerRow.firstChild);
+	headerRow.insertBefore(thEnable, headerRow.firstChild);
+
 }
-function enableRow(rowId){
-	var chkValue = document.querySelectorAll('#'+rowId+' input[type=checkbox]')[0].checked;
+function addCheckboxesToRow (e){
+	var chkBoxRow = document.createElement('input');
+	chkBoxRow.setAttribute('type', 'checkbox');
+	chkBoxRow.setAttribute ('onclick', 'enableRow(this)');
+	var cell = e.insertCell(0);
+	chkBoxRow.setAttribute ('id', e.id+'.delete');
+	chkBoxRow.setAttribute ('rowId', e.id);
+	chkBoxRow.setAttribute ('name', e.id+'.delete');
+	chkBoxRow.setAttribute ('class', 'rowDelete');
+	var chkDelete = chkBoxRow.cloneNode(true);
+	chkDelete.setAttribute ('value', e.querySelector('input[name="'+e.id+'.PAGEID"]').value);
+	chkDelete.setAttribute('onclick','markForDelete(this);');
+	chkDelete.disabled=true;
+	cell.appendChild(chkDelete);
+	
+	chkBoxRow.setAttribute ('id', e.id+'.select');
+	chkBoxRow.setAttribute ('name', e.id+'.select');
+	chkBoxRow.setAttribute ('class', 'rowSelect');
+	chkBoxRow.setAttribute('onclick','toggleSubmit(this);');
+	e.insertCell(0).appendChild(chkBoxRow.cloneNode(true));
+}
+
+function selectAllClass(e){
+	var allRowSelects = document.querySelectorAll('.'+ e.getAttribute('class'));
+	for (var i=1;i<allRowSelects.length;i++){
+		if (allRowSelects[i].checked != e.checked)
+			allRowSelects[i].click();
+	}
+	console.log('done');	
+}
+function toggleSubmit(e){
+	var chkValue = e.checked;
+	var rowId = e.getAttribute('rowId');
 	var allRowInputs = document.querySelectorAll('#'+rowId+' input,#'+rowId+' select');
 	for (var i=1;i<allRowInputs.length;i++){
 		allRowInputs[i].disabled = !chkValue;
+	}
+}
+function markForDelete(e){
+	var rowId = e.getAttribute('rowId');
+	var eRow = document.querySelector('#'+rowId);
+	var parents = document.querySelectorAll('.PARENTID');
+	var pageName = document.querySelectorAll('#'+rowId+ ' .PAGENAME')[0].value;
+	var message = 'Following rows: ';
+	var markForDelete = [];
+	for (var i=0;i<parents.length;i++){
+		var parentName = parents[i].selectedOptions[0].text;
+		
+		if (pageName===parentName){
+			var parentRowId = parents[i].getAttribute('rowId');
+			markForDelete.push(parentRowId);
+		}
+	}
+	var bConfirm = false;
+	if (e.checked ){
+		bConfirm = confirm ('Following Pages heirarchy will be reset!Please Confirm!'+ markForDelete.toString());
+	}
+	if (bConfirm){
+	for (var i=0;i<markForDelete.length;i++){
+		var eSelect = document.querySelector('#'+markForDelete[i]+' .rowSelect');
+		if (!eSelect.checked)
+			eSelect.click();
+		
+		
+		var eParentSelect = document.querySelector('#'+markForDelete[i]+' .PARENTID');
+		eParentSelect.style.border = 'thin solid red';
+		eParentSelect.value = -1;
+	}	
+	} else {
+		e.checked=false;
+		}
+	var allRowInputs = document.querySelectorAll('#'+rowId+' input,#'+rowId+' select');
+	for (var i=2;i<allRowInputs.length;i++){
+		allRowInputs[i].disabled = e.checked;
 	}
 }
 function add_UpdatePagesRows (pageData){
@@ -103,7 +209,7 @@ function add_UpdatePagesRows (pageData){
 				row.id = rowIdmain;
 				for (var r=0; r<dbColumns.length; r++){
 					var inputElement ;
-					var rowId = rowIdmain + '.' + dbColumns[r];
+					var inputId = rowIdmain + '.' + dbColumns[r];
 					var cell = row.insertCell(-1);
 					if (r !== selectIndex){
 						inputElement = document.createElement('input');
@@ -115,7 +221,9 @@ function add_UpdatePagesRows (pageData){
 					if (r< indexToHide){
 						cell.setAttribute ('style', 'display:none;');
 					} 
-					inputElement.setAttribute ('name', rowId);
+					inputElement.setAttribute('class',dbColumns[r]);
+					inputElement.setAttribute ('name', inputId);
+					inputElement.setAttribute ('rowId', row.id);
 					inputElement.id = inputElement.name;
 					inputElement.disabled=true;
 					cell.appendChild(inputElement);
@@ -124,10 +232,13 @@ function add_UpdatePagesRows (pageData){
 					else 
 						inputElement.value = '';
 				}
-				add_selectorToRow (row.id);
+				addCheckboxesToRow(row);
 			  if (pageData == null)
 					break;	
 			}
+		/*if (pageData != null)
+			add_selectorsToTable ('#'+tname);
+		*/
 	});
 	
 }
@@ -528,4 +639,11 @@ function addExtendedPropsTableToPopup(popup/* , operation */){
 	var footer = exPropsTable.appendChild(document.createElement('tfoot'));
 	var footerRow = footer.insertRow(-1);	
 	var btnContainer = footerRow.insertCell(-1);
+}
+
+function removeSelectCheckboxes(){
+	var chkSelects = document.querySelectorAll('.rowSelect');
+	for (var i=0;i< chkSelects.length;i++){
+		chkSelects[i].disabled=true;
+	}
 }
