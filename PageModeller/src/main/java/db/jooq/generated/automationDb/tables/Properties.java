@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Properties extends TableImpl<PropertiesRecord> {
 
-    private static final long serialVersionUID = -1019187754;
+    private static final long serialVersionUID = -851742977;
 
     /**
      * The reference instance of <code>automation.PROPERTIES</code>
@@ -83,7 +83,12 @@ public class Properties extends TableImpl<PropertiesRecord> {
     /**
      * The column <code>automation.PROPERTIES.LOCATORTYPE</code>.
      */
-    public final TableField<PropertiesRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(20), this, "");
+    public final TableField<PropertiesRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(20).nullable(false), this, "");
+
+    /**
+     * The column <code>automation.PROPERTIES.LOCATORS</code>.
+     */
+    public final TableField<PropertiesRecord, String> LOCATORS = createField("LOCATORS", org.jooq.impl.SQLDataType.VARCHAR(256), this, "");
 
     /**
      * Create a <code>automation.PROPERTIES</code> table reference

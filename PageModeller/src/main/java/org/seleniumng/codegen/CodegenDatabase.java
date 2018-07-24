@@ -15,7 +15,7 @@ import java.util.Map;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 
-import org.jooq.Record17;
+import org.jooq.Record18;
 import org.jooq.Record2;
 import org.jooq.Record5;
 import org.jooq.Result;
@@ -41,15 +41,15 @@ public class CodegenDatabase {
 	private static Result<Record5<String,String, String, String, String>> resultMapData = mapData.fetch();
 	private static Map<String, Result<Record5<String,String, String, String, String>>> mapDataByPageName = resultMapData.intoGroups(PROPSVIEW.PAGENAME);
 
-	private static SelectJoinStep<Record17<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> propertyData = dslContext
+	private static SelectJoinStep<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String,String>> propertyData = dslContext
 			.select(PROPWRITERVIEW.PAGENAME,PROPWRITERVIEW.GUIMAPID, PROPWRITERVIEW.ABRV, PROPWRITERVIEW.CONTROLNAME,
-					PROPWRITERVIEW.CONTROLDESCRIPTION, PROPWRITERVIEW.LOCATORTYPE, PROPWRITERVIEW.LOCATORVALUE,
+					PROPWRITERVIEW.CONTROLDESCRIPTION, PROPWRITERVIEW.LOCATORTYPE, PROPWRITERVIEW.LOCATORVALUE,PROPWRITERVIEW.LOCATORS,
 					PROPWRITERVIEW.MAPPEDCLASS, PROPWRITERVIEW.EXPROP1, PROPWRITERVIEW.EXPROP2,
 					PROPWRITERVIEW.EXPROP3, PROPWRITERVIEW.EXPROP4, PROPWRITERVIEW.EXPROP5, PROPWRITERVIEW.EXPROP6,
 					PROPWRITERVIEW.EXPROP7, PROPWRITERVIEW.EXPROP8, PROPWRITERVIEW.EXPROP9)
 			.from(PROPWRITERVIEW);
-	private static Result<Record17<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> resultPropertyData = propertyData.fetch(); 
-	private static Map<String, Result<Record17<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>>> propertyDataByPageName = resultPropertyData.intoGroups(PROPWRITERVIEW.PAGENAME);
+	private static Result<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String,String, String, String, String, String, String>> resultPropertyData = propertyData.fetch(); 
+	private static Map<String, Result<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>>> propertyDataByPageName = resultPropertyData.intoGroups(PROPWRITERVIEW.PAGENAME);
 	
 
 	private static Result<Record2<String, String>> result = dslContext.select(TYPES.CLASS, TYPES.PROPERTYMAP)
@@ -126,15 +126,16 @@ private static <K,R extends Record> List<Record> getRecords(Map<K, Result<R>> pa
 			}
 			LinkedHashMap<String, Object> propertyMap = new LinkedHashMap<String, Object>();
 
-			propertyMap.put("CONTROLDESCRIPTION", r.get(PROPSVIEW.CONTROLDESCRIPTION));
-			propertyMap.put("LOCATORTYPE", r.get(PROPSVIEW.LOCATORTYPE));
-			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
+			propertyMap.put("CONTROLDESCRIPTION", r.get(PROPWRITERVIEW.CONTROLDESCRIPTION));
+			propertyMap.put("LOCATORTYPE", r.get(PROPWRITERVIEW.LOCATORTYPE));
+			propertyMap.put("LOCATORVALUE", r.get(PROPWRITERVIEW.LOCATORVALUE));
+			propertyMap.put("LOCATORS", (String)r.get(PROPWRITERVIEW.LOCATORS));
 			if (exmap != null) {
 				for (String xf : exmap.keySet()) {
 					propertyMap.put(exmap.get(xf), r.get(xf));
 				}
 			}
-			propertyMap.put("LOCATORVALUE", r.get(PROPSVIEW.LOCATORVALUE));
+			propertyMap.put("LOCATORVALUE", r.get(PROPWRITERVIEW.LOCATORVALUE));
 			Object o = (Object) propertyMap;
 			pageData.put(r.get(PROPWRITERVIEW.ABRV) + r.get(PROPWRITERVIEW.CONTROLNAME).toString(), o);
 

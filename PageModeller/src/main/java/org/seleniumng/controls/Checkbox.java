@@ -31,16 +31,16 @@ public class Checkbox extends GuiControl{
 	}
 	
 	public Boolean isChecked (){
-		String checked = i().getAttribute("checked");
+		String checked = me().getAttribute("checked");
 		return Boolean.parseBoolean(checked);
 	}
 	
 	public void setChecked(){
 		if (!isChecked())
-			i().click();
+			me().click();
 	}
 	public void setUnChecked(){
 		if (isChecked())
-			i().click();
+			me().click();
 	}
 }

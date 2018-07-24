@@ -10,7 +10,7 @@ create table PAGES (
 PRIMARY KEY (`PAGEID`)
 );
 insert into PAGES (`PAGENAME`, `PARENTID`, `PAGEDESCRIPTION`)
-values ('Login',null, 'Login page');
+values ('Login',-1, 'Login page');
 create table GUIMAP (
 `GUIMAPID` int (10) NOT NULL AUTO_INCREMENT,
 `PAGEID`  int (10) NOT NULL, 
@@ -32,6 +32,7 @@ create table PROPERTIES (
 `MAPPEDCLASS`  VARCHAR (50) DEFAULT '(No Maping)', 
 `LOCATORVALUE` VARCHAR  (100) NOT NULL, -- Select
 `LOCATORTYPE` VARCHAR (20) NOT NULL, -- Calculate based on value (xpath or id?)
+`LOCATORS` VARCHAR (256) NOT NULL, -- Calculate based on value (xpath or id?)
 PRIMARY KEY (`PROPERTYID`),
 CONSTRAINT fk_guimap FOREIGN KEY (GUIMAPID)
   REFERENCES GUIMAP(`GUIMAPID`)
@@ -89,6 +90,10 @@ g.GUIMAPID = r.GUIMAPID INNER JOIN
 automation.PAGES p ON
 g.PAGEID = p.PAGEID;
 
+rename table `propsview` to `v`;
+
+rename table `v` to `PROPSVIEW`;
+
 CREATE VIEW automation.EXTENDEDPROPSVIEW AS
 SELECT  
 c.GUIMAPID, p.MAPPEDCLASS, c.EXPROP1, c.EXPROP2, c.EXPROP3, c.EXPROP4, c.EXPROP5,
@@ -98,9 +103,12 @@ automation.EXTENDEDPROPS c
 INNER JOIN automation.PROPERTIES p 
 ON c.GUIMAPID=p.GUIMAPID;
 
+rename table `extendedprops` to `v`;
+rename table `v` to `EXTENDEDPROPS`;
+
 CREATE VIEW `automation`.`PROPWRITERVIEW` AS
 SELECT p.PAGENAME, g.GUIMAPID, t.ABRV, g.CONTROLNAME, g.CONTROLDESCRIPTION,
-r.MAPPEDCLASS, r.LOCATORVALUE, r.LOCATORTYPE,c.EXPROP1, c.EXPROP2, c.EXPROP3, c.EXPROP4, c.EXPROP5,
+r.MAPPEDCLASS, r.LOCATORVALUE, r.LOCATORTYPE,r.LOCATORS,c.EXPROP1, c.EXPROP2, c.EXPROP3, c.EXPROP4, c.EXPROP5,
 c.EXPROP6, c.EXPROP7, c.EXPROP8, c.EXPROP9
 FROM
  automation.GUIMAP g INNER JOIN
@@ -112,6 +120,10 @@ automation.PAGES p ON
 g.PAGEID = p.PAGEID INNER JOIN
 automation.TYPES t ON
 r.STANDARDCLASS = t.CLASS;
+
+rename table `propwriterview` to `v`;
+rename table `v` to `PROPWRITERVIEW`;
+
 
 /*
 ALTER TABLE PROPERTIES

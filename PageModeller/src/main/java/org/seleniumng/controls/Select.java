@@ -37,7 +37,7 @@ public class Select extends GuiControl{
     public void select(String option) {
         System.out.println("Using selenium selectByVisibleText");
         
-        org.openqa.selenium.support.ui.Select s = new org.openqa.selenium.support.ui.Select (i());
+        org.openqa.selenium.support.ui.Select s = new org.openqa.selenium.support.ui.Select (me());
         s.selectByVisibleText(option);
     }
     /**
@@ -46,7 +46,7 @@ public class Select extends GuiControl{
      */      
     public void select(Integer index) {
         System.out.println("Using selenium selectByIndex");
-        org.openqa.selenium.support.ui.Select s = new org.openqa.selenium.support.ui.Select (i());
+        org.openqa.selenium.support.ui.Select s = new org.openqa.selenium.support.ui.Select (me());
         s.selectByIndex(index);
     }
 

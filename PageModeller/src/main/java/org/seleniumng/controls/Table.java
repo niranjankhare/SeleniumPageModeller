@@ -41,11 +41,11 @@ public class Table extends GuiControl{
 	
 	
 	public List<WebElement> getRows(){
-		return i().findElements(By.cssSelector("tr"));
+		return me().findElements(By.cssSelector("tr"));
 	}
 	
 	public List<WebElement> getColumnNames(){
-		return i().findElements(By.cssSelector("thead tr th"));
+		return me().findElements(By.cssSelector("thead tr th"));
 	}
 	
 }

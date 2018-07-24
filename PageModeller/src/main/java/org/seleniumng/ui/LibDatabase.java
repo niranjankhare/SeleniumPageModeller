@@ -104,7 +104,7 @@ public class LibDatabase {
 	public static void insertUpdatePages(LinkedHashMap<String, LinkedHashMap<String, String>> postParamMap) {
 
 		try {
-			List<Integer> pagesToDelete= new ArrayList<Integer>();
+			List<Integer> pagesToDelete = new ArrayList<Integer>();
 			for (Entry<String, LinkedHashMap<String, String>> row : postParamMap.entrySet()) { // for
 																								// 1
 				Boolean isInsert = false;
@@ -113,11 +113,13 @@ public class LibDatabase {
 
 				List<TableField<?, ?>> pagesFields = new ArrayList<TableField<?, ?>>();
 				List<Object> pagesValues = new ArrayList<Object>();
-			
+
 				Integer pageId = null;
 				for (String key : keys) {
-					if (key.equalsIgnoreCase("delete")){
-						pagesToDelete.add(Integer.parseInt(fieldMap.get(key)));
+					if (key.equalsIgnoreCase("delete")) {
+						if (!fieldMap.get(key).equalsIgnoreCase("")) {
+							pagesToDelete.add(Integer.parseInt(fieldMap.get(key)));
+						}
 						continue;
 					}
 					if (key.equalsIgnoreCase("PAGEID")) {
@@ -127,15 +129,12 @@ public class LibDatabase {
 						else
 							continue;
 					} else {
-						pagesFields.add((TableField<PagesRecord, ?>) PAGES.field(key));
-						if (key.equalsIgnoreCase(PAGES.PARENTID.getName())){
-							if (fieldMap.get(key).equals("")|| fieldMap.get(key).equals("_blank")){
-								pagesValues.add(null);
-								// over to next value
-								continue;
-							}  
-						} 
-						pagesValues.add(fieldMap.get(key));
+
+						if (Arrays.asList(PAGES.fields()).contains(PAGES.field(key))) {
+							System.out.println("adding key:" + key);
+							pagesFields.add((TableField<PagesRecord, ?>) PAGES.field(key));
+							pagesValues.add(fieldMap.get(key));
+						}
 					}
 				}
 				if (!isInsert) {
@@ -145,6 +144,10 @@ public class LibDatabase {
 						updateGuiMap.where(PAGES.PAGEID.eq(pageId)).execute();
 					}
 				} else {
+					if (!pagesFields.contains(PAGES.PARENTID)) {
+						pagesFields.add(PAGES.PARENTID);
+						pagesValues.add(-1);
+					}
 					InsertValuesStepN<?> insertSetStepGuiMap = DbManager.getOpenContext().insertInto(PAGES,
 							pagesFields);
 					insertSetStepGuiMap.values(pagesValues);
@@ -154,7 +157,7 @@ public class LibDatabase {
 
 			}
 			DbManager.getOpenContext().delete(PAGES).where(PAGES.PAGEID.in(pagesToDelete)).execute();
-		} catch (Exception e){
+		} catch (Exception e) {
 			System.out.println("Some problem updating database:");
 			e.printStackTrace();
 		}
@@ -166,6 +169,7 @@ public class LibDatabase {
 	public static void updateGuiMap(String pageName,
 			LinkedHashMap<String, LinkedHashMap<String, String>> cleanParamMap) {
 		try {
+			List<Integer> fieldsToDelete = new ArrayList<Integer>();
 			for (Entry<String, LinkedHashMap<String, String>> row : cleanParamMap.entrySet()) {
 				Boolean isInsert = false;
 				LinkedHashMap<String, String> fieldMap = row.getValue();
@@ -185,7 +189,12 @@ public class LibDatabase {
 
 				Integer currentGuiMapId = null;
 				for (String key : keys) {
-
+					if (key.equalsIgnoreCase("delete")) {
+						if (!fieldMap.get(key).equalsIgnoreCase("")) {
+							fieldsToDelete.add(Integer.parseInt(fieldMap.get(key)));
+						}
+						continue;
+					}
 					if (key.equalsIgnoreCase("GUIMAPID")) {
 						isInsert = fieldMap.get(key).equalsIgnoreCase("");
 						if (!isInsert)
@@ -215,6 +224,13 @@ public class LibDatabase {
 						updateGuiMap.where(GUIMAP.GUIMAPID.eq(currentGuiMapId)).execute();
 					}
 					if (propertiesFields.size() > 0) {
+						propertiesFields.add(PROPERTIES.LOCATORS);
+						LinkedHashMap <String,String>map = new LinkedHashMap<String,String>();
+						map.put((String)propertiesValues.get(propertiesFields.indexOf(PROPERTIES.LOCATORTYPE)), (String)propertiesValues.get(propertiesFields.indexOf(PROPERTIES.LOCATORVALUE)));
+						
+						List<LinkedHashMap<String,String>> list = Arrays.asList(map);
+						String json = new Gson().toJson(list);
+						propertiesValues.add(json);
 						UpdateSetMoreStep<PropertiesRecord> updateProperties = (UpdateSetMoreStep<PropertiesRecord>) getTableUpdateStatement(
 								PROPERTIES, propertiesFields, propertiesValues);
 						updateProperties.where(PROPERTIES.GUIMAPID.eq(currentGuiMapId)).execute();
@@ -248,7 +264,8 @@ public class LibDatabase {
 					insertSetStepExtendedProps.values(expropertiesValues).execute();
 				}
 			}
-
+			if (!fieldsToDelete.isEmpty())
+				DbManager.getOpenContext().delete(GUIMAP).where(GUIMAP.GUIMAPID.in(fieldsToDelete)).execute();
 			System.out.println("done");
 
 		} catch (Exception e) {
@@ -268,16 +285,16 @@ public class LibDatabase {
 	public static LinkedHashMap getAvailablePages() {
 		return getKeyValues(PAGES.PAGENAME, PAGES.PAGEDESCRIPTION, PAGES);
 	}
-	
+
 	public static LinkedHashMap getAvailablePageIds() {
 		LinkedHashMap<String, String> pageData = getKeyValues(PAGES.PAGEID, PAGES.PAGENAME, PAGES);
-		LinkedHashMap <String, Object> toReturn = new LinkedHashMap<String,Object>();
-		for (String key : pageData.keySet()){
+		LinkedHashMap<String, Object> toReturn = new LinkedHashMap<String, Object>();
+		for (String key : pageData.keySet()) {
 			toReturn.put(key, Arrays.asList(pageData.get(key), null));
 		}
 		return toReturn;
 	}
-	
+
 	public static LinkedHashMap getStandardTypes() {
 		// LinkedHashMap oldMap = getTypes("STANDARD");
 		LinkedHashMap<String, String[]> list = new LinkedHashMap<String, String[]>();
@@ -394,8 +411,9 @@ public class LibDatabase {
 		for (Integer i = 0; i < tableFields.size(); i++) {
 			Field<?> f = table.field(tableFields.get(i));
 			;
-			DataType t = f.getDataType();
-			updateStatement = updateStatement.set(f, DSL.cast(values.get(i), t));
+			DataType<?> t = f.getDataType();
+			Field x = DSL.cast(values.get(i), t);
+			updateStatement = updateStatement.set(f, x);
 		}
 		return updateStatement;
 	}
@@ -403,8 +421,9 @@ public class LibDatabase {
 	public static LinkedHashMap<String, LinkedHashMap<String, String>> getPageGuiMapData(String webPage) {
 		LinkedHashMap<String, LinkedHashMap<String, String>> pageData = new LinkedHashMap<String, LinkedHashMap<String, String>>();
 
-		SelectConditionStep<Record4<String, String, String,String>> selectStatement = DbManager.getOpenContext()
-				.select(PROPSVIEW.CONTROLNAME, PROPSVIEW.MAPPEDCLASS, PROPSVIEW.STANDARDCLASS,TYPES.ABRV).from(PROPSVIEW).innerJoin(TYPES).on(PROPSVIEW.STANDARDCLASS.eq(TYPES.CLASS))
+		SelectConditionStep<Record4<String, String, String, String>> selectStatement = DbManager.getOpenContext()
+				.select(PROPSVIEW.CONTROLNAME, PROPSVIEW.MAPPEDCLASS, PROPSVIEW.STANDARDCLASS, TYPES.ABRV)
+				.from(PROPSVIEW).innerJoin(TYPES).on(PROPSVIEW.STANDARDCLASS.eq(TYPES.CLASS))
 				.where(PROPSVIEW.PAGENAME.equal(webPage));
 
 		for (Record r : selectStatement.fetch()) {
@@ -416,11 +435,13 @@ public class LibDatabase {
 		}
 		return pageData;
 	}
+
 	public static List<Object> getPageGuiMapData2(String webPage) {
 		Object obj1 = getPageGuiMapData(webPage);
 		Object obj2 = getPageGuiPropertyData(webPage);
-		return Arrays.asList(obj1,obj2);
+		return Arrays.asList(obj1, obj2);
 	}
+
 	public static Map<String, Object> getPageGuiPropertyData(String webPage) {
 		Map<String, Object> pageData = new LinkedHashMap<String, Object>();
 
