@@ -228,8 +228,8 @@ public class LibDatabase {
 						LinkedHashMap <String,String>map = new LinkedHashMap<String,String>();
 						map.put((String)propertiesValues.get(propertiesFields.indexOf(PROPERTIES.LOCATORTYPE)), (String)propertiesValues.get(propertiesFields.indexOf(PROPERTIES.LOCATORVALUE)));
 						
-						List<LinkedHashMap<String,String>> list = Arrays.asList(map);
-						String json = new Gson().toJson(list);
+//						List<LinkedHashMap<String,String>> list = Arrays.asList(map);
+						String json = new Gson().toJson(map);
 						propertiesValues.add(json);
 						UpdateSetMoreStep<PropertiesRecord> updateProperties = (UpdateSetMoreStep<PropertiesRecord>) getTableUpdateStatement(
 								PROPERTIES, propertiesFields, propertiesValues);

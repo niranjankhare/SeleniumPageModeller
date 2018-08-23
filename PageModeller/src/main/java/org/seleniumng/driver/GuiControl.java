@@ -12,11 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *******************************************************************************/
+ ********************************************************************************/
 package org.seleniumng.driver;
 
 import java.lang.reflect.Type;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -39,6 +41,8 @@ import org.seleniumng.utils.ByChild;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigObject;
+import com.typesafe.config.ConfigRenderOptions;
 
 /**
  * Wrapper for Seleniums Remote Web element, to be able to provide methods
@@ -51,39 +55,69 @@ public class GuiControl extends RemoteWebElement {
 	private final static Logger logger = LogManager.getLogger(GuiControl.class);
 	public String friendlyName;
 	public String session;
-	private List<LinkedHashMap<String, String>> locators;
-	private List<By> byLocators;
+//	private List<LinkedHashMap<String, String>> locators;
+	private Entry<String, Object> locators = null;
+	private By byLocator;
 
 	public GuiControl(Config config) {
 		friendlyName = config.getString("CONTROLDESCRIPTION");
-		locators = createLocatorMap(config.getString("LOCATORS"));
-		this.byLocators = getBys();
+		locators = createLocatorMap(config.getObject("LOCATORS"));
+		this.byLocator = getBys(locators);
 		this.session = config.getString("session");
 	}
 
-	private List<By> getBys() {
+	private By getBys(Entry<String,Object> entry) {
 		List<By> bys = new ArrayList<By>();
-		for (int i = 0; i < locators.size(); i++) {
-			LinkedHashMap<String, String> locator = locators.get(i);
-			for (Entry<String, String> e : locator.entrySet()) {
-				bys.add(byLocator(e));
+		By by = null;
+//		for (Entry entry:locators.entrySet()) {
+		Object value = entry.getValue();
+		if (value instanceof String) {
+			System.out.println("leaf!!");
+			by = byLocator(entry);
+		} else {
+			System.out.println("Recurse");
+			ArrayList<Object> list = (ArrayList<Object>) value;
+			for (int i = 0; i < list.size(); i++) {
+				AbstractMap e =(AbstractMap)  list.get(i);
+			
+				System.out.println("leaf!!");					
+//				 Object obj = e.getValue();
+				Entry y = (Entry<String, Object>) e.entrySet().iterator().next();
+				bys.add(getBys(y));
 			}
+			by = byLocator(entry.getKey(), bys.toArray(new By[bys.size()]));
 		}
-		return bys;
+		return by;
 	}
 
-	private List<LinkedHashMap<String, String>> createLocatorMap(Object object) {
-		Type listType = new TypeToken<List<LinkedHashMap<String, String>>>() {
-		}.getType();
-		String jSon = (String) object;
-		List<LinkedHashMap<String, String>> bys = null;
+	private Entry<String, Object> createLocatorMap(Object object) {
+//		Type listType = new TypeToken<List<LinkedHashMap<String, String>>>() {
+//		}.getType();
+		String jSon = "";
 		try {
-			bys = new Gson().fromJson(jSon, listType);
+			ConfigObject c = (ConfigObject) object;
+			jSon = c.render(ConfigRenderOptions.concise());
+			System.out.println("OK");
+		} catch (Exception e) {
+			e.printStackTrace();
+			;
+		}
+		Type typeMap = new TypeToken<HashMap<String, Object>>() {
+		}.getType();
+		HashMap<String, Object> bys = null;
+		HashMap<String, Object> obj = null;
+		try {
+			obj = (HashMap<String, Object>) new Gson().fromJson(jSon, typeMap);
 		} catch (Exception e) {
 			logger.error("Problem parsing json {}", jSon);
 			e.printStackTrace();
 		}
-		return bys;
+		for (Entry<String, Object> entry : obj.entrySet()) {
+			System.out.println("key:" + entry.getKey());
+			System.out.println("ValueType:" + entry.getValue().getClass());
+		}
+
+		return obj.entrySet().iterator().next();
 	}
 
 	/**
@@ -91,14 +125,14 @@ public class GuiControl extends RemoteWebElement {
 	 */
 	public WebElement me() {
 		WebElement me = null;
-		if (byLocators.size() == 1) {
-			me = DriverInventory.getDriver(session).findElement(byLocators.get(0));
-		}
+//		if (byLocator.size() == 1) {
+			me = DriverInventory.getDriver(session).findElement(byLocator);
+//		}
 		return me;
 	}
 
-	private By byLocator(Entry<String, String> entry) {
-		String value = entry.getValue();
+	private By byLocator(Entry<String, Object> entry) {
+		String value = (String) entry.getValue();
 		By byMethod = null;
 		switch (entry.getKey()) {
 		case "ByClassName":
@@ -144,7 +178,26 @@ public class GuiControl extends RemoteWebElement {
 		}
 		return byMethod;
 	}
-
+	
+	private By byLocator(String by, By... bys) {
+		By byMethod = null;
+		switch (by) {
+		case "ByChained":
+//			List<By> locatorList = new ArrayList<By>();
+//			for (Entry<String, String> locator : locators.entrySet()) {
+//				locatorList.add(byLocator(locator));
+//			}
+			byMethod = new ByChained(bys);
+			break;
+		case "ByAll":
+			byMethod = new ByAll(bys);
+			break;
+		case "ByChild":
+			byMethod = new ByChild(bys);
+			break;
+		}
+		return byMethod;
+	}
 	public void playAround(Integer... keysToSend) {
 		// TODO Auto-generated method stub
 

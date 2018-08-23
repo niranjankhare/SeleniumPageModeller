@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
@@ -38,8 +39,6 @@ import static org.seleniumng.utils.TAFConfig.*;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-
-import org.seleniumng.ui.LibDatabase;
 
 /**
  * @author niru The main class that will generated the source code and metadata
@@ -210,7 +209,11 @@ public class PageObjectCodegen {
 		List<Object> fieldProperties = CodegenDatabase.getPageGuiMapData2(webPage);
 		LinkedHashMap<String, LinkedHashMap<String, String>> fields = (LinkedHashMap<String, LinkedHashMap<String, String>>) fieldProperties.get(0);
 		Map<String, ? extends Object> properties = (Map<String, ? extends Object>) fieldProperties.get(1);
-		Config c = ConfigFactory.parseMap(properties);
+		Config c = ConfigFactory.empty();
+		for (Entry<String, ? extends Object> entry : properties.entrySet()) {
+			Config e = (Config)entry.getValue(); 
+			c = e.atKey(entry.getKey()).withFallback(c);
+		}
 		for (String control : fields.keySet()) {
 			String stdClass = fields.get(control).get("standardClass");
 			String classAbrv = fields.get(control).get("typeAbrv");

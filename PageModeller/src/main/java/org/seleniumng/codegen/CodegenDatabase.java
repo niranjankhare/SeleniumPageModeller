@@ -26,6 +26,8 @@ import org.seleniumng.ui.DbManager;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 import db.jooq.generated.automationDb.tables.records.PagesRecord;
 
@@ -95,7 +97,7 @@ private static <K,R extends Record> List<Record> getRecords(Map<K, Result<R>> pa
 		return  toReturn;
 	}
 
-	public static LinkedHashMap<String, LinkedHashMap<String, String>> getPageGuiMapData(String webPage) {
+	private static LinkedHashMap<String, LinkedHashMap<String, String>> getPageGuiMapData(String webPage) {
 		LinkedHashMap<String, LinkedHashMap<String, String>> pageData = new LinkedHashMap<String, LinkedHashMap<String, String>>();
 		for (Record r : getRecords(mapDataByPageName, new String[]{webPage})) {
 			LinkedHashMap<String, String> classmap = new LinkedHashMap<String, String>();
@@ -114,8 +116,9 @@ private static <K,R extends Record> List<Record> getRecords(Map<K, Result<R>> pa
 		Object obj2 = getPageGuiPropertyData(webPage);
 		return Arrays.asList(obj1,obj2);
 	}
-	public static Map<String, Object> getPageGuiPropertyData(String webPage) {
+	private static Map<String, Object> getPageGuiPropertyData(String webPage) {
 		Map<String, Object> pageData = new LinkedHashMap<String, Object>();
+		Config  propertyMap = ConfigFactory.empty();
 		for (Record r : getRecords(propertyDataByPageName, new String[]{webPage})) {
 			HashMap<String, String> exmap = null;
 			if (r.get(PROPWRITERVIEW.MAPPEDCLASS) != null
@@ -124,18 +127,16 @@ private static <K,R extends Record> List<Record> getRecords(Map<K, Result<R>> pa
 				exmap = new Gson().fromJson(jSon, new TypeToken<HashMap<String, String>>() {
 				}.getType());
 			}
-			LinkedHashMap<String, Object> propertyMap = new LinkedHashMap<String, Object>();
-
-			propertyMap.put("CONTROLDESCRIPTION", r.get(PROPWRITERVIEW.CONTROLDESCRIPTION));
-			propertyMap.put("LOCATORTYPE", r.get(PROPWRITERVIEW.LOCATORTYPE));
-			propertyMap.put("LOCATORVALUE", r.get(PROPWRITERVIEW.LOCATORVALUE));
-			propertyMap.put("LOCATORS", (String)r.get(PROPWRITERVIEW.LOCATORS));
+			propertyMap = ConfigFactory.parseString("CONTROLDESCRIPTION:"+r.get(PROPWRITERVIEW.CONTROLDESCRIPTION)).withFallback(propertyMap);
+			propertyMap = ConfigFactory.parseString("LOCATORTYPE:"+r.get(PROPWRITERVIEW.LOCATORTYPE)).withFallback(propertyMap);
+			propertyMap = ConfigFactory.parseString("LOCATORVALUE:\""+r.get(PROPWRITERVIEW.LOCATORVALUE)+"\"").withFallback(propertyMap);
+			propertyMap = ConfigFactory.parseString("LOCATORS:"+r.get(PROPWRITERVIEW.LOCATORS)).withFallback(propertyMap);
 			if (exmap != null) {
 				for (String xf : exmap.keySet()) {
-					propertyMap.put(exmap.get(xf), r.get(xf));
+					propertyMap = ConfigFactory.parseString(exmap.get(xf)+r.get(xf)).withFallback(propertyMap);
 				}
 			}
-			propertyMap.put("LOCATORVALUE", r.get(PROPWRITERVIEW.LOCATORVALUE));
+//			propertyMap.put("LOCATORVALUE", r.get(PROPWRITERVIEW.LOCATORVALUE));
 			Object o = (Object) propertyMap;
 			pageData.put(r.get(PROPWRITERVIEW.ABRV) + r.get(PROPWRITERVIEW.CONTROLNAME).toString(), o);
 
