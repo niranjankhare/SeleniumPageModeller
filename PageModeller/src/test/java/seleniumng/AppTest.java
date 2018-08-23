@@ -48,7 +48,7 @@ public class AppTest extends TestTemplate {
 		String n =tafConfig.getString("aut.url");
 		s1.get(n );
 		s1.pageLogin.login("myUsername", "password!23");
-		s1.pageDashboard.lnkSend.click();
+		s1.pageDash.waitForPageToLoad();
 		
 	}
 	
