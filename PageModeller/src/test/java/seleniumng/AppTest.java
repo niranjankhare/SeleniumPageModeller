@@ -77,7 +77,6 @@ public class AppTest extends TestTemplate {
 		s1.get(n);
 		s1.pageLogin.login("myUsername", "password!23");
 		s1.pageDash.waitForPageToLoad();
-
 	}
 
 	@Test
