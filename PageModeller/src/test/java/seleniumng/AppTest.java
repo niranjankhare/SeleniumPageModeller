@@ -20,6 +20,8 @@ import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigMergeable;
 import com.typesafe.config.ConfigObject;
 import com.typesafe.config.ConfigRenderOptions;
+import com.typesafe.config.ConfigValue;
+import com.typesafe.config.ConfigValueFactory;
 
 import ExampleApp.PageLibraries.ExampleAppSession;
 import ExampleApp.webPages._PageLogin;
@@ -77,6 +79,7 @@ public class AppTest extends TestTemplate {
 		s1.get(n);
 		s1.pageLogin.login("myUsername", "password!23");
 		s1.pageDash.waitForPageToLoad();
+
 	}
 
 	@Test
@@ -100,14 +103,20 @@ public class AppTest extends TestTemplate {
 	public void listJson() {
 		Type listType = new TypeToken<List<HashMap<String, String>>>() {
 		}.getType();
-		List<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+		Gson gson = new Gson();
+		List<String> list = new ArrayList<String>();
 		HashMap<String, String> locator = new HashMap<String, String>();
 		locator.put("ById", "#id");
 		HashMap<String, String> locator1 = new HashMap<String, String>();
 		locator1.put("ByName", "name");
-		list.add(locator);
-		list.add(locator1);
-		Gson gson = new Gson();
+		list.add(gson.toJson(locator));
+		list.add(gson.toJson(locator1));
+		
+		String value = gson.toJson(list);
+		Config c = ConfigFactory.parseString("value:"+value);
+		System.out.println(c.root().render());
+		
+		
 		String json = gson.toJson(list);
 		System.out.println(json);
 		List<HashMap<String, String>> returned = gson.fromJson(json, listType);
@@ -125,245 +134,48 @@ public class AppTest extends TestTemplate {
 	@Parameters({ "username", "password" })
 	public void locatorsTest(@Optional("user@aut.in") String username, @Optional("password") String password)
 			throws InterruptedException {
-		String locatorOne = "{\"ByCssSelector\":\".btn.btn-primary\"}";
-		String locatorTwo = "{\"ById\":\"j_password\"}";
-		List<String> twoLocators = Arrays.asList(locatorOne, locatorTwo);
-		String locatorComposite = "\"ByAll\":" + twoLocators;
-		String nest = "{" + locatorComposite + "}";
-		List<String> nestedComposite = Arrays.asList(locatorOne, nest);
-		String locatorNested = "\"ByChained\":" + nestedComposite;
-		String forCompositeConfig = "{" + locatorNested + "}";
-		System.out.println(forCompositeConfig);
-		String forStdConfig = locatorTwo;
-		Config stubConfig = ConfigFactory.parseString("CONTROLDESCRIPTION: controlDescription");
-		stubConfig = ConfigFactory.parseString("session: sessionValue").withFallback(stubConfig);
-		Config compositeControlConfig = ConfigFactory.parseString("LOCATORS:" + forCompositeConfig);
-		compositeControlConfig = compositeControlConfig
-				.withFallback(stubConfig);
-		Config stdControlConfig = ConfigFactory.parseString("LOCATORS:" + forStdConfig);
-		stdControlConfig = stdControlConfig.withFallback(stubConfig );
-//		System.out.println(forCompositeConfig);
-		GuiControl control1 = new GuiControl(compositeControlConfig);
-//		TestControl control2 = new TestControl(stdControlConfig);
-		// Get different locators:
-		String output = stdControlConfig.root().render();
-		String name = "en_us/_PageLogin.conf";
-//		  URL urlOut = _PageLogin.class.getResource(name);
-		  URL urlin = null;
-		  Config readFromFile = null;
-//		  File f = new File(urlOut.getFile());
-		try {
-//			FileOutputStream os = new FileOutputStream(f);
-//			os.write(output.getBytes());
-			urlin =  _PageLogin.class.getResource(name);
-			readFromFile =ConfigFactory.parseURL(urlin);
-		} catch ( Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		GuiControl controlread = new GuiControl(readFromFile);
+		String locatorOne = "ByCssSelector=.btn.btn-primary";
+		String locatorTwo = "ById=j_password";
+		
+		Config l1 = ConfigFactory.parseString(locatorOne);
+		Config l2 = ConfigFactory.parseString(locatorTwo);
+		List<Config> l1l2 = Arrays.asList(l1,l2);
+		Config g1 = ConfigFactory.empty(), g2 = ConfigFactory.empty();
+		g1 = g1.withFallback(l1.atKey("LOCATORS"));
+		
+//		g2 = g2.withFallback(other)
+		
+		System.out.println(g1.root().render(ConfigRenderOptions.concise()));
+
 	}
 
-//	class TestControl {
-//		public String friendlyName;
-//		public String session;
-//		private By byLocator;
-//		Entry<String, Object> locators = null;
-//
-//		public TestControl(Config config) {
-//			friendlyName = config.getString("CONTROLDESCRIPTION");
-//			locators = createLocatorMap(config.getObject("LOCATORS"));
-//			this.byLocator = getBys(locators);
-//			this.session = config.getString("session");
-//			// TODO Auto-generated constructor stub
-//		}
-//
-//		private By getBys(Entry<String,Object> entry) {
-//			List<By> bys = new ArrayList<By>();
-//			By by = null;
-////			for (Entry entry:locators.entrySet()) {
-//			Object value = entry.getValue();
-//			if (value instanceof String) {
-//				System.out.println("leaf!!");
-//				by = byLocator(entry);
-//			} else {
-//				System.out.println("Recurse");
-//				ArrayList<Object> list = (ArrayList<Object>) value;
-//				for (int i = 0; i < list.size(); i++) {
-//					AbstractMap e =(AbstractMap)  list.get(i);
-//				
-//					System.out.println("leaf!!");					
-////					 Object obj = e.getValue();
-//					Entry y = (Entry<String, Object>) e.entrySet().iterator().next();
-//					bys.add(getBys(y));
-//				}
-//				by = byLocator(entry.getKey(), bys.toArray(new By[bys.size()]));
-//			}
-//			return by;
-//		}
-//
-//		private By byLocator(Entry<String, Object> entry) {
-//			String value = (String) entry.getValue();
-//			By byMethod = null;
-//			switch (entry.getKey()) {
-//			case "ByClassName":
-//				byMethod = By.className(value);
-//				break;
-//			case "ByCssSelector":
-//				byMethod = By.cssSelector(value);
-//				break;
-//			case "ByLinkText":
-//				byMethod = By.linkText(value);
-//				break;
-//			case "ByName":
-//				byMethod = By.name(value);
-//				break;
-//			case "ByPartialLinkText":
-//				byMethod = By.partialLinkText(value);
-//				break;
-//			case "ByTagName":
-//				byMethod = By.tagName(value);
-//				break;
-//			case "ByXPath":
-//				byMethod = By.xpath(value);
-//				break;
-//			case "ByIdOrName":
-//				byMethod = new ByIdOrName(value);
-//				break;
-////			case "ByChained":
-////				List<By> locatorList = new ArrayList<By>();
-////				for (Entry<String, String> locator : locators.entrySet()) {
-////					locatorList.add(byLocator(locator));
-////				}
-////				byMethod = new ByChained(locatorList.toArray(new By[locatorList.size()]));
-////				break;
-////			case "ByAll":
-////				byMethod = new ByAll(value);
-////				break;
-////			case "ByChild":
-////				byMethod = NgBy.child(value);
-////				break;
-//			case "ById":
-//			default:
-//				byMethod = By.id(value);
-//			}
-//			return byMethod;
-//		}
-//
-//		private By byLocator(String by, By... bys) {
-//			By byMethod = null;
-//			switch (by) {
-//			case "ByChained":
-////				List<By> locatorList = new ArrayList<By>();
-////				for (Entry<String, String> locator : locators.entrySet()) {
-////					locatorList.add(byLocator(locator));
-////				}
-//				byMethod = new ByChained(bys);
-//				break;
-//			case "ByAll":
-//				byMethod = new ByAll(bys);
-//				break;
-//			case "ByChild":
-//				byMethod = new ByChild(bys);
-//				break;
-//			}
-//			return byMethod;
-//		}
-//
-//		protected Entry<String, Object> createLocatorMap(ConfigObject object) {
-////			Type listType = new TypeToken<List<LinkedHashMap<String, String>>>() {
-////			}.getType();
-//			String jSon = "";
-//			try {
-//				ConfigObject c = (ConfigObject) object;
-//				jSon = c.render(ConfigRenderOptions.concise());
-//				System.out.println("OK");
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				;
-//			}
-//			Type typeMap = new TypeToken<HashMap<String, Object>>() {
-//			}.getType();
-//			HashMap<String, Object> bys = null;
-//			HashMap<String, Object> obj = null;
-//			try {
-//				obj = (HashMap<String, Object>) new Gson().fromJson(jSon, typeMap);
-//			} catch (Exception e) {
-//				logger.error("Problem parsing json {}", jSon);
-//				e.printStackTrace();
-//			}
-//			for (Entry<String, Object> entry : obj.entrySet()) {
-//				System.out.println("key:" + entry.getKey());
-//				System.out.println("ValueType:" + entry.getValue().getClass());
-//			}
-//
-//			return obj.entrySet().iterator().next();
-//		}
-//
-//	}
 
 	@Test
 	public void locatorsMap() {
-		Gson gson = new Gson();
-		ById byId = new By.ById("#myid");
-		ByName byName = new By.ByName("the name");
-		By byClassName = new By.ByClassName("someclass");
-		By byCss = new By.ByCssSelector(".cssselector");
-		By byLinkText = new By.ByLinkText("link text");
-		By byPartialLinkText = new By.ByPartialLinkText("partialLinkText");
-		By byTagName = new By.ByTagName("sometagName");
-		ByChild byChild = new ByChild(byId, byName);
-		ByChained byChained = new ByChained(byClassName, byCss);
-		ByAll byAll = new ByAll(byLinkText, byPartialLinkText);
+		Config c = ConfigFactory.empty();
+		ConfigValue v1 = ConfigValueFactory.fromAnyRef("#username"),v2= ConfigValueFactory.fromAnyRef("#password"),
+				v3 =  ConfigValueFactory.fromAnyRef(".tbody.tr"), v4 =  ConfigValueFactory.fromAnyRef("image");
+		Config l1 = ConfigFactory.empty().withValue("ById",v1 );
+		Config l2 = ConfigFactory.empty().withValue("ById",v2 );
+		
+		Config l3 = ConfigFactory.empty().withValue("ByClass",v3 );
+		Config l4 = ConfigFactory.empty().withValue("ByTag",v4 );
+		
+		ConfigValue l3l4 = ConfigValueFactory.fromIterable(Arrays.asList(l3.root(), l4.root()));
+		
+		Config composite = ConfigFactory.empty().withValue("ByAll", l3l4);
+		// add username
+		c = l1.atKey("Locators").atKey("iTxtUsername").withFallback(c);
+		// add password
+		c = l2.atKey("Locators").atKey("iTxtPassword").withFallback(c);
+		
+		// add the composite one
+		c = composite.atKey("Locators").atKey("btnLogin").withFallback(c);
+		
+		System.out.println(c.root().render(ConfigRenderOptions.concise().setJson(true).setComments(false).setFormatted(true)));
 
-		ByChained compositeLocator = new ByChained(byChild, byTagName);
 
-		By stdLocator = byId;
-		String jsonComposite = gson.toJson(compositeLocator);
-		String jsonStd = gson.toJson(stdLocator);
-		System.out.println(jsonComposite);
-		String configJson = jsonComposite.replaceAll("\\\"", "'");
-
-		Config locComposite = ConfigFactory.parseString("LOCATORS = \"" + configJson + "\"");
-
-		Config locStd = ConfigFactory.parseString("LOCATORS:" + jsonStd);
-		String renderedCompositeConfig = locComposite.root().render(ConfigRenderOptions.concise().setFormatted(true));
-		String renderedStdConfig = locStd.root().render(ConfigRenderOptions.concise().setFormatted(true));
-		System.out.println(renderedCompositeConfig);
-		System.out.println(renderedStdConfig);
-		Config readCompositeConfig = ConfigFactory.parseString(renderedCompositeConfig);
-		Config readStdConfig = ConfigFactory.parseString(renderedStdConfig);
-
-//		Object automationLocatorObject = readCompositeConfig.getAnyRef("LOCATORS");
-		String automationLocatorJson = readCompositeConfig.getString("LOCATORS");
-		System.out.println(automationLocatorJson);
-		ByChained by = gson.fromJson(automationLocatorJson, ByChained.class);
-
-		System.out.println(by.getClass());
-
-//		HashMap<?,?> myMap = (HashMap<?,?>)automationLocatorObject ;
-//		
-//		
-//		for ( Entry<?, ?> entry  :myMap.entrySet()) {
-//			System.out.println(entry.getKey());
-//			System.out.println(entry.getValue().toString());
-//		}
 
 	}
 }
 
-//{
-//    "iTxtUsername" : {
-//        "CONTROLDESCRIPTION" : "Login User name field",
-//        "LOCATORS" : [{"ById": ,
-//        "LOCATORVALUE" : "j_username"
-//    }
-//}
-
-//{
-//    "iTxtUsername" : {
-//        "CONTROLDESCRIPTION" : "Login User name field",
-//        "LOCATORTYPE" : "ById",
-//        "LOCATORVALUE" : "j_username"
-//    }
-//}

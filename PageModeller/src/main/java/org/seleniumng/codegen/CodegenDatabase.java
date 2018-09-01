@@ -5,6 +5,7 @@ import static db.jooq.generated.automationDb.tables.Propsview.PROPSVIEW;
 import static db.jooq.generated.automationDb.tables.Propwriterview.PROPWRITERVIEW;
 import static db.jooq.generated.automationDb.tables.Types.TYPES;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigValue;
 
 import db.jooq.generated.automationDb.tables.records.PagesRecord;
 
@@ -129,8 +131,9 @@ private static <K,R extends Record> List<Record> getRecords(Map<K, Result<R>> pa
 			}
 			propertyMap = ConfigFactory.parseString("CONTROLDESCRIPTION:"+r.get(PROPWRITERVIEW.CONTROLDESCRIPTION)).withFallback(propertyMap);
 			propertyMap = ConfigFactory.parseString("LOCATORTYPE:"+r.get(PROPWRITERVIEW.LOCATORTYPE)).withFallback(propertyMap);
-			propertyMap = ConfigFactory.parseString("LOCATORVALUE:\""+r.get(PROPWRITERVIEW.LOCATORVALUE)+"\"").withFallback(propertyMap);
-			propertyMap = ConfigFactory.parseString("LOCATORS:"+r.get(PROPWRITERVIEW.LOCATORS)).withFallback(propertyMap);
+			propertyMap = ConfigFactory.parseString("LOCATORVALUE:"+r.get(PROPWRITERVIEW.LOCATORVALUE)).withFallback(propertyMap);
+//			propertyMap = ConfigFactory.parseString("LOCATORS:"+r.get(PROPWRITERVIEW.LOCATORS)).withFallback(propertyMap);
+			propertyMap = getLocatorConfig(r.get(PROPWRITERVIEW.LOCATORTYPE),r.get(PROPWRITERVIEW.LOCATORVALUE)).withFallback(propertyMap);
 			if (exmap != null) {
 				for (String xf : exmap.keySet()) {
 					propertyMap = ConfigFactory.parseString(exmap.get(xf)+r.get(xf)).withFallback(propertyMap);
@@ -142,5 +145,33 @@ private static <K,R extends Record> List<Record> getRecords(Map<K, Result<R>> pa
 
 		}
 		return pageData;
+	}
+	
+	private static Config getLocatorConfig (String locatorType, String json) {
+		
+		 Type type = new TypeToken<HashMap<String,Object>>() {
+		}.getType();
+		Config c = ConfigFactory.empty();
+		String parsed = "{"+locatorType+":"+json+"}";
+		System.out.println(json);System.out.println(parsed);
+		HashMap v = new Gson().fromJson(parsed, type);
+		c = ConfigFactory.parseMap(v);
+		c=c.atKey("LOCATORS");
+		try {
+			Map<String, Object> o =(Map<String, Object>)c.getAnyRef("LOCATORS");
+			Object l = c.getAnyRef("LOCATORS");
+			System.out.println(l.getClass());
+			System.out.println(o.entrySet().iterator().next().getValue().getClass());
+			
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			Object l = c.getAnyRef(locatorType);
+			System.out.println(l.getClass());
+		}
+//		c = c.withValue(key, v);
+		return c;
+		
 	}
 }

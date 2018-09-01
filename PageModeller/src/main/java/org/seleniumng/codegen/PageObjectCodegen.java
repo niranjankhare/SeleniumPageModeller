@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.joda.time.DateTime;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
@@ -37,6 +39,7 @@ import com.typesafe.config.ConfigRenderOptions;
 
 import static org.seleniumng.utils.TAFConfig.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -109,6 +112,7 @@ public class PageObjectCodegen {
 	private static ImmutableSet<ClassInfo> userLibrariesPackageSet =classPath.getTopLevelClasses (userLibrariesPackage);
 	
 	public static void main(String... args) {
+		DateTime start = DateTime.now();
 		try {
 			PageObjectCodegen.generateSource();
 
@@ -121,7 +125,9 @@ public class PageObjectCodegen {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		DateTime done = DateTime.now();
+		System.out.println("Done in mills: ");
+		System.out.println(done.getMillis()-start.getMillis());
 	}
 
 

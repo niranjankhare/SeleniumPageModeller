@@ -40,6 +40,8 @@ ext {
 	h2databaseVersion = '1.4.196'
 	mysqlDriverVersion = '5.1.6'
 	tomcatJdbcVersion = '8.5.23'
+	jodaTimeVersion = '2.10'
+	googleGsonVersion = '2.8.5'
 }
 buildscript {
 	repositories { mavenCentral() }
@@ -82,8 +84,11 @@ dependencies {
 	compile group: 'mysql', name: 'mysql-connector-java', version: "$mysqlDriverVersion"
 	// https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-jdbc
 	compile group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: "$tomcatJdbcVersion"
+// https://mvnrepository.com/artifact/joda-time/joda-time
+compile group: 'joda-time', name: 'joda-time', version: "$jodaTimeVersion"
+// https://mvnrepository.com/artifact/com.google.code.gson/gson
+compile group: 'com.google.code.gson', name: 'gson', version: "$googleGsonVersion"
 
-	compile group: 'com.google.code.gson', name: 'gson', version: '2.6.2'
 }
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory

@@ -12,5 +12,6 @@ public class _PageLogin
     public InputText iTxtUsername;
     public InputText iTxtPassword;
     public Button btnLogin;
+    public Button btnNestedSomething;
 
 }
