@@ -37,71 +37,75 @@ public class CodegenDatabase {
 	private static DSLContext dslContext = DbManager.getOpenContext();
 	private static SelectWhereStep<PagesRecord> pages = dslContext.selectFrom(PAGES);
 	private static Result<PagesRecord> pagesResult = pages.fetch();
-	private static Map<Integer, Result<PagesRecord>> pagesByParentId= pagesResult.intoGroups(PAGES.PARENTID);
-	private static Map<Integer, Result<PagesRecord>> pagesByPageId= pagesResult.intoGroups(PAGES.PAGEID);
-	
-	private static SelectOnConditionStep<Record5<String,String, String, String, String>> mapData =  dslContext
-			.select(PROPSVIEW.PAGENAME,PROPSVIEW.CONTROLNAME, PROPSVIEW.MAPPEDCLASS, PROPSVIEW.STANDARDCLASS,TYPES.ABRV).from(PROPSVIEW).innerJoin(TYPES).on(PROPSVIEW.STANDARDCLASS.eq(TYPES.CLASS));
-	private static Result<Record5<String,String, String, String, String>> resultMapData = mapData.fetch();
-	private static Map<String, Result<Record5<String,String, String, String, String>>> mapDataByPageName = resultMapData.intoGroups(PROPSVIEW.PAGENAME);
+	private static Map<Integer, Result<PagesRecord>> pagesByParentId = pagesResult.intoGroups(PAGES.PARENTID);
+	private static Map<Integer, Result<PagesRecord>> pagesByPageId = pagesResult.intoGroups(PAGES.PAGEID);
 
-	private static SelectJoinStep<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String,String>> propertyData = dslContext
-			.select(PROPWRITERVIEW.PAGENAME,PROPWRITERVIEW.GUIMAPID, PROPWRITERVIEW.ABRV, PROPWRITERVIEW.CONTROLNAME,
-					PROPWRITERVIEW.CONTROLDESCRIPTION, PROPWRITERVIEW.LOCATORTYPE, PROPWRITERVIEW.LOCATORVALUE,PROPWRITERVIEW.LOCATORS,
-					PROPWRITERVIEW.MAPPEDCLASS, PROPWRITERVIEW.EXPROP1, PROPWRITERVIEW.EXPROP2,
+	private static SelectOnConditionStep<Record5<String, String, String, String, String>> mapData = dslContext
+			.select(PROPSVIEW.PAGENAME, PROPSVIEW.CONTROLNAME, PROPSVIEW.MAPPEDCLASS, PROPSVIEW.STANDARDCLASS,
+					TYPES.ABRV)
+			.from(PROPSVIEW).innerJoin(TYPES).on(PROPSVIEW.STANDARDCLASS.eq(TYPES.CLASS));
+	private static Result<Record5<String, String, String, String, String>> resultMapData = mapData.fetch();
+	private static Map<String, Result<Record5<String, String, String, String, String>>> mapDataByPageName = resultMapData
+			.intoGroups(PROPSVIEW.PAGENAME);
+
+	private static SelectJoinStep<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> propertyData = dslContext
+			.select(PROPWRITERVIEW.PAGENAME, PROPWRITERVIEW.GUIMAPID, PROPWRITERVIEW.ABRV, PROPWRITERVIEW.CONTROLNAME,
+					PROPWRITERVIEW.CONTROLDESCRIPTION, PROPWRITERVIEW.LOCATORTYPE, PROPWRITERVIEW.LOCATORVALUE,
+					PROPWRITERVIEW.LOCATORS, PROPWRITERVIEW.MAPPEDCLASS, PROPWRITERVIEW.EXPROP1, PROPWRITERVIEW.EXPROP2,
 					PROPWRITERVIEW.EXPROP3, PROPWRITERVIEW.EXPROP4, PROPWRITERVIEW.EXPROP5, PROPWRITERVIEW.EXPROP6,
 					PROPWRITERVIEW.EXPROP7, PROPWRITERVIEW.EXPROP8, PROPWRITERVIEW.EXPROP9)
 			.from(PROPWRITERVIEW);
-	private static Result<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String,String, String, String, String, String, String>> resultPropertyData = propertyData.fetch(); 
-	private static Map<String, Result<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>>> propertyDataByPageName = resultPropertyData.intoGroups(PROPWRITERVIEW.PAGENAME);
-	
+	private static Result<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> resultPropertyData = propertyData
+			.fetch();
+	private static Map<String, Result<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>>> propertyDataByPageName = resultPropertyData
+			.intoGroups(PROPWRITERVIEW.PAGENAME);
 
 	private static Result<Record2<String, String>> result = dslContext.select(TYPES.CLASS, TYPES.PROPERTYMAP)
 			.from(TYPES).where(TYPES.HASEXTENDEDPROPS.isTrue()).fetch();
 	private static Map<String, List<String>> typeMap = result.intoGroups(TYPES.CLASS, TYPES.PROPERTYMAP);
-	
+
 	public static List<HashMap<String, String>> getPageHeirarchy(Integer... pageId) {
 		List<HashMap<String, String>> returnList = new ArrayList<HashMap<String, String>>();
 		List<Record> selectedRecords = null;
 		if (pageId.length == 0)
-			selectedRecords = getRecords (pagesByParentId , new Integer[] {-1});
-		else 
-			selectedRecords = getRecords (pagesByParentId , pageId);
+			selectedRecords = getRecords(pagesByParentId, new Integer[] { -1 });
+		else
+			selectedRecords = getRecords(pagesByParentId, pageId);
 		HashMap<String, String> pageHeirarchy = new HashMap<String, String>();
 		for (Record r : selectedRecords) {
 			Integer pId = r.get(PAGES.PAGEID);
 			Integer prId = r.get(PAGES.PARENTID);
-			String pageName = getRecords (pagesByPageId ,  new Integer[]{pId}).get(0).get(PAGES.PAGENAME);
-			List<Record> parentRecord = getRecords (pagesByPageId, new Integer[]{prId});
-			Record s =parentRecord.size()==0? null:(Record) parentRecord.get(0); 
+			String pageName = getRecords(pagesByPageId, new Integer[] { pId }).get(0).get(PAGES.PAGENAME);
+			List<Record> parentRecord = getRecords(pagesByPageId, new Integer[] { prId });
+			Record s = parentRecord.size() == 0 ? null : (Record) parentRecord.get(0);
 			String parentName = (s == null) ? null : s.get(PAGES.PAGENAME);
 			pageHeirarchy.put(pageName, parentName);
 
 		}
 		returnList.add(pageHeirarchy);
 		List<Integer> a = new ArrayList<Integer>();
-		for (Record r:selectedRecords){
+		for (Record r : selectedRecords) {
 			a.add(r.get(PAGES.PAGEID));
-		} 
+		}
 		if (a.size() > 0) {
 			Integer list2[] = new Integer[a.size()];
 			returnList.addAll(getPageHeirarchy((Integer[]) a.toArray(list2)));
 		}
 		return returnList;
 	}
-	
-private static <K,R extends Record> List<Record> getRecords(Map<K, Result<R>> pagesMapByParentId, K[] pageId) {
-		 List<Record> toReturn = new ArrayList<Record>();
-		 for (int i=0; i <pageId.length; i++){
-			 if (pagesMapByParentId.containsKey(pageId[i]))
-				 toReturn.addAll(pagesMapByParentId.get(pageId[i]));
-		 }
-		return  toReturn;
+
+	private static <K, R extends Record> List<Record> getRecords(Map<K, Result<R>> pagesMapByParentId, K[] pageId) {
+		List<Record> toReturn = new ArrayList<Record>();
+		for (int i = 0; i < pageId.length; i++) {
+			if (pagesMapByParentId.containsKey(pageId[i]))
+				toReturn.addAll(pagesMapByParentId.get(pageId[i]));
+		}
+		return toReturn;
 	}
 
 	private static LinkedHashMap<String, LinkedHashMap<String, String>> getPageGuiMapData(String webPage) {
 		LinkedHashMap<String, LinkedHashMap<String, String>> pageData = new LinkedHashMap<String, LinkedHashMap<String, String>>();
-		for (Record r : getRecords(mapDataByPageName, new String[]{webPage})) {
+		for (Record r : getRecords(mapDataByPageName, new String[] { webPage })) {
 			LinkedHashMap<String, String> classmap = new LinkedHashMap<String, String>();
 			classmap.put("standardClass", r.get(PROPSVIEW.STANDARDCLASS));
 			classmap.put("customClass", r.get(PROPSVIEW.MAPPEDCLASS));
@@ -110,18 +114,17 @@ private static <K,R extends Record> List<Record> getRecords(Map<K, Result<R>> pa
 		}
 		return pageData;
 	}
-	
 
-	public static List<Object> getPageGuiMapData2(String webPage) 
-	{
+	public static List<Object> getPageGuiMapData2(String webPage) {
 		Object obj1 = getPageGuiMapData(webPage);
 		Object obj2 = getPageGuiPropertyData(webPage);
-		return Arrays.asList(obj1,obj2);
+		return Arrays.asList(obj1, obj2);
 	}
+
 	private static Map<String, Object> getPageGuiPropertyData(String webPage) {
 		Map<String, Object> pageData = new LinkedHashMap<String, Object>();
-		Config  propertyMap = ConfigFactory.empty();
-		for (Record r : getRecords(propertyDataByPageName, new String[]{webPage})) {
+		Config propertyMap = ConfigFactory.empty();
+		for (Record r : getRecords(propertyDataByPageName, new String[] { webPage })) {
 			HashMap<String, String> exmap = null;
 			if (r.get(PROPWRITERVIEW.MAPPEDCLASS) != null
 					&& !r.get(PROPWRITERVIEW.MAPPEDCLASS).equalsIgnoreCase("(No Maping)")) {
@@ -129,14 +132,24 @@ private static <K,R extends Record> List<Record> getRecords(Map<K, Result<R>> pa
 				exmap = new Gson().fromJson(jSon, new TypeToken<HashMap<String, String>>() {
 				}.getType());
 			}
-			propertyMap = ConfigFactory.parseString("CONTROLDESCRIPTION:"+r.get(PROPWRITERVIEW.CONTROLDESCRIPTION)).withFallback(propertyMap);
-			propertyMap = ConfigFactory.parseString("LOCATORTYPE:"+r.get(PROPWRITERVIEW.LOCATORTYPE)).withFallback(propertyMap);
-			propertyMap = ConfigFactory.parseString("LOCATORVALUE:"+r.get(PROPWRITERVIEW.LOCATORVALUE)).withFallback(propertyMap);
-//			propertyMap = ConfigFactory.parseString("LOCATORS:"+r.get(PROPWRITERVIEW.LOCATORS)).withFallback(propertyMap);
-			propertyMap = getLocatorConfig(r.get(PROPWRITERVIEW.LOCATORTYPE),r.get(PROPWRITERVIEW.LOCATORVALUE)).withFallback(propertyMap);
+			String configString = null;
+			try {
+				configString = "CONTROLDESCRIPTION:" + r.get(PROPWRITERVIEW.CONTROLDESCRIPTION);
+				propertyMap = ConfigFactory.parseString(configString).withFallback(propertyMap);
+				configString = "LOCATORTYPE:" + r.get(PROPWRITERVIEW.LOCATORTYPE);
+				propertyMap = ConfigFactory.parseString(configString).withFallback(propertyMap);
+				configString = "LOCATORVALUE:" + r.get(PROPWRITERVIEW.LOCATORVALUE);
+				propertyMap = ConfigFactory.parseString(configString).withFallback(propertyMap);
+				propertyMap = getLocatorConfig(r.get(PROPWRITERVIEW.LOCATORTYPE), r.get(PROPWRITERVIEW.LOCATORVALUE))
+						.withFallback(propertyMap);
+			} catch (Exception e) {
+				System.out.println("Error processing:");
+				System.out.println(configString);
+				throw e; 
+			}
 			if (exmap != null) {
 				for (String xf : exmap.keySet()) {
-					propertyMap = ConfigFactory.parseString(exmap.get(xf)+r.get(xf)).withFallback(propertyMap);
+					propertyMap = ConfigFactory.parseString(exmap.get(xf) + r.get(xf)).withFallback(propertyMap);
 				}
 			}
 //			propertyMap.put("LOCATORVALUE", r.get(PROPWRITERVIEW.LOCATORVALUE));
@@ -146,25 +159,24 @@ private static <K,R extends Record> List<Record> getRecords(Map<K, Result<R>> pa
 		}
 		return pageData;
 	}
-	
-	private static Config getLocatorConfig (String locatorType, String json) {
-		
-		 Type type = new TypeToken<HashMap<String,Object>>() {
+
+	private static Config getLocatorConfig(String locatorType, String json) {
+
+		Type type = new TypeToken<HashMap<String, Object>>() {
 		}.getType();
 		Config c = ConfigFactory.empty();
-		String parsed = "{"+locatorType+":"+json+"}";
-		System.out.println(json);System.out.println(parsed);
+		String parsed = "{" + locatorType + ":" + json + "}";
+		System.out.println(json);
+		System.out.println(parsed);
 		HashMap v = new Gson().fromJson(parsed, type);
 		c = ConfigFactory.parseMap(v);
-		c=c.atKey("LOCATORS");
+		c = c.atKey("LOCATORS");
 		try {
-			Map<String, Object> o =(Map<String, Object>)c.getAnyRef("LOCATORS");
+			Map<String, Object> o = (Map<String, Object>) c.getAnyRef("LOCATORS");
 			Object l = c.getAnyRef("LOCATORS");
 			System.out.println(l.getClass());
 			System.out.println(o.entrySet().iterator().next().getValue().getClass());
-			
-			
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			Object l = c.getAnyRef(locatorType);
@@ -172,6 +184,6 @@ private static <K,R extends Record> List<Record> getRecords(Map<K, Result<R>> pa
 		}
 //		c = c.withValue(key, v);
 		return c;
-		
+
 	}
 }
