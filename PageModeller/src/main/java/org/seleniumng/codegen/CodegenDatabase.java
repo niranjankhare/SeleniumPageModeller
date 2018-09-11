@@ -16,7 +16,7 @@ import java.util.Map;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 
-import org.jooq.Record18;
+import org.jooq.Record17;
 import org.jooq.Record2;
 import org.jooq.Record5;
 import org.jooq.Result;
@@ -48,16 +48,16 @@ public class CodegenDatabase {
 	private static Map<String, Result<Record5<String, String, String, String, String>>> mapDataByPageName = resultMapData
 			.intoGroups(PROPSVIEW.PAGENAME);
 
-	private static SelectJoinStep<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> propertyData = dslContext
+	private static SelectJoinStep<Record17<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> propertyData = dslContext
 			.select(PROPWRITERVIEW.PAGENAME, PROPWRITERVIEW.GUIMAPID, PROPWRITERVIEW.ABRV, PROPWRITERVIEW.CONTROLNAME,
 					PROPWRITERVIEW.CONTROLDESCRIPTION, PROPWRITERVIEW.LOCATORTYPE, PROPWRITERVIEW.LOCATORVALUE,
-					PROPWRITERVIEW.LOCATORS, PROPWRITERVIEW.MAPPEDCLASS, PROPWRITERVIEW.EXPROP1, PROPWRITERVIEW.EXPROP2,
+					PROPWRITERVIEW.MAPPEDCLASS, PROPWRITERVIEW.EXPROP1, PROPWRITERVIEW.EXPROP2,
 					PROPWRITERVIEW.EXPROP3, PROPWRITERVIEW.EXPROP4, PROPWRITERVIEW.EXPROP5, PROPWRITERVIEW.EXPROP6,
 					PROPWRITERVIEW.EXPROP7, PROPWRITERVIEW.EXPROP8, PROPWRITERVIEW.EXPROP9)
 			.from(PROPWRITERVIEW);
-	private static Result<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> resultPropertyData = propertyData
+	private static Result<Record17<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>> resultPropertyData = propertyData
 			.fetch();
-	private static Map<String, Result<Record18<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>>> propertyDataByPageName = resultPropertyData
+	private static Map<String, Result<Record17<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String>>> propertyDataByPageName = resultPropertyData
 			.intoGroups(PROPWRITERVIEW.PAGENAME);
 
 	private static Result<Record2<String, String>> result = dslContext.select(TYPES.CLASS, TYPES.PROPERTYMAP)

@@ -30,9 +30,9 @@ create table PROPERTIES (
 `GUIMAPID` int (10) NOT NULL, 
 `STANDARDCLASS`  VARCHAR (50), -- same as element type from guimap
 `MAPPEDCLASS`  VARCHAR (50) DEFAULT '(No Maping)', 
-`LOCATORVALUE` VARCHAR  (100) NOT NULL, -- Select
+`LOCATORVALUE` VARCHAR  (256) NOT NULL, -- Select
 `LOCATORTYPE` VARCHAR (20) NOT NULL, -- Calculate based on value (xpath or id?)
-`LOCATORS` VARCHAR (256) NOT NULL, -- Calculate based on value (xpath or id?)
+-- `LOCATORS` VARCHAR (256) NOT NULL, -- Calculate based on value (xpath or id?)
 PRIMARY KEY (`PROPERTYID`),
 CONSTRAINT fk_guimap FOREIGN KEY (GUIMAPID)
   REFERENCES GUIMAP(`GUIMAPID`)
@@ -51,7 +51,7 @@ PRIMARY KEY (`CLASSID`)
 );
 
 insert into TYPES (`CLASS`, `TYPE`, `ABRV`,`HASEXTENDEDPROPS`,`PROPERTYMAP`)
-values  ('(No Maping)','STANDARD','null',true, null),
+values  ('Generic','STANDARD','gui',true, null),
 ('Link','STANDARD','lnk',null, null),
 ('Button','STANDARD','btn',null, null),
 ('Checkbox','STANDARD','chk',null, null),
@@ -108,7 +108,7 @@ rename table `v` to `EXTENDEDPROPS`;
 
 CREATE VIEW `automation`.`PROPWRITERVIEW` AS
 SELECT p.PAGENAME, g.GUIMAPID, t.ABRV, g.CONTROLNAME, g.CONTROLDESCRIPTION,
-r.MAPPEDCLASS, r.LOCATORVALUE, r.LOCATORTYPE,r.LOCATORS,c.EXPROP1, c.EXPROP2, c.EXPROP3, c.EXPROP4, c.EXPROP5,
+r.MAPPEDCLASS, r.LOCATORVALUE, r.LOCATORTYPE,c.EXPROP1, c.EXPROP2, c.EXPROP3, c.EXPROP4, c.EXPROP5,
 c.EXPROP6, c.EXPROP7, c.EXPROP8, c.EXPROP9
 FROM
  automation.GUIMAP g INNER JOIN

@@ -86,11 +86,6 @@ public class Properties extends TableImpl<PropertiesRecord> {
     public final TableField<PropertiesRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(20).nullable(false), this, "");
 
     /**
-     * The column <code>automation.PROPERTIES.LOCATORS</code>.
-     */
-    public final TableField<PropertiesRecord, String> LOCATORS = createField("LOCATORS", org.jooq.impl.SQLDataType.VARCHAR(256), this, "");
-
-    /**
      * Create a <code>automation.PROPERTIES</code> table reference
      */
     public Properties() {
