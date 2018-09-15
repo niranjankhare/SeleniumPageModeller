@@ -79,7 +79,7 @@ public class Propwriterview extends TableImpl<PropwriterviewRecord> {
     /**
      * The column <code>automation.PROPWRITERVIEW.LOCATORVALUE</code>.
      */
-    public final TableField<PropwriterviewRecord, String> LOCATORVALUE = createField("LOCATORVALUE", org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "");
+    public final TableField<PropwriterviewRecord, String> LOCATORVALUE = createField("LOCATORVALUE", org.jooq.impl.SQLDataType.VARCHAR(256), this, "");
 
     /**
      * The column <code>automation.PROPWRITERVIEW.LOCATORTYPE</code>.

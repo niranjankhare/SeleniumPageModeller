@@ -74,7 +74,7 @@ public class Propsview extends TableImpl<PropsviewRecord> {
     /**
      * The column <code>automation.PROPSVIEW.LOCATORVALUE</code>.
      */
-    public final TableField<PropsviewRecord, String> LOCATORVALUE = createField("LOCATORVALUE", org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "");
+    public final TableField<PropsviewRecord, String> LOCATORVALUE = createField("LOCATORVALUE", org.jooq.impl.SQLDataType.VARCHAR(256), this, "");
 
     /**
      * The column <code>automation.PROPSVIEW.LOCATORTYPE</code>.
