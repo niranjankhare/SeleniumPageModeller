@@ -22,6 +22,7 @@ import static org.seleniumng.utils.TAFConfig.dbUser;
 import java.sql.Connection;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -68,7 +69,7 @@ public class DbManager {
 	 * @return teh DSL Context for JOOQ query exection
 	 */
 	public static DSLContext getOpenContext() {
-		return DSL.using(conn, SQLDialect.MYSQL);
+		return DSL.using(conn, SQLDialect.MYSQL, new Settings().withRenderSchema(false) );
 	}
 
 }
