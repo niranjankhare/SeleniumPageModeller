@@ -49,25 +49,6 @@ import java.util.LinkedHashMap;
  */
 public class PageObjectCodegen {
 	/**
-	 * The code modeller to generate the source code for Page Modeller
-	 */
-	private static JCodeModel codeModel = new JCodeModel();
-	/**
-	 * The code modeller to generate the metadata resources for Page Modeller
-	 * 
-	 */
-	private static JCodeModel resourceModel = new JCodeModel();
-	
-	private static String myApplication = tafConfig.getString("application");
-	private static String pagePackage = myApplication + ".webPages";
-	private static String userLibrariesPackage = myApplication + ".PageLibraries";
-	
-	private static List<String> languages = tafConfig.getStringList("languages");
-	private static String defaultLanguage = languages.get(0);
-	
-	private static JPackage retResource = resourceModel._package(pagePackage + "." + defaultLanguage);
-	private static JPackage uLibResource = resourceModel._package(userLibrariesPackage + "." + defaultLanguage);
-	/**
 	 * Location under which the classes representing the Page Objects will be
 	 * generated
 	 */
@@ -76,7 +57,30 @@ public class PageObjectCodegen {
 	 * Location under which the Page Objects metadata will be generated
 	 */
 	private static String resourceDirPath = tafConfig.getString("PageModeller.resourceDirPath");
-	
+	/**
+	 * Parent package for the package/classes representing the Page Objects will be
+	 * generated
+	 */
+	private static String targetPackage = tafConfig.getString("PageModeller.targetPackage");
+	/**
+	 * The code modeller to generate the source code for Page Modeller
+	 */
+	private static JCodeModel codeModel = new JCodeModel();
+	/**
+	 * The code modeller to generate the metadata resources for Page Modeller
+	 * 
+	 */
+	private static JCodeModel resourceModel = new JCodeModel();
+
+	private static String myApplication = tafConfig.getString("application");
+	private static String pagePackage = targetPackage + "." + myApplication + ".webPages";
+	private static String userLibrariesPackage = targetPackage + "." + myApplication + ".PageLibraries";
+
+	private static List<String> languages = tafConfig.getStringList("languages");
+	private static String defaultLanguage = languages.get(0);
+
+	private static JPackage retResource = resourceModel._package(pagePackage + "." + defaultLanguage);
+	private static JPackage uLibResource = resourceModel._package(userLibrariesPackage + "." + defaultLanguage);
 	/**
 	 * Controls whether to overwrite existing user defined library templates
 	 */
@@ -90,27 +94,28 @@ public class PageObjectCodegen {
 	 */
 	private static ClassPath classPath = getClassPath();
 	/**
-	 * The superclass for the PageRepository class generated for your
-	 * application under test. This class defines constructors to auto-
-	 * initialize your PageRepository
+	 * The superclass for the PageRepository class generated for your application
+	 * under test. This class defines constructors to auto- initialize your
+	 * PageRepository
 	 */
 	private static JClass objectRepositoryBaseClass = codeModel.directClass("org.seleniumng.utils.SessionManager");
 	/**
 	 * The superclass for the Page Object class heirarchy. This class defines
-	 * constructors to auto-initialize your Page objects using the Pages
-	 * metadata.
+	 * constructors to auto-initialize your Page objects using the Pages metadata.
 	 */
 	private static JClass pageClassBaseClass = codeModel.directClass("org.seleniumng.utils.PageObjectBaseClass");
 
 	/**
-	 *  The package PageModeller references for Page control classes 
+	 * The package PageModeller references for Page control classes
 	 */
 	private static String pageModellerControlsPackage = "org.seleniumng.controls";
-	
-	private static ImmutableSet<ClassInfo> pageModellerControlsSet =classPath.getTopLevelClasses (pageModellerControlsPackage);
-	private static ImmutableSet<ClassInfo> additionalControlsSet =classPath.getTopLevelClasses (additionalControlsPackage);
-	private static ImmutableSet<ClassInfo> userLibrariesPackageSet =classPath.getTopLevelClasses (userLibrariesPackage);
-	
+
+	private static ImmutableSet<ClassInfo> pageModellerControlsSet = classPath
+			.getTopLevelClasses(pageModellerControlsPackage);
+	private static ImmutableSet<ClassInfo> additionalControlsSet = classPath
+			.getTopLevelClasses(additionalControlsPackage);
+	private static ImmutableSet<ClassInfo> userLibrariesPackageSet = classPath.getTopLevelClasses(userLibrariesPackage);
+
 	public static void main(String... args) {
 		DateTime start = DateTime.now();
 		try {
@@ -127,9 +132,8 @@ public class PageObjectCodegen {
 		}
 		DateTime done = DateTime.now();
 		System.out.println("Done in mills: ");
-		System.out.println(done.getMillis()-start.getMillis());
+		System.out.println(done.getMillis() - start.getMillis());
 	}
-
 
 	/**
 	 * Starting point for generating the Page Object Model. Defines the Page
@@ -137,8 +141,9 @@ public class PageObjectCodegen {
 	 * database.
 	 * 
 	 * @throws JClassAlreadyExistsException thrown by codeModel
-	 * @throws IOException thrown by codeModel
-	 * @throws ClassNotFoundException if the controlClass for page fields does not exist
+	 * @throws IOException                  thrown by codeModel
+	 * @throws ClassNotFoundException       if the controlClass for page fields does
+	 *                                      not exist
 	 */
 	public static void generateSource() throws JClassAlreadyExistsException, IOException, ClassNotFoundException {
 		JDefinedClass repositoryToCreate = codeModel._class(userLibrariesPackage + "." + myApplication + "Session");
@@ -148,34 +153,29 @@ public class PageObjectCodegen {
 
 		for (HashMap<String, String> webPages : orderedList) {
 			for (String webPage : webPages.keySet()) {
-				JClass pageClassToCreate = generatePageObject(  webPage,
-						webPages.get(webPage));
+				JClass pageClassToCreate = generatePageObject(webPage, webPages.get(webPage));
 				repositoryToCreate.field(JMod.PUBLIC, pageClassToCreate, "page" + webPage);
 
 			}
 		}
 		codeModel.build(new File(sourceDirPath));
 		resourceModel.build(new File(resourceDirPath));
-		codeModel =  new JCodeModel();
-		resourceModel =  new JCodeModel();
+		codeModel = new JCodeModel();
+		resourceModel = new JCodeModel();
 	}
 
 	/**
-	 * @param webPage
-	 *            Name for the Class representing the Page Object
-	 * @param parent
-	 *            super class for the webPage class
-	 * @return the class to include in the page repository for users this would
-	 *         be where the user is expected to implement his re-usable actions
-	 *         on this page. this could be the JDefinedClass or JClass depending
-	 *         on whether the Library class exists or not and if user has
-	 *         specifically asked for re-writing the class See:
-	 *         reWriteUserDefinedLibs
-	 * @throws IOException, ClassNotFoundException
-	 *             in case of problems with writing the source code
+	 * @param webPage Name for the Class representing the Page Object
+	 * @param parent  super class for the webPage class
+	 * @return the class to include in the page repository for users this would be
+	 *         where the user is expected to implement his re-usable actions on this
+	 *         page. this could be the JDefinedClass or JClass depending on whether
+	 *         the Library class exists or not and if user has specifically asked
+	 *         for re-writing the class See: reWriteUserDefinedLibs
+	 * @throws IOException, ClassNotFoundException in case of problems with writing
+	 *                      the source code
 	 */
-	private static JClass generatePageObject( String webPage, String parent)
-			throws IOException, ClassNotFoundException {
+	private static JClass generatePageObject(String webPage, String parent) throws IOException, ClassNotFoundException {
 
 		JDefinedClass pageClass = null;
 		JDefinedClass parentClass = null;
@@ -213,11 +213,12 @@ public class PageObjectCodegen {
 			e.printStackTrace();
 		}
 		List<Object> fieldProperties = CodegenDatabase.getPageGuiMapData2(webPage);
-		LinkedHashMap<String, LinkedHashMap<String, String>> fields = (LinkedHashMap<String, LinkedHashMap<String, String>>) fieldProperties.get(0);
+		LinkedHashMap<String, LinkedHashMap<String, String>> fields = (LinkedHashMap<String, LinkedHashMap<String, String>>) fieldProperties
+				.get(0);
 		Map<String, ? extends Object> properties = (Map<String, ? extends Object>) fieldProperties.get(1);
 		Config c = ConfigFactory.empty();
 		for (Entry<String, ? extends Object> entry : properties.entrySet()) {
-			Config e = (Config)entry.getValue(); 
+			Config e = (Config) entry.getValue();
 			c = e.atKey(entry.getKey()).withFallback(c);
 		}
 		for (String control : fields.keySet()) {
@@ -225,11 +226,13 @@ public class PageObjectCodegen {
 			String classAbrv = fields.get(control).get("typeAbrv");
 			String customClass = fields.get(control).get("customClass");
 			String controlClass = (customClass == null || customClass.equals("") || customClass.equals("(No Maping)"))
-					? stdClass : customClass;
-			
-			String controlClassPackage = getControlClassPackage (controlClass);
-			if (controlClassPackage==null) throw new ClassNotFoundException("You do not have a class:"+controlClass );
-			JClass jc = codeModel.ref(controlClassPackage+ "." + controlClass);
+					? stdClass
+					: customClass;
+
+			String controlClassPackage = getControlClassPackage(controlClass);
+			if (controlClassPackage == null)
+				throw new ClassNotFoundException("You do not have a class:" + controlClass);
+			JClass jc = codeModel.ref(controlClassPackage + "." + controlClass);
 			pageClass.field(JMod.PUBLIC, jc, classAbrv + control);
 
 		}
@@ -246,33 +249,36 @@ public class PageObjectCodegen {
 
 		return userImplClass;
 	}
-	
-	private static Boolean getClassExists (String clazz, ImmutableSet<ClassInfo> classInfoSet ){
-		
+
+	private static Boolean getClassExists(String clazz, ImmutableSet<ClassInfo> classInfoSet) {
+
 		Boolean exists = false;
-		for (ClassInfo e: classInfoSet){
+		for (ClassInfo e : classInfoSet) {
 			exists = e.getSimpleName().equals(clazz);
-			if (exists)break;
+			if (exists)
+				break;
 		}
 		return exists;
 	}
-	private static String getControlClassPackage (String controlClass){
+
+	private static String getControlClassPackage(String controlClass) {
 		String clsPackage = null;
-		if (getClassExists (controlClass,additionalControlsSet )){
+		if (getClassExists(controlClass, additionalControlsSet)) {
 			clsPackage = additionalControlsPackage;
 			return clsPackage;
 		}
-		if (getClassExists (controlClass,pageModellerControlsSet ))
+		if (getClassExists(controlClass, pageModellerControlsSet))
 			clsPackage = pageModellerControlsPackage;
 		return clsPackage;
 	}
-	private static ClassPath getClassPath(){
+
+	private static ClassPath getClassPath() {
 		ClassPath toReturn = null;
 		try {
 			toReturn = ClassPath.from(Thread.currentThread().getContextClassLoader());
-		} catch (Exception e){
-			
+		} catch (Exception e) {
+
 		}
-		return toReturn; 
+		return toReturn;
 	}
 }
