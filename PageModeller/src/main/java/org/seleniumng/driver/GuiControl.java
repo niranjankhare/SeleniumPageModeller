@@ -193,7 +193,7 @@ public class GuiControl extends RemoteWebElement {
 			byMethod = new ByAll(bys);
 			break;
 		case "ByChild":
-			byMethod = new ByChild(bys);
+			byMethod = new ByChild(bys[0],bys[1]);
 			break;
 		}
 		return byMethod;

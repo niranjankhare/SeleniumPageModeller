@@ -59,7 +59,12 @@ repositories {
 	mavenCentral()
 	jcenter()
 }
-
+if (file ('.gradle/local.gradle').exists()){
+println 'fileexists';
+apply from: '.gradle/local.gradle'
+}else {
+println 'does not exist'
+}
 dependencies {
 	compile group: 'com.typesafe', name: 'config', version: "$typesafeConfigVersion"
 	// https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java

@@ -26,10 +26,13 @@ public class ByChild extends By implements Serializable {
 
 private static final long serialVersionUID = 1563769051170172451L;
 
+private By by;
+private By byChild;
 private By[] bys;
-
-public ByChild(By... bys) {
- this.bys = bys;
+public ByChild(By by, By child) {
+	this.by= by;
+	this.byChild = child;
+	this.bys = new By[]{by,child};
 }
 
 @Override
@@ -46,20 +49,16 @@ public List<WebElement> findElements(SearchContext context) {
    return new ArrayList<>();
  }
 
- List<WebElement> elems = null;
- for (By by : bys) {
-   List<WebElement> newElems = new ArrayList<>();
+ List<WebElement> elems =  new ArrayList<WebElement>();
+ List<WebElement> candidates = by.findElements(context);
 
-   if (elems == null) {
-     newElems.addAll(by.findElements(context));
-   } else {
-     for (WebElement elem : elems) {
-       newElems.addAll(elem.findElements(by));
-     }
-   }
-   elems = newElems;
+ for (WebElement candidate:candidates) {
+	 List<WebElement> children = candidate.findElements(byChild);
+	 if (children.size()>0) {
+		 elems.add(candidate);
+	 }
  }
-
+  
  return elems;
 }
 
