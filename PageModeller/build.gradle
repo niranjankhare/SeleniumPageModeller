@@ -38,7 +38,7 @@ ext {
 	eclipseJettyAggregateVersion = '9.3.6.v20151106'
 	codeModelVersion = '2.3.0'
 	h2databaseVersion = '1.4.196'
-	mysqlDriverVersion = '5.1.6'
+	mysqlDriverVersion = '8.0.12'
 	tomcatJdbcVersion = '8.5.23'
 	jodaTimeVersion = '2.10'
 	googleGsonVersion = '2.8.5'
@@ -48,7 +48,7 @@ buildscript {
 	dependencies {
 		classpath "org.jooq:jooq-codegen:3.10.0"
 		classpath "org.mariadb.jdbc:mariadb-java-client:1.1.7"
-		classpath 'mysql:mysql-connector-java:5.1.6'
+		classpath 'mysql:mysql-connector-java:8.0.12'
 		classpath "com.typesafe:config:1.3.1"
 		classpath files('src/main/resources')
 
@@ -58,12 +58,6 @@ repositories {
 	mavenLocal()
 	mavenCentral()
 	jcenter()
-}
-if (file ('.gradle/local.gradle').exists()){
-println 'fileexists';
-apply from: '.gradle/local.gradle'
-}else {
-println 'does not exist'
 }
 dependencies {
 	compile group: 'com.typesafe', name: 'config', version: "$typesafeConfigVersion"
