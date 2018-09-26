@@ -97,7 +97,7 @@ public class LibHtml {
         return Parser.unescapeEntities(html.toString(), false);
     }
 
-    public static String getPageProvisioningForm(String pageName, String operation) {
+    public static String getPageProvisioningForm(/*String pageName, String operation*/) {
         String targetTable = "PAGES";
 
         targetTable.replaceAll(targetTable, targetTable.toUpperCase());
@@ -215,7 +215,7 @@ public class LibHtml {
 
 
 
-	public static String getPageUpdateGUIForm(String pageName, String operationc) {
+	public static String getPageUpdateGUIForm(String pageName/*, String operxationc*/) {
         String mainPropertiesView = "propsview";
        
         mainPropertiesView.replaceAll(mainPropertiesView, mainPropertiesView.toLowerCase());

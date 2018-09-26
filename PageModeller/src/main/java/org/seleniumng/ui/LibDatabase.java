@@ -101,7 +101,7 @@ public class LibDatabase {
 		return returnList;
 	}
 
-	public static void insertUpdatePages(LinkedHashMap<String, LinkedHashMap<String, String>> postParamMap) {
+	public static String insertUpdatePages(LinkedHashMap<String, LinkedHashMap<String, String>> postParamMap) {
 
 		try {
 			List<Integer> pagesToDelete = new ArrayList<Integer>();
@@ -163,10 +163,10 @@ public class LibDatabase {
 		}
 
 		System.out.println("done");
-
+		return LibHtml.getPageProvisioningForm();
 	}
 
-	public static void updateGuiMap(String pageName,
+	public static String updateGuiMap(String pageName,
 			LinkedHashMap<String, LinkedHashMap<String, String>> cleanParamMap) {
 		try {
 			List<Integer> fieldsToDelete = new ArrayList<Integer>();
@@ -267,11 +267,11 @@ public class LibDatabase {
 			if (!fieldsToDelete.isEmpty())
 				DbManager.getOpenContext().delete(GUIMAP).where(GUIMAP.GUIMAPID.in(fieldsToDelete)).execute();
 			System.out.println("done");
-
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		return LibHtml.getPageUpdateGUIForm(pageName);
 	}
 
 	private static List<String> getTableList() {

@@ -83,20 +83,20 @@ public class HTMLServerMain extends HttpServlet {
                 req.getParameterMap());
         switch (sPath.toLowerCase()) {
             case "/insertpagegui":
-                LibDatabase.insertUpdatePages(postParamMap);
-                responseStr = req.getParameterMap().toString();
+            	responseStr =LibDatabase.insertUpdatePages(postParamMap);
+//                responseStr = req.getParameterMap().toString();
 
                 break;
             case "/updatepagegui":
-                LibDatabase.updateGuiMap(pageName, postParamMap);
-                responseStr = req.getParameterMap().toString();
+            	responseStr = LibDatabase.updateGuiMap(pageName, postParamMap);
+//                responseStr = req.getParameterMap().toString();
 
                 break;
             case "/fetchpage":
                 if (operation.equalsIgnoreCase("new"))
-                	responseStr = LibHtml.getPageProvisioningForm(pageName, operation);
+                	responseStr = LibHtml.getPageProvisioningForm();
                 else 
-                	responseStr = LibHtml.getPageUpdateGUIForm(pageName, operation);
+                	responseStr = LibHtml.getPageUpdateGUIForm(pageName/*, operation*/);
                 break;
             case "/fetchcustomclasses":
                 break;

@@ -64,7 +64,7 @@ public List<WebElement> findElements(SearchContext context) {
 
 @Override
 public String toString() {
- StringBuilder stringBuilder = new StringBuilder("By.chained(");
+ StringBuilder stringBuilder = new StringBuilder("By.child(");
  stringBuilder.append("{");
 
  boolean first = true;
