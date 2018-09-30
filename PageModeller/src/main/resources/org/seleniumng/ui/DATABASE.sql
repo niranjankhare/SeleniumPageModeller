@@ -51,7 +51,8 @@ PRIMARY KEY (`CLASSID`)
 );
 
 insert into TYPES (`CLASS`, `TYPE`, `ABRV`,`HASEXTENDEDPROPS`,`PROPERTYMAP`)
-values  ('Generic','STANDARD','gui',true, null),
+values  ('(No Maping)','STANDARD','null',true, null),
+('Generic','STANDARD','gui',true, null),
 ('Link','STANDARD','lnk',null, null),
 ('Button','STANDARD','btn',null, null),
 ('Checkbox','STANDARD','chk',null, null),
