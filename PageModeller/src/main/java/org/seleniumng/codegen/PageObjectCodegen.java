@@ -241,7 +241,7 @@ public class PageObjectCodegen {
 		JTextFile rsrc = new JTextFile(rsrcFQN);
 		JTextFile uLibRrc = new JTextFile(uLibRsrcFQN);
 		String propertyMap = c.root().render(ConfigRenderOptions.concise().setFormatted(true).setJson(true));
-		System.out.println(propertyMap);
+//		System.out.println(propertyMap);
 		rsrc.setContents(propertyMap);
 		uLibRrc.setContents("");
 		retResource.addResourceFile(rsrc);
