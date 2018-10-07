@@ -124,23 +124,12 @@ public class LibHtml {
         elTableName.attr("id", "tableName");
         elTableName.attr("name", "tableName");
         elTableName.attr("value", targetTable);
-// 		This will become appName ?
-//        Element elPageName = new Element("input");
-//        elPageName.attr("type", "hidden");
-//        elPageName.attr("id", "pageName");
-//        elPageName.attr("name", "pageName");
-//        elPageName.attr("value", pageName);
-
-//        Element elOperation = new Element("input");
-//        elOperation.attr("type", "hidden");
-//        elOperation.attr("id", "oper");
-//        elOperation.attr("name", "oper");
-//        elOperation.attr("value", operation);
 
         Element addMore = new Element("input");
         addMore.attr("type", "button");
         addMore.attr("id", "addRow");
-        addMore.attr("onclick", "add_UpdatePagesRows(null, getTableFields('"+targetTable +"'));");
+/*        addMore.attr("onclick", "add_UpdatePagesRows(null, getTableFields('"+targetTable +"'));");*/
+        addMore.attr("onclick", "add_UpdatePagesRows([] );");
         addMore.attr("value", "Add row");
 
         Element submit = new Element("input");
@@ -159,7 +148,7 @@ public class LibHtml {
         form.appendChild(submit);
         html.body().before(scriptElement);
         html.body().appendChild(form);
-        html.body().attr("onload", "add_PagesHeaderRow()");
+        html.body().attr("onload", "loadTable('PAGES','PAGENAME');");
 
         return Parser.unescapeEntities(html.toString(), false);
 
@@ -216,7 +205,7 @@ public class LibHtml {
 
 
 	public static String getPageUpdateGUIForm(String pageName/*, String operxationc*/) {
-        String mainPropertiesView = "propsview";
+        String mainPropertiesView = "PROPSVIEW";
        
         mainPropertiesView.replaceAll(mainPropertiesView, mainPropertiesView.toLowerCase());
         List<String> mainFieldsList = LibDatabase.getTableFields(mainPropertiesView);
@@ -249,17 +238,10 @@ public class LibHtml {
         elPageName.attr("name", "pageName");
         elPageName.attr("value", pageName);
 
-//        Element elOperation = new Element("input");
-//        elOperation.attr("type", "hidden");
-//        elOperation.attr("id", "oper");
-//        elOperation.attr("name", "oper");
-//        elOperation.attr("value", operation);
-        
         Element addMore = new Element("input");
         addMore.attr("type", "button");
         addMore.attr("id", "addRow");
-/*        addMore.attr("onclick", "add_UpdateRow(null,getTableFields('propsview'));");         */
-        addMore.attr("onclick", "add_UpdateRow(null);");
+        addMore.attr("onclick", "add_UpdateRow([]);");
         addMore.attr("value", "Add row");
 
         Element submit = new Element("input");
@@ -277,7 +259,8 @@ public class LibHtml {
         form.appendChild(submit);
         html.body().before(scriptElement);
         html.body().appendChild(form);
-        html.body().attr("onload", "add_HeaderRow()");
+//        html.body().attr("onload", "add_HeaderRow('PROPSVIEW',)");
+        html.body().attr("onload", "var pageName=document.getElementById('pageName').value;loadTable('PROPSVIEW','CONTROLNAME','STANDARDCLASS',pageName);");
 
         return Parser.unescapeEntities(html.toString(), false);
 

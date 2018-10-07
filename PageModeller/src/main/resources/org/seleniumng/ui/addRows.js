@@ -13,71 +13,40 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-function add_HeaderRow(){
-	var tname = 'propsview';
-	var pageName = document.getElementById('pageName').value;
+
+function loadTable(tname,hideBeforeColumn, selectIndex, pageName){
 	var elTable = document.getElementById(tname);
-	var respFields = Promise.resolve(getTableData(tname, pageName));
+	var respFields = Promise.resolve(getTableData(tname,pageName));
 	Promise.resolve(respFields).then(function (tableData ){
 	var headerRow = document.getElementById('headerRow');
 	var dbColumns = tableData[0];
-	var indexToHide = dbColumns.indexOf('CONTROLNAME');
-	var selectIndex = dbColumns.indexOf('STANDARDCLASS');
+	var indexToHide = dbColumns.indexOf(hideBeforeColumn);
+	
 	for (var i = 0; i < dbColumns.length; i++) {
-		var th = document.createElement('th');
 		if (i< indexToHide){
-			th.setAttribute ('style', 'display:none;');
+			headerRow.appendChild(addHeaderColumn(dbColumns[i], true)); 
 		}
-        headerRow.appendChild(th).innerHTML=dbColumns[i];
+		else {
+			headerRow.appendChild(addHeaderColumn(dbColumns[i], false));
+		}
     }
-	headerRow.appendChild(document.createElement('th')).innerHTML='More properties';
-	add_UpdateRow (tableData);
+	if (tname==='PAGES'){
+		add_UpdatePagesRows (tableData);
+	}	else {
+		headerRow.appendChild(document.createElement('th')).innerHTML='More properties';
+		add_UpdateRow (tableData);
+	}
 	addCheckboxesToHeaderRow(headerRow );
 	});
 }
-function add_PagesHeaderRow (){
-	var tname = 'PAGES';
-	var elTable = document.getElementById(tname);
-	var respFields = Promise.resolve(getTableData(tname));
-	Promise.resolve(respFields).then(function (tableData ){
-	var headerRow = document.getElementById('headerRow');
-	var dbColumns = tableData[0];
-	var indexToHide = dbColumns.indexOf('PAGENAME');
-	var th;
-	for (var i = 0; i < dbColumns.length; i++) {
-		th = document.createElement('th');
-		th.appendChild(document.createTextNode(dbColumns[i]));
-		th.setAttribute ('value', dbColumns[i]);
-		if (i< indexToHide){
-			th.setAttribute ('style', 'display:none;');
-		}
-        headerRow.appendChild(th);
-    }
-	add_UpdatePagesRows (tableData);
-	addCheckboxesToHeaderRow(headerRow );
-/*
- * var thEnable = document.createElement('th'); var thDelete =
- * document.createElement('th'); var chkBoxSelect =
- * document.createElement('input'); chkBoxSelect.setAttribute('type',
- * 'checkbox'); chkBoxSelect.setAttribute ('onclick', 'enableRow(this)'); var
- * chkBoxRow = chkBoxSelect.cloneNode(true); //need this for rows
- * chkBoxSelect.setAttribute ('rowId','headerRow'); chkBoxSelect.setAttribute
- * ('onclick','selectAllClass(this);'); var chkBoxDelete =
- * chkBoxSelect.cloneNode(true); chkBoxSelect.setAttribute
- * ('onclick','selectAllClass(this);document.querySelector("#headerRow
- * .rowDelete").disabled=!this.checked;'); chkBoxSelect.setAttribute('class',
- * 'rowSelect'); chkBoxDelete.setAttribute('class', 'rowDelete');
- * chkBoxSelect.setAttribute ('id',headerRow.id+'.select');
- * chkBoxDelete.setAttribute ('id',headerRow.id+'.delete');
- * chkBoxDelete.disabled=true; thEnable.appendChild(chkBoxSelect);
- * thEnable.appendChild (document.createTextNode('All'));
- * 
- * thDelete.appendChild(chkBoxDelete); thDelete.appendChild
- * (document.createTextNode('Delete')); headerRow.insertBefore(thDelete,
- * headerRow.firstChild); headerRow.insertBefore(thEnable,
- * headerRow.firstChild);
- */
-	});
+
+function addHeaderColumn (hdrTxt, bHide){
+	var th = document.createElement('th');
+	th.appendChild(document.createTextNode(hdrTxt));
+	if (bHide){
+		th.setAttribute ('style', 'display:none;');
+	}
+	return th;
 }
 
 function addCheckboxesToHeaderRow (h){
@@ -214,12 +183,9 @@ function add_UpdatePagesRows (pageData){
 	var indexToHide = dbColumns.indexOf('PAGENAME');
 	var selectIndex = dbColumns.indexOf('PARENTID');
 	
-	var rowIterator;
-	if (pageData != null)
-		rowIterator = pageData.length;
-	else 
-		rowIterator = 2; /* To force it to run once for row addition */
-		for (var k = 1; k < rowIterator; k++) {
+	var rowIterator= pageData.length;
+	var k = 1;
+	do {
 			var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
 				var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
 				var rowIdmain = 'Row'+ (rowCount-1);
@@ -244,15 +210,16 @@ function add_UpdatePagesRows (pageData){
 					inputElement.id = inputElement.name;
 					inputElement.disabled=true;
 					cell.appendChild(inputElement);
-					if (pageData != null)
+					if (pageData.length != 0)
 						inputElement.value = pageData[k][r];
 					else 
 						inputElement.value = '';
 				}
 				addCheckboxesToRow(row,'PAGEID');
-			  if (pageData == null)
+			  if (pageData.length == 0 )
 					break;	
-			}
+			  k++;
+			} while (k< rowIterator);
 		/*
 		 * if (pageData != null) add_selectorsToTable ('#'+tname);
 		 */
@@ -261,8 +228,8 @@ function add_UpdatePagesRows (pageData){
 }
 var propertyMap = null;
 
-function add_UpdateRow(someData){
-	var tname = 'propsview';
+function add_UpdateRow (someData){
+	var tname = 'PROPSVIEW';
 	var pageName = document.getElementById('pageName').value;
 	var elTable = document.getElementById(tname);
 	var headerRow = document.getElementById('headerRow');
@@ -277,75 +244,67 @@ function add_UpdateRow(someData){
 	var tableData = allData[0];
 	var stdClassesData = allData[1];
 	var supportedLocatorTypes = allData[2];
-	/*
-	 * var dbColumns ; if (tableData != null) dbColumns = tableData[0]; else
-	 * dbColumns = allData[3];
-	 */
 	console.log (dbColumns);
 	var indexToHide = dbColumns.indexOf('CONTROLNAME');
 	var selectIndex = dbColumns.indexOf('LOCATORTYPE');
-	var rowIterator;
-	if (tableData != null)
-		rowIterator = tableData.length;
-	else 
-		rowIterator = 2; /* To force it to run once for row addition */
-		for (var k = 1; k < rowIterator; k++) {
-			var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
-				var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
-				var rowIdmain = 'Row'+ (rowCount-1);
-				row.id = rowIdmain;
-				for (var r=0; r<dbColumns.length; r++){
-					var rowId = rowIdmain + '.' + dbColumns[r];
-					var cell = row.insertCell(-1);
-					var inputElement ;
-					if (r < selectIndex){
-						inputElement = document.createElement('input');
-					} else{
-						inputElement = document.createElement('select');
-						if (r == selectIndex){
-							getSelectControlt(supportedLocatorTypes, inputElement, false);
-						}
-						if (r > selectIndex){
-							getSelectControlt(stdClassesData, inputElement, false);
-						}
-					} 
-						
-					if (r< indexToHide){
-						cell.setAttribute ('style', 'display:none;');
-					} 
-					inputElement.setAttribute ('name', rowId);
-					inputElement.id = inputElement.name;
-					
-					cell.appendChild(inputElement);
-					
-					if (tableData != null)
-						inputElement.value = tableData[k][r];
-					
+	var rowIterator=tableData.length;
+	var k = 1;
+	do {
+		var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
+		var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
+		var rowIdmain = 'Row'+ (rowCount-1);
+		row.id = rowIdmain;
+		for (var r=0; r<dbColumns.length; r++){
+			var rowId = rowIdmain + '.' + dbColumns[r];
+			var cell = row.insertCell(-1);
+			var inputElement ;
+			if (r < selectIndex){
+				inputElement = document.createElement('input');
+			} else{
+				inputElement = document.createElement('select');
+				if (r == selectIndex){
+					getSelectControlt(supportedLocatorTypes, inputElement, false);
 				}
+				if (r > selectIndex){
+					getSelectControlt(stdClassesData, inputElement, false);
+				}
+			} 
 				
-				var popupBtn = document.createElement('button'); 
-				popupBtn.type = 'button'; 
-				popupBtn.setAttribute
-					  ('onclick','showMoreProps(this)');
-				popupBtn.id = rowIdmain +
-					  '.popupBtn'; 
-				popupBtn.appendChild(document.createTextNode("Define More\nProperties")); 
-			  popupBtn.style.resize = 'none';
-			  popupBtn.setAttribute ('rowid', rowIdmain); 
-			  var cellButton = row.insertCell(-1); 
-			  cellButton.appendChild(popupBtn); 
-			  var cellPopupDiv = row.insertCell(-1); 
-			  cellPopupDiv.setAttribute ('style', 'visibility:hidden;'); 
-			  var popupDiv = document.createElement('div'); 
-			  popupDiv.id = rowIdmain +'.popupDiv';
-			  popupDiv.setAttribute ('style', 'visibility:hidden;display:block'); 
-			  popupDiv.setAttribute ('rowid', rowIdmain); 
-			  cellPopupDiv.appendChild(popupDiv); 
-			  addCheckboxesToRow(row, 'GUIMAPID');
-			  if (tableData == null)
-					break;	
-			}
-	 
+			if (r< indexToHide){
+				cell.setAttribute ('style', 'display:none;');
+			} 
+			inputElement.setAttribute ('name', rowId);
+			inputElement.id = inputElement.name;
+			inputElement.disabled = true; /*NIRU*/
+			cell.appendChild(inputElement);
+			
+			if (tableData.length != 0)
+				inputElement.value = tableData[k][r];
+			
+		}
+		
+		var popupBtn = document.createElement('button'); 
+		popupBtn.type = 'button'; 
+		popupBtn.setAttribute
+			  ('onclick','showMoreProps(this)');
+		popupBtn.id = rowIdmain +
+			  '.popupBtn'; 
+		popupBtn.appendChild(document.createTextNode("Define More\nProperties")); 
+	  popupBtn.style.resize = 'none';
+	  popupBtn.setAttribute ('rowid', rowIdmain); 
+	  var cellButton = row.insertCell(-1); 
+	  cellButton.appendChild(popupBtn); 
+	  var cellPopupDiv = row.insertCell(-1); 
+	  cellPopupDiv.setAttribute ('style', 'visibility:hidden;'); 
+	  var popupDiv = document.createElement('div'); 
+	  popupDiv.id = rowIdmain +'.popupDiv';
+	  popupDiv.setAttribute ('style', 'visibility:hidden;display:block'); 
+	  popupDiv.setAttribute ('rowid', rowIdmain); 
+	  cellPopupDiv.appendChild(popupDiv); 
+	  addCheckboxesToRow(row, 'GUIMAPID');
+	 k++;
+	} while (k< rowIterator);
+
 		});
 	}
 
@@ -488,8 +447,7 @@ function sleep(ms) {
  * valueCell.innerHTML = cellContent.outerHTML; contentIndex++; } for (var d=0;
  * d<(existingRowCount-contentIndex);d++){ pTable.deleteRow(contentIndex); }
  * console.log ('was: existingRowCount:' + existingRowCount); console.log
- * ('contentIndex:' + contentIndex); console.log ('new:'+ pTable.rows.length);
- *  }
+ * ('contentIndex:' + contentIndex); console.log ('new:'+ pTable.rows.length); }
  */
 function refreshPopup (popup, e){
 	var val = e.value;
