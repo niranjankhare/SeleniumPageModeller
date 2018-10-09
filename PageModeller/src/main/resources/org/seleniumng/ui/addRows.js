@@ -31,7 +31,7 @@ function loadTable(tname,hideBeforeColumn, selectIndex, pageName){
 		}
     }
 	if (tname==='PAGES'){
-		add_UpdatePagesRows (tableData);
+		add_UpdatePagesRows (tableData,hideBeforeColumn,selectIndex);
 	}	else {
 		headerRow.appendChild(document.createElement('th')).innerHTML='More properties';
 		add_UpdateRow (tableData);
@@ -168,7 +168,7 @@ function markForDelete(e){
 	}
 }
 
-function add_UpdatePagesRows (pageData){
+function add_UpdatePagesRowsOLD (pageData){
 	var tname = document.getElementById('tableName').value;
 	var elTable = document.getElementById(tname);
     var headerRow = document.getElementById('headerRow');
@@ -192,7 +192,7 @@ function add_UpdatePagesRows (pageData){
 				row.id = rowIdmain;
 				for (var r=0; r<dbColumns.length; r++){
 					var inputElement ;
-					var inputId = rowIdmain + '.' + dbColumns[r];
+					var rowId = rowIdmain + '.' + dbColumns[r];
 					var cell = row.insertCell(-1);
 					if (r !== selectIndex){
 						inputElement = document.createElement('input');
@@ -205,7 +205,7 @@ function add_UpdatePagesRows (pageData){
 						cell.setAttribute ('style', 'display:none;');
 					} 
 					inputElement.setAttribute('class',dbColumns[r]);
-					inputElement.setAttribute ('name', inputId);
+					inputElement.setAttribute ('name', rowId);
 					inputElement.setAttribute ('rowId', row.id);
 					inputElement.id = inputElement.name;
 					inputElement.disabled=true;
@@ -220,17 +220,73 @@ function add_UpdatePagesRows (pageData){
 					break;	
 			  k++;
 			} while (k< rowIterator);
-		/*
-		 * if (pageData != null) add_selectorsToTable ('#'+tname);
-		 */
+		
 	});
 	
 }
+
+function add_UpdatePagesRows (pageData,hideBeforeColumn, selectColumn){
+	var tname = document.getElementById('tableName').value;
+	var elTable = document.getElementById(tname);
+    var headerRow = document.getElementById('headerRow');
+    var headers = headerRow.getElementsByTagName('th');
+	var dbColumns = [];	
+	for (i = 0; i < headers.length; i++){
+		dbColumns.push(headers[i].textContent);
+	}
+	var parentSelect = getData ('/fetch/libdatabase/availablepages');
+	
+	Promise.resolve(parentSelect).then(function (parentData){
+	var indexToHide = dbColumns.indexOf(hideBeforeColumn);
+	var selectIndex = dbColumns.indexOf(selectColumn);
+	
+	var rowIterator= pageData.length;
+	var k = 1;
+	do {
+			var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
+				var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
+				var rowIdmain = 'Row'+ (rowCount-1);
+				row.id = rowIdmain;
+				for (var r=0; r<dbColumns.length; r++){
+					var inputElement ;
+					var rowId = rowIdmain + '.' + dbColumns[r];
+					var cell = row.insertCell(-1);
+					if (r !== selectIndex){
+						inputElement = document.createElement('input');
+					} else{
+						inputElement = document.createElement('select');
+						getSelectControlt(parentData, inputElement,  true);
+					} 
+						
+					if (r< indexToHide){
+						cell.setAttribute ('style', 'display:none;');
+					} 
+					inputElement.setAttribute('class',dbColumns[r]);
+					inputElement.setAttribute ('name', rowId);
+					inputElement.setAttribute ('rowId', row.id);
+					inputElement.id = inputElement.name;
+					inputElement.disabled=true;
+					cell.appendChild(inputElement);
+					if (pageData.length != 0)
+						inputElement.value = pageData[k][r];
+					else 
+						inputElement.value = '';
+				}
+				addCheckboxesToRow(row,'PAGEID');
+			  if (pageData.length == 0 )
+					break;	
+			  k++;
+			} while (k< rowIterator);
+		
+	});
+	
+}
+
+
 var propertyMap = null;
 
 function add_UpdateRow (someData){
 	var tname = 'PROPSVIEW';
-	var pageName = document.getElementById('pageName').value;
 	var elTable = document.getElementById(tname);
 	var headerRow = document.getElementById('headerRow');
     var headers = headerRow.getElementsByTagName('th');
@@ -275,7 +331,7 @@ function add_UpdateRow (someData){
 			} 
 			inputElement.setAttribute ('name', rowId);
 			inputElement.id = inputElement.name;
-			inputElement.disabled = true; /*NIRU*/
+			inputElement.disabled = true;
 			cell.appendChild(inputElement);
 			
 			if (tableData.length != 0)
@@ -525,7 +581,13 @@ function fillPopup_new(p){
 			 .then(function(respData){
 				var flds = respData[0];
 				var vals = respData[1];
-				var mapClass = vals[flds.indexOf('MAPPEDCLASS')];
+				var mapClass ;
+				if (guimapId === '') {
+					mapClass = '(No Maping)';
+				}
+				else {
+					mapClass= vals[flds.indexOf('MAPPEDCLASS')];	
+				}
 				console.log (resp);
 				sel.value = mapClass;
 				refreshPopup (p,sel);

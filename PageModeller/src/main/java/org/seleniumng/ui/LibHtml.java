@@ -129,7 +129,7 @@ public class LibHtml {
         addMore.attr("type", "button");
         addMore.attr("id", "addRow");
 /*        addMore.attr("onclick", "add_UpdatePagesRows(null, getTableFields('"+targetTable +"'));");*/
-        addMore.attr("onclick", "add_UpdatePagesRows([] );");
+        addMore.attr("onclick", "add_UpdatePagesRows([],'PAGENAME','PARENTID' );");
         addMore.attr("value", "Add row");
 
         Element submit = new Element("input");
@@ -148,7 +148,7 @@ public class LibHtml {
         form.appendChild(submit);
         html.body().before(scriptElement);
         html.body().appendChild(form);
-        html.body().attr("onload", "loadTable('PAGES','PAGENAME');");
+        html.body().attr("onload", "loadTable('PAGES','PAGENAME','PARENTID');");
 
         return Parser.unescapeEntities(html.toString(), false);
 

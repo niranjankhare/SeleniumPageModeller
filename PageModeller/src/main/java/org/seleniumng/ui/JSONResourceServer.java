@@ -105,6 +105,7 @@ public class JSONResourceServer extends HttpServlet {
             break;
         case "/libdatabase/pageguiextendedprops":
         	String guiId = getParameter(req, "guiId");
+        	guiId = (guiId.equalsIgnoreCase(""))? "-1":guiId;
         	Object oMoreProps = LibDatabase.getPageExtendedProperties(Integer.parseInt(guiId));
             responseStr = new Gson().toJson(oMoreProps);
             System.out.println(responseStr);
