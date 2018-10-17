@@ -30,18 +30,17 @@ function loadTable(tname,hideBeforeColumn, selectIndex, pageName){
 			headerRow.appendChild(addHeaderColumn(dbColumns[i], false));
 		}
     }
-	if (tname==='PAGES'){
-		add_UpdatePagesRows (tableData,hideBeforeColumn,selectIndex);
-	}	else {
+	if (tname==='PROPSVIEW'){
 		headerRow.appendChild(document.createElement('th')).innerHTML='More properties';
-		add_UpdateRow (tableData);
-	}
+	}	
+	addTableRows (tableData,hideBeforeColumn,selectIndex); 
 	addCheckboxesToHeaderRow(headerRow );
 	});
 }
 
 function addHeaderColumn (hdrTxt, bHide){
 	var th = document.createElement('th');
+	th.setAttribute('class','header');
 	th.appendChild(document.createTextNode(hdrTxt));
 	if (bHide){
 		th.setAttribute ('style', 'display:none;');
@@ -168,202 +167,120 @@ function markForDelete(e){
 	}
 }
 
-function add_UpdatePagesRowsOLD (pageData){
+function addTableRows (tableData,hideBeforeColumn, selectColumn){
 	var tname = document.getElementById('tableName').value;
 	var elTable = document.getElementById(tname);
     var headerRow = document.getElementById('headerRow');
-    var headers = headerRow.getElementsByTagName('th');
+    var headers = headerRow.getElementsByClassName('header');
 	var dbColumns = [];	
 	for (i = 0; i < headers.length; i++){
 		dbColumns.push(headers[i].textContent);
 	}
-	var parentSelect = getData ('/fetch/libdatabase/availablepages');
-	
-	Promise.resolve(parentSelect).then(function (parentData){
-	var indexToHide = dbColumns.indexOf('PAGENAME');
-	var selectIndex = dbColumns.indexOf('PARENTID');
-	
-	var rowIterator= pageData.length;
-	var k = 1;
-	do {
-			var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
-				var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
-				var rowIdmain = 'Row'+ (rowCount-1);
-				row.id = rowIdmain;
-				for (var r=0; r<dbColumns.length; r++){
-					var inputElement ;
-					var rowId = rowIdmain + '.' + dbColumns[r];
-					var cell = row.insertCell(-1);
-					if (r !== selectIndex){
-						inputElement = document.createElement('input');
-					} else{
-						inputElement = document.createElement('select');
-						getSelectControlt(parentData, inputElement,  true);
-					} 
-						
-					if (r< indexToHide){
-						cell.setAttribute ('style', 'display:none;');
-					} 
-					inputElement.setAttribute('class',dbColumns[r]);
-					inputElement.setAttribute ('name', rowId);
-					inputElement.setAttribute ('rowId', row.id);
-					inputElement.id = inputElement.name;
-					inputElement.disabled=true;
-					cell.appendChild(inputElement);
-					if (pageData.length != 0)
-						inputElement.value = pageData[k][r];
-					else 
-						inputElement.value = '';
-				}
-				addCheckboxesToRow(row,'PAGEID');
-			  if (pageData.length == 0 )
-					break;	
-			  k++;
-			} while (k< rowIterator);
-		
-	});
-	
-}
-
-function add_UpdatePagesRows (pageData,hideBeforeColumn, selectColumn){
-	var tname = document.getElementById('tableName').value;
-	var elTable = document.getElementById(tname);
-    var headerRow = document.getElementById('headerRow');
-    var headers = headerRow.getElementsByTagName('th');
-	var dbColumns = [];	
-	for (i = 0; i < headers.length; i++){
-		dbColumns.push(headers[i].textContent);
+	var promises ;
+	switch (tname){
+	case 'PAGES':
+		var pageData=Promise.resolve(getData ('/fetch/libdatabase/availablepages'));
+		promises =  Promise.all([ pageData]);
+		break;
+	case 'PROPSVIEW':
+		var stdClasses = Promise.resolve(getData('/fetch/libdatabase/getstandardypes'));
+        var locatorTypes = Promise.resolve(getData('/fetch/getlocatorytypes'));
+        promises =  Promise.all([ locatorTypes, stdClasses ]);
+		break;
 	}
-	var parentSelect = getData ('/fetch/libdatabase/availablepages');
-	
-	Promise.resolve(parentSelect).then(function (parentData){
-	var indexToHide = dbColumns.indexOf(hideBeforeColumn);
-	var selectIndex = dbColumns.indexOf(selectColumn);
-	
-	var rowIterator= pageData.length;
-	var k = 1;
-	do {
-			var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
-				var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
-				var rowIdmain = 'Row'+ (rowCount-1);
-				row.id = rowIdmain;
-				for (var r=0; r<dbColumns.length; r++){
-					var inputElement ;
-					var rowId = rowIdmain + '.' + dbColumns[r];
-					var cell = row.insertCell(-1);
-					if (r !== selectIndex){
-						inputElement = document.createElement('input');
-					} else{
-						inputElement = document.createElement('select');
-						getSelectControlt(parentData, inputElement,  true);
-					} 
-						
-					if (r< indexToHide){
-						cell.setAttribute ('style', 'display:none;');
-					} 
-					inputElement.setAttribute('class',dbColumns[r]);
-					inputElement.setAttribute ('name', rowId);
-					inputElement.setAttribute ('rowId', row.id);
-					inputElement.id = inputElement.name;
-					inputElement.disabled=true;
-					cell.appendChild(inputElement);
-					if (pageData.length != 0)
-						inputElement.value = pageData[k][r];
-					else 
-						inputElement.value = '';
-				}
-				addCheckboxesToRow(row,'PAGEID');
-			  if (pageData.length == 0 )
-					break;	
-			  k++;
-			} while (k< rowIterator);
-		
+	promises.then(function (allData){
+		addUpdateTable (tname, elTable,dbColumns,tableData, allData);
 	});
+		
+}
+function addUpdateTable (table, elTable,dbColumns,tableData, allData){
+	var rowIterator= tableData.length;
+	var k = 1;
+	do{
+		var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
+		var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
+		var rowIdMain = 'Row'+ (rowCount-1);
+		row.id = rowIdMain;	
+		var inputElement ;
+		/* var cell = row.insertCell(-1); */
+		switch (table){
+		case 'PAGES':
+			if (tableData.length === 0)
+				addPagesRow (row, dbColumns,['','','',''],allData);
+			else 
+				addPagesRow (row, dbColumns,tableData[k],allData);
+			addCheckboxesToRow(row,'PAGEID'); 
+			break;
+		case 'PROPSVIEW': 
+			if (tableData.length === 0)
+				addPropsViewRow (row, dbColumns,['','','','','','',''],allData);
+			else 
+				addPropsViewRow (row, dbColumns,tableData[k],allData);
+			addCheckboxesToRow(row, 'GUIMAPID');
+			break;
+		}
+		
+		k++;
+	} while (k< rowIterator);
 	
 }
-
+function addInputToRow (cell,rowId,column,data,bHide,selectData){
+	var inputElement ;
+	var cellName = rowId + '.' + column;
+	if (bHide){
+		cell.setAttribute ('style', 'display:none;');
+	}
+	if (selectData == null)
+		inputElement = document.createElement('input');
+	else {
+		inputElement = document.createElement('select');
+		getSelectControlt(selectData, inputElement,  true);
+		
+	}	
+	inputElement.setAttribute('class',column);
+	inputElement.setAttribute ('name', cellName);
+	inputElement.setAttribute ('rowId', rowId);
+	inputElement.id = inputElement.name;
+	inputElement.value = data;
+	inputElement.disabled=true;
+	cell.appendChild(inputElement);
+}
 
 var propertyMap = null;
 
-function add_UpdateRow (someData){
-	var tname = 'PROPSVIEW';
-	var elTable = document.getElementById(tname);
-	var headerRow = document.getElementById('headerRow');
-    var headers = headerRow.getElementsByTagName('th');
-	var dbColumns = [];	
-	for (i = 0; i < headers.length-1; i++){
-		dbColumns.push(headers[i].textContent);
-	}
-	var stdClasses = Promise.resolve(getData('/fetch/libdatabase/getstandardypes'));
-	var locatoryTypes = Promise.resolve(getData('/fetch/getlocatorytypes'));
-	Promise.all([someData, stdClasses,locatoryTypes]).then(function (allData){
-	var tableData = allData[0];
-	var stdClassesData = allData[1];
-	var supportedLocatorTypes = allData[2];
-	console.log (dbColumns);
-	var indexToHide = dbColumns.indexOf('CONTROLNAME');
-	var selectIndex = dbColumns.indexOf('LOCATORTYPE');
-	var rowIterator=tableData.length;
-	var k = 1;
-	do {
-		var row = (elTable.getElementsByTagName('tbody')[0]).insertRow(-1);
-		var rowCount = elTable.getElementsByTagName('tbody')[0].rows.length;
-		var rowIdmain = 'Row'+ (rowCount-1);
-		row.id = rowIdmain;
-		for (var r=0; r<dbColumns.length; r++){
-			var rowId = rowIdmain + '.' + dbColumns[r];
-			var cell = row.insertCell(-1);
-			var inputElement ;
-			if (r < selectIndex){
-				inputElement = document.createElement('input');
-			} else{
-				inputElement = document.createElement('select');
-				if (r == selectIndex){
-					getSelectControlt(supportedLocatorTypes, inputElement, false);
-				}
-				if (r > selectIndex){
-					getSelectControlt(stdClassesData, inputElement, false);
-				}
-			} 
-				
-			if (r< indexToHide){
-				cell.setAttribute ('style', 'display:none;');
-			} 
-			inputElement.setAttribute ('name', rowId);
-			inputElement.id = inputElement.name;
-			inputElement.disabled = true;
-			cell.appendChild(inputElement);
-			
-			if (tableData.length != 0)
-				inputElement.value = tableData[k][r];
-			
-		}
-		
-		var popupBtn = document.createElement('button'); 
-		popupBtn.type = 'button'; 
-		popupBtn.setAttribute
-			  ('onclick','showMoreProps(this)');
-		popupBtn.id = rowIdmain +
-			  '.popupBtn'; 
-		popupBtn.appendChild(document.createTextNode("Define More\nProperties")); 
-	  popupBtn.style.resize = 'none';
-	  popupBtn.setAttribute ('rowid', rowIdmain); 
-	  var cellButton = row.insertCell(-1); 
-	  cellButton.appendChild(popupBtn); 
-	  var cellPopupDiv = row.insertCell(-1); 
-	  cellPopupDiv.setAttribute ('style', 'visibility:hidden;'); 
-	  var popupDiv = document.createElement('div'); 
-	  popupDiv.id = rowIdmain +'.popupDiv';
-	  popupDiv.setAttribute ('style', 'visibility:hidden;display:block'); 
-	  popupDiv.setAttribute ('rowid', rowIdmain); 
-	  cellPopupDiv.appendChild(popupDiv); 
-	  addCheckboxesToRow(row, 'GUIMAPID');
-	 k++;
-	} while (k< rowIterator);
-
-		});
-	}
-
+function addPagesRow (row, columns,data,selections){
+	addInputToRow (row.insertCell(-1),row.id,columns[0],data[0],true);
+	addInputToRow (row.insertCell(-1),row.id,columns[1],data[1],false);
+	addInputToRow (row.insertCell(-1),row.id,columns[2],data[2],false,selections[0]);
+	addInputToRow (row.insertCell(-1),row.id,columns[3],data[3],false);
+}
+function addPropsViewRow (row, columns,data,selections){
+	addInputToRow (row.insertCell(-1),row.id,columns[0],data[0],true);
+	addInputToRow (row.insertCell(-1),row.id,columns[1],data[1],true);
+	addInputToRow (row.insertCell(-1),row.id,columns[2],data[2],false);
+	addInputToRow (row.insertCell(-1),row.id,columns[3],data[3],false);
+	addInputToRow (row.insertCell(-1),row.id,columns[4],data[4],false);
+	addInputToRow (row.insertCell(-1),row.id,columns[5],data[5],false,selections[0]);
+	addInputToRow (row.insertCell(-1),row.id,columns[6],data[6],false,selections[1]);
+	var popupBtn = document.createElement('button'); 
+	popupBtn.type = 'button'; 
+	popupBtn.setAttribute
+		  ('onclick','showMoreProps(this)');
+	popupBtn.id = row.id +
+		  '.popupBtn'; 
+	popupBtn.appendChild(document.createTextNode("Define More\nProperties")); 
+  popupBtn.style.resize = 'none';
+  popupBtn.setAttribute ('rowid', row.id); 
+  var cellButton = row.insertCell(-1); 
+  cellButton.appendChild(popupBtn); 
+  var cellPopupDiv = row.insertCell(-1); 
+  cellPopupDiv.setAttribute ('style', 'visibility:hidden;'); 
+  var popupDiv = document.createElement('div'); 
+  popupDiv.id = row.id +'.popupDiv';
+  popupDiv.setAttribute ('style', 'visibility:hidden;display:block'); 
+  popupDiv.setAttribute ('rowid', row.id); 
+  cellPopupDiv.appendChild(popupDiv); 
+  }
 function getStandardtypes(e){
 	Promise.resolve(getData('/fetch/libdatabase/getstandardypes'))
 	.then(function(resp){

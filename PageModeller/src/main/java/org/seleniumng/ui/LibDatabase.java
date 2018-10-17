@@ -207,10 +207,7 @@ public class LibDatabase {
 							guimapValues.add(fieldMap.get(key));
 						} else if (PROPERTIES.field(key) != null) {
 							propertiesFields.add((TableField<PropertiesRecord, ?>) PROPERTIES.field(key));
-							if (key.equals("MAPPEDCLASS")) {
-								propertiesValues.add((Object) "(No Maping)");
-							} else
-								propertiesValues.add((Object) fieldMap.get(key));
+							propertiesValues.add((Object) fieldMap.get(key));
 						} else if (EXTENDEDPROPS.field(key) != null) {
 							expropertiesFields.add((TableField<ExtendedpropsRecord, ?>) EXTENDEDPROPS.field(key));
 							expropertiesValues.add(fieldMap.get(key));

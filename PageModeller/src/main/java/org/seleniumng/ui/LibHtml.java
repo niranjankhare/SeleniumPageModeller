@@ -128,8 +128,7 @@ public class LibHtml {
         Element addMore = new Element("input");
         addMore.attr("type", "button");
         addMore.attr("id", "addRow");
-/*        addMore.attr("onclick", "add_UpdatePagesRows(null, getTableFields('"+targetTable +"'));");*/
-        addMore.attr("onclick", "add_UpdatePagesRows([],'PAGENAME','PARENTID' );");
+        addMore.attr("onclick", "addTableRows([],'PAGENAME','PARENTID' );");
         addMore.attr("value", "Add row");
 
         Element submit = new Element("input");
@@ -241,9 +240,9 @@ public class LibHtml {
         Element addMore = new Element("input");
         addMore.attr("type", "button");
         addMore.attr("id", "addRow");
-        addMore.attr("onclick", "add_UpdateRow([]);");
+        addMore.attr("onclick", "addTableRows([],'CONTROLNAME','STANDARDCLASS' );");
         addMore.attr("value", "Add row");
-
+        
         Element submit = new Element("input");
         submit.attr("type", "submit");
         submit.attr("id", "submit");
