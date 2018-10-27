@@ -27,7 +27,7 @@ import org.jooq.impl.TableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements Record8<String, Integer, String, String, String, String, String, String> {
 
-    private static final long serialVersionUID = 1612815604;
+    private static final long serialVersionUID = -756481910;
 
     /**
      * Setter for <code>automation.PROPSVIEW.PAGENAME</code>.
@@ -100,30 +100,30 @@ public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements
     }
 
     /**
-     * Setter for <code>automation.PROPSVIEW.LOCATORVALUE</code>.
-     */
-    public void setLocatorvalue(String value) {
-        set(5, value);
-    }
-
-    /**
-     * Getter for <code>automation.PROPSVIEW.LOCATORVALUE</code>.
-     */
-    public String getLocatorvalue() {
-        return (String) get(5);
-    }
-
-    /**
      * Setter for <code>automation.PROPSVIEW.LOCATORTYPE</code>.
      */
     public void setLocatortype(String value) {
-        set(6, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>automation.PROPSVIEW.LOCATORTYPE</code>.
      */
     public String getLocatortype() {
+        return (String) get(5);
+    }
+
+    /**
+     * Setter for <code>automation.PROPSVIEW.LOCATORVALUE</code>.
+     */
+    public void setLocatorvalue(String value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>automation.PROPSVIEW.LOCATORVALUE</code>.
+     */
+    public String getLocatorvalue() {
         return (String) get(6);
     }
 
@@ -206,7 +206,7 @@ public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements
      */
     @Override
     public Field<String> field6() {
-        return Propsview.PROPSVIEW.LOCATORVALUE;
+        return Propsview.PROPSVIEW.LOCATORTYPE;
     }
 
     /**
@@ -214,7 +214,7 @@ public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements
      */
     @Override
     public Field<String> field7() {
-        return Propsview.PROPSVIEW.LOCATORTYPE;
+        return Propsview.PROPSVIEW.LOCATORVALUE;
     }
 
     /**
@@ -270,7 +270,7 @@ public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements
      */
     @Override
     public String component6() {
-        return getLocatorvalue();
+        return getLocatortype();
     }
 
     /**
@@ -278,7 +278,7 @@ public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements
      */
     @Override
     public String component7() {
-        return getLocatortype();
+        return getLocatorvalue();
     }
 
     /**
@@ -334,7 +334,7 @@ public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements
      */
     @Override
     public String value6() {
-        return getLocatorvalue();
+        return getLocatortype();
     }
 
     /**
@@ -342,7 +342,7 @@ public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements
      */
     @Override
     public String value7() {
-        return getLocatortype();
+        return getLocatorvalue();
     }
 
     /**
@@ -403,7 +403,7 @@ public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements
      */
     @Override
     public PropsviewRecord value6(String value) {
-        setLocatorvalue(value);
+        setLocatortype(value);
         return this;
     }
 
@@ -412,7 +412,7 @@ public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements
      */
     @Override
     public PropsviewRecord value7(String value) {
-        setLocatortype(value);
+        setLocatorvalue(value);
         return this;
     }
 
@@ -455,7 +455,7 @@ public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements
     /**
      * Create a detached, initialised PropsviewRecord
      */
-    public PropsviewRecord(String pagename, Integer guimapid, String mappedclass, String controlname, String controldescription, String locatorvalue, String locatortype, String standardclass) {
+    public PropsviewRecord(String pagename, Integer guimapid, String mappedclass, String controlname, String controldescription, String locatortype, String locatorvalue, String standardclass) {
         super(Propsview.PROPSVIEW);
 
         set(0, pagename);
@@ -463,8 +463,8 @@ public class PropsviewRecord extends TableRecordImpl<PropsviewRecord> implements
         set(2, mappedclass);
         set(3, controlname);
         set(4, controldescription);
-        set(5, locatorvalue);
-        set(6, locatortype);
+        set(5, locatortype);
+        set(6, locatorvalue);
         set(7, standardclass);
     }
 }

@@ -28,7 +28,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PropertiesRecord extends UpdatableRecordImpl<PropertiesRecord> implements Record6<Integer, Integer, String, String, String, String> {
 
-    private static final long serialVersionUID = -2105367473;
+    private static final long serialVersionUID = 753683705;
 
     /**
      * Setter for <code>automation.PROPERTIES.PROPERTYID</code>.

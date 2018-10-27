@@ -27,7 +27,7 @@ import org.jooq.impl.TableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PropwriterviewRecord extends TableRecordImpl<PropwriterviewRecord> implements Record17<String, Integer, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String> {
 
-    private static final long serialVersionUID = 1659157181;
+    private static final long serialVersionUID = -1594753849;
 
     /**
      * Setter for <code>automation.PROPWRITERVIEW.PAGENAME</code>.

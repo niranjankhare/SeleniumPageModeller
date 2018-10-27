@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Propsview extends TableImpl<PropsviewRecord> {
 
-    private static final long serialVersionUID = -1830259987;
+    private static final long serialVersionUID = -233783508;
 
     /**
      * The reference instance of <code>automation.PROPSVIEW</code>
@@ -72,14 +72,14 @@ public class Propsview extends TableImpl<PropsviewRecord> {
     public final TableField<PropsviewRecord, String> CONTROLDESCRIPTION = createField("CONTROLDESCRIPTION", org.jooq.impl.SQLDataType.VARCHAR(150), this, "");
 
     /**
-     * The column <code>automation.PROPSVIEW.LOCATORVALUE</code>.
-     */
-    public final TableField<PropsviewRecord, String> LOCATORVALUE = createField("LOCATORVALUE", org.jooq.impl.SQLDataType.VARCHAR(256), this, "");
-
-    /**
      * The column <code>automation.PROPSVIEW.LOCATORTYPE</code>.
      */
     public final TableField<PropsviewRecord, String> LOCATORTYPE = createField("LOCATORTYPE", org.jooq.impl.SQLDataType.VARCHAR(20).nullable(false), this, "");
+
+    /**
+     * The column <code>automation.PROPSVIEW.LOCATORVALUE</code>.
+     */
+    public final TableField<PropsviewRecord, String> LOCATORVALUE = createField("LOCATORVALUE", org.jooq.impl.SQLDataType.VARCHAR(256), this, "");
 
     /**
      * The column <code>automation.PROPSVIEW.STANDARDCLASS</code>.

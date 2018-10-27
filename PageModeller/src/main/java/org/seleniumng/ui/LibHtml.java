@@ -147,7 +147,7 @@ public class LibHtml {
         form.appendChild(submit);
         html.body().before(scriptElement);
         html.body().appendChild(form);
-        html.body().attr("onload", "loadTable('PAGES','PAGENAME','PARENTID');");
+        html.body().attr("onload", "loadTable('PAGES','PAGENAME');");
 
         return Parser.unescapeEntities(html.toString(), false);
 
@@ -259,7 +259,7 @@ public class LibHtml {
         html.body().before(scriptElement);
         html.body().appendChild(form);
 //        html.body().attr("onload", "add_HeaderRow('PROPSVIEW',)");
-        html.body().attr("onload", "var pageName=document.getElementById('pageName').value;loadTable('PROPSVIEW','CONTROLNAME','STANDARDCLASS',pageName);");
+        html.body().attr("onload", "var pageName=document.getElementById('pageName').value;loadTable('PROPSVIEW','CONTROLNAME',pageName);");
 
         return Parser.unescapeEntities(html.toString(), false);
 

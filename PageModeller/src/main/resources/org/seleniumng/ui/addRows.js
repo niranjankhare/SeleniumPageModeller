@@ -14,26 +14,32 @@
  * the License.
  ******************************************************************************/
 
-function loadTable(tname,hideBeforeColumn, selectIndex, pageName){
+function loadTable(tname,hideBeforeColumn, pageName){
 	var elTable = document.getElementById(tname);
 	var respFields = Promise.resolve(getTableData(tname,pageName));
 	Promise.resolve(respFields).then(function (tableData ){
 	var headerRow = document.getElementById('headerRow');
 	var dbColumns = tableData[0];
 	var indexToHide = dbColumns.indexOf(hideBeforeColumn);
-	
-	for (var i = 0; i < dbColumns.length; i++) {
-		if (i< indexToHide){
-			headerRow.appendChild(addHeaderColumn(dbColumns[i], true)); 
-		}
-		else {
-			headerRow.appendChild(addHeaderColumn(dbColumns[i], false));
-		}
-    }
-	if (tname==='PROPSVIEW'){
+	switch (tname){
+	case 'PAGES':
+		headerRow.appendChild(addHeaderColumn(dbColumns[0], true)); 
+		headerRow.appendChild(addHeaderColumn(dbColumns[1], false));
+		headerRow.appendChild(addHeaderColumn(dbColumns[2], false));
+		headerRow.appendChild(addHeaderColumn(dbColumns[3], false));
+		break;
+	case 'PROPSVIEW':
+		headerRow.appendChild(addHeaderColumn(dbColumns[0], true)); 
+		headerRow.appendChild(addHeaderColumn(dbColumns[1], true));
+		headerRow.appendChild(addHeaderColumn(dbColumns[2], false));
+		headerRow.appendChild(addHeaderColumn(dbColumns[3], false));
+		headerRow.appendChild(addHeaderColumn(dbColumns[4], false));
+		headerRow.appendChild(addHeaderColumn(dbColumns[5], false));
+		headerRow.appendChild(addHeaderColumn(dbColumns[6], false));
 		headerRow.appendChild(document.createElement('th')).innerHTML='More properties';
-	}	
-	addTableRows (tableData,hideBeforeColumn,selectIndex); 
+		break;
+	}
+	addTableRows (tableData,hideBeforeColumn); 
 	addCheckboxesToHeaderRow(headerRow );
 	});
 }
@@ -167,7 +173,7 @@ function markForDelete(e){
 	}
 }
 
-function addTableRows (tableData,hideBeforeColumn, selectColumn){
+function addTableRows (tableData,hideBeforeColumn){
 	var tname = document.getElementById('tableName').value;
 	var elTable = document.getElementById(tname);
     var headerRow = document.getElementById('headerRow');
@@ -244,6 +250,8 @@ function addInputToRow (cell,rowId,column,data,bHide,selectData){
 	inputElement.value = data;
 	inputElement.disabled=true;
 	cell.appendChild(inputElement);
+	cell.id = cellName;
+	return cell;
 }
 
 var propertyMap = null;
@@ -259,8 +267,8 @@ function addPropsViewRow (row, columns,data,selections){
 	addInputToRow (row.insertCell(-1),row.id,columns[1],data[1],true);
 	addInputToRow (row.insertCell(-1),row.id,columns[2],data[2],false);
 	addInputToRow (row.insertCell(-1),row.id,columns[3],data[3],false);
-	addInputToRow (row.insertCell(-1),row.id,columns[4],data[4],false);
-	addInputToRow (row.insertCell(-1),row.id,columns[5],data[5],false,selections[0]);
+    addInputToRow (row.insertCell(-1),row.id,columns[4],data[4],false,selections[0]);
+    addInputToRow (row.insertCell(-1),row.id,columns[5],data[5],false);
 	addInputToRow (row.insertCell(-1),row.id,columns[6],data[6],false,selections[1]);
 	var popupBtn = document.createElement('button'); 
 	popupBtn.type = 'button'; 

@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Propwriterview extends TableImpl<PropwriterviewRecord> {
 
-    private static final long serialVersionUID = -1802755782;
+    private static final long serialVersionUID = 467960127;
 
     /**
      * The reference instance of <code>automation.PROPWRITERVIEW</code>
