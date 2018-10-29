@@ -45,4 +45,5 @@ gradle-app.setting
 application.conf
 
 #generated test code, ignore for checkin
-#generated/
+!src/main/java/db/jooq/generated/
+generated/
