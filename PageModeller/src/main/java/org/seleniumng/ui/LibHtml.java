@@ -148,8 +148,7 @@ public class LibHtml {
 		String mainPropertiesView = "PROPSVIEW";
 
 		mainPropertiesView.replaceAll(mainPropertiesView, mainPropertiesView.toLowerCase());
-		List<String> mainFieldsList = LibDatabase.getTableFields(mainPropertiesView);
-
+		
 		Element elTableName = new Element("input");
 		elTableName.attr("type", "hidden");
 		elTableName.attr("id", "tableName");
