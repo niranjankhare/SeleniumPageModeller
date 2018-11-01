@@ -250,7 +250,7 @@ function addInputToRow (cell,rowId,column,data,bHide,selectData){
 	inputElement.value = data;
 	inputElement.disabled=true;
 	cell.appendChild(inputElement);
-	cell.id = cellName;
+	/*cell.id = cellName;*/
 	return cell;
 }
 
