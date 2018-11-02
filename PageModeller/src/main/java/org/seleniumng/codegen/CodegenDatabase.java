@@ -149,7 +149,7 @@ public class CodegenDatabase {
 			}
 			if (exmap != null) {
 				for (String xf : exmap.keySet()) {
-					propertyMap = ConfigFactory.parseString(exmap.get(xf) + r.get(xf)).withFallback(propertyMap);
+					propertyMap = ConfigFactory.parseString(exmap.get(xf)+":" + r.get(xf)).withFallback(propertyMap);
 				}
 			}
 //			propertyMap.put("LOCATORVALUE", r.get(PROPWRITERVIEW.LOCATORVALUE));
